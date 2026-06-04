@@ -20,7 +20,6 @@
       --border-medium: rgba(0,0,0,.18);
       --radius-md: 8px;
       --radius-lg: 12px;
-      /* semantic */
       --green-bg:   #EAF3DE; --green-text:   #27500A;
       --red-bg:     #FCEBEB; --red-text:     #A32D2D;
       --amber-bg:   #FAEEDA; --amber-text:   #633806;
@@ -55,12 +54,71 @@
       min-height: 100vh;
     }
 
-    /* ── Layout shell ─────────────────────────────────────── */
     .shell {
       max-width: 900px;
       margin: 0 auto;
       padding: 1.5rem 1rem 4rem;
     }
+
+    /* ── Firebase status banner ───────────────────────────── */
+    #fb-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      border: 0.5px solid var(--border-light);
+      transition: all .3s;
+    }
+    #fb-status.connecting { background: var(--amber-bg); color: var(--amber-text); }
+    #fb-status.connected  { background: var(--green-bg); color: var(--green-text); }
+    #fb-status.error      { background: var(--red-bg);   color: var(--red-text);   }
+    #fb-status.config     { background: var(--blue-bg);  color: var(--blue-text);  }
+    #fb-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+    /* ── Firebase config modal ────────────────────────────── */
+    #fb-config-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(4px);
+      z-index: 900;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+    }
+    #fb-config-box {
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      width: 100%; max-width: 520px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    #fb-config-box h2 { font-size: 18px; margin-bottom: .5rem; display:flex; align-items:center; gap:8px; }
+    #fb-config-box p  { font-size: 13px; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.6; }
+    #fb-config-box .cfg-field { display:flex; flex-direction:column; gap:4px; margin-bottom: .75rem; }
+    #fb-config-box .cfg-field label { font-size: 12px; color: var(--text-secondary); font-weight:500; }
+    #fb-config-box .cfg-field input {
+      padding: 8px 10px; font-size: 13px;
+      border: 0.5px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary); color: var(--text-primary);
+      outline: none;
+    }
+    #fb-config-box .cfg-field input:focus { border-color: var(--info-text); }
+    #fb-config-box .cfg-actions { display:flex; gap:8px; margin-top: 1rem; }
+    .how-to {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: .75rem 1rem;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+      line-height: 1.7;
+    }
+    .how-to strong { color: var(--text-primary); }
+    .how-to ol { padding-left: 1.2rem; }
 
     /* ── Header ───────────────────────────────────────────── */
     .app-header {
@@ -80,6 +138,7 @@
       color: var(--text-primary);
     }
     .app-title i { font-size: 22px; color: var(--info-text); }
+    .header-right { display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
 
     /* ── Ufficio switcher ─────────────────────────────────── */
     .ufficio-switcher { display: flex; gap: 6px; }
@@ -241,6 +300,7 @@
     .btn-danger { color: var(--red-text); border-color: transparent; background: transparent; }
     .btn-danger:hover { background: var(--red-bg); }
     .btn-export { margin-left: auto; font-size: 12px; }
+    .btn-config { font-size: 12px; padding: 5px 12px; }
 
     /* ── List controls ────────────────────────────────────── */
     .list-controls {
@@ -339,11 +399,72 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    /* ── Spinner ──────────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
+<!-- ── Firebase Config Modal ──────────────────────────────── -->
+<div id="fb-config-overlay">
+  <div id="fb-config-box">
+    <h2><i class="ti ti-database" style="color:var(--info-text)"></i> Configura Firebase</h2>
+    <p>Inserisci le credenziali del tuo progetto Firebase per abilitare la sincronizzazione in tempo reale tra le filiali di Cesena e Forlì.</p>
+    <div class="how-to">
+      <strong>Come ottenere le credenziali:</strong>
+      <ol>
+        <li>Vai su <strong>console.firebase.google.com</strong> e crea un progetto</li>
+        <li>Aggiungi un'app Web (icona &lt;/&gt;)</li>
+        <li>Vai in <strong>Realtime Database → Crea database</strong> (modalità test)</li>
+        <li>Copia i valori da <em>Impostazioni progetto → Le tue app</em></li>
+      </ol>
+    </div>
+    <div class="cfg-field">
+      <label>API Key</label>
+      <input type="text" id="cfg-apiKey" placeholder="AIzaSy..." />
+    </div>
+    <div class="cfg-field">
+      <label>Auth Domain</label>
+      <input type="text" id="cfg-authDomain" placeholder="il-tuo-progetto.firebaseapp.com" />
+    </div>
+    <div class="cfg-field">
+      <label>Database URL</label>
+      <input type="text" id="cfg-databaseURL" placeholder="https://il-tuo-progetto-default-rtdb.europe-west1.firebasedatabase.app" />
+    </div>
+    <div class="cfg-field">
+      <label>Project ID</label>
+      <input type="text" id="cfg-projectId" placeholder="il-tuo-progetto" />
+    </div>
+    <div class="cfg-field">
+      <label>App ID</label>
+      <input type="text" id="cfg-appId" placeholder="1:123456789:web:abc123" />
+    </div>
+    <div class="cfg-actions">
+      <button class="btn btn-primary" onclick="saveFirebaseConfig()"><i class="ti ti-check"></i> Connetti</button>
+      <button class="btn" onclick="closeConfigModal()" id="btn-skip-config" style="display:none"><i class="ti ti-x"></i> Annulla</button>
+    </div>
+  </div>
+</div>
+
 <div class="shell">
+
+  <!-- Firebase status bar -->
+  <div id="fb-status" class="connecting">
+    <span id="fb-dot"></span>
+    <span id="fb-status-text"><span class="spinner"></span> Connessione a Firebase…</span>
+    <button class="btn btn-sm btn-config" onclick="openConfigModal()" style="margin-left:auto" title="Modifica configurazione Firebase">
+      <i class="ti ti-settings"></i>
+    </button>
+  </div>
 
   <!-- Header -->
   <header class="app-header">
@@ -351,10 +472,12 @@
       <i class="ti ti-building-store"></i>
       Gestione Aziende
     </div>
-    <div class="ufficio-switcher">
-      <button class="uff-btn cesena active" onclick="setUfficio('cesena')">Cesena</button>
-      <button class="uff-btn forli"         onclick="setUfficio('forli')">Forlì</button>
-      <button class="uff-btn tutte"         onclick="setUfficio('tutte')">Tutte le filiali</button>
+    <div class="header-right">
+      <div class="ufficio-switcher">
+        <button class="uff-btn cesena active" onclick="setUfficio('cesena')">Cesena</button>
+        <button class="uff-btn forli"         onclick="setUfficio('forli')">Forlì</button>
+        <button class="uff-btn tutte"         onclick="setUfficio('tutte')">Tutte le filiali</button>
+      </div>
     </div>
   </header>
 
@@ -507,51 +630,152 @@
     </div>
   </div>
 
-  <!-- ── TAB: TUTTE (vista combinata) ─────────────────────── -->
-  <!-- Note: "Tutte" tab is handled by tab-all above -->
-
 </div><!-- /shell -->
 
 <div id="toast"></div>
 
+<!-- Firebase SDK (compat v9) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
 /* ═══════════════════════════════════════════════════════════
-   DATA LAYER
+   FIREBASE CONFIG PERSISTENCE (sessionStorage-safe fallback)
    ═══════════════════════════════════════════════════════════ */
 
-const STORAGE_KEY = 'gestione_aziende_v3';
+// In-memory config store (sessionStorage fallback)
+let _fbConfig = null;
+const CONFIG_KEY = 'pfc_firebase_config';
 
-function loadData() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { cesena: [], forli: [] };
-    const parsed = JSON.parse(raw);
-    // migrate old flat array
-    if (Array.isArray(parsed)) return { cesena: parsed, forli: [] };
-    return parsed;
-  } catch(e) { return { cesena: [], forli: [] }; }
+function loadConfig() {
+  try { return JSON.parse(sessionStorage.getItem(CONFIG_KEY)); } catch(e) {}
+  return null;
+}
+function persistConfig(cfg) {
+  try { sessionStorage.setItem(CONFIG_KEY, JSON.stringify(cfg)); } catch(e) {}
+  _fbConfig = cfg;
 }
 
-function saveData() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(DB)); } catch(e) {}
-}
-
-let DB = loadData();
-let currentUfficio = 'cesena'; // 'cesena' | 'forli' | 'tutte'
-
-function getList() {
-  if (currentUfficio === 'tutte') {
-    // merge, tag with ufficio
-    const c = DB.cesena.map(x => ({...x, _ufficio:'cesena'}));
-    const f = DB.forli.map(x  => ({...x, _ufficio:'forli'}));
-    return [...c, ...f];
+/* ═══════════════════════════════════════════════════════════
+   FIREBASE CONFIG MODAL
+   ═══════════════════════════════════════════════════════════ */
+function openConfigModal() {
+  // Pre-fill if config already saved
+  const cfg = _fbConfig || loadConfig();
+  if (cfg) {
+    document.getElementById('cfg-apiKey').value      = cfg.apiKey || '';
+    document.getElementById('cfg-authDomain').value  = cfg.authDomain || '';
+    document.getElementById('cfg-databaseURL').value = cfg.databaseURL || '';
+    document.getElementById('cfg-projectId').value   = cfg.projectId || '';
+    document.getElementById('cfg-appId').value       = cfg.appId || '';
+    document.getElementById('btn-skip-config').style.display = '';
   }
-  return DB[currentUfficio].map(x => ({...x, _ufficio: currentUfficio}));
+  document.getElementById('fb-config-overlay').style.display = 'flex';
+}
+function closeConfigModal() {
+  document.getElementById('fb-config-overlay').style.display = 'none';
 }
 
-function getWriteList() {
-  if (currentUfficio === 'tutte') return DB.cesena; // fallback: write to cesena
-  return DB[currentUfficio];
+function saveFirebaseConfig() {
+  const cfg = {
+    apiKey:      document.getElementById('cfg-apiKey').value.trim(),
+    authDomain:  document.getElementById('cfg-authDomain').value.trim(),
+    databaseURL: document.getElementById('cfg-databaseURL').value.trim(),
+    projectId:   document.getElementById('cfg-projectId').value.trim(),
+    appId:       document.getElementById('cfg-appId').value.trim(),
+  };
+  if (!cfg.apiKey || !cfg.databaseURL || !cfg.projectId) {
+    showToast('Compila almeno API Key, Database URL e Project ID');
+    return;
+  }
+  persistConfig(cfg);
+  closeConfigModal();
+  initFirebase(cfg);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DATA LAYER — in-memory DB (synced via Firebase)
+   ═══════════════════════════════════════════════════════════ */
+let DB = { cesena: [], forli: [] };
+let fbDatabase = null;
+let currentUfficio = 'cesena';
+
+function setStatus(state, msg) {
+  const el = document.getElementById('fb-status');
+  const txt = document.getElementById('fb-status-text');
+  el.className = state;
+  txt.innerHTML = msg;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIREBASE INIT
+   ═══════════════════════════════════════════════════════════ */
+function initFirebase(cfg) {
+  setStatus('connecting', '<span class="spinner"></span> Connessione a Firebase…');
+  try {
+    // Delete existing app if re-initializing
+    if (firebase.apps.length) {
+      firebase.app().delete().catch(()=>{});
+    }
+    firebase.initializeApp(cfg);
+    fbDatabase = firebase.database();
+
+    // Listen to both branches in realtime
+    fbDatabase.ref('aziende').on('value', snapshot => {
+      const data = snapshot.val() || {};
+      DB.cesena = objectToArray(data.cesena);
+      DB.forli  = objectToArray(data.forli);
+      renderCurrentTab();
+      renderStats();
+      setStatus('connected', '<i class="ti ti-circle-check" style="font-size:13px"></i> Sincronizzato con Firebase · dati in tempo reale');
+    }, err => {
+      setStatus('error', '<i class="ti ti-alert-circle" style="font-size:13px"></i> Errore Firebase: ' + err.message);
+    });
+
+    // Connection state
+    fbDatabase.ref('.info/connected').on('value', snap => {
+      if (!snap.val()) {
+        setStatus('error', '<i class="ti ti-wifi-off" style="font-size:13px"></i> Offline — dati non aggiornati');
+      }
+    });
+
+  } catch(e) {
+    setStatus('error', '<i class="ti ti-alert-circle" style="font-size:13px"></i> Errore init Firebase: ' + e.message);
+  }
+}
+
+// Firebase object → array (Firebase stores arrays as objects)
+function objectToArray(obj) {
+  if (!obj) return [];
+  return Object.entries(obj).map(([fbKey, val]) => ({ ...val, _fbKey: fbKey }));
+}
+
+// Write to Firebase
+async function fbWrite(ufficio, items) {
+  if (!fbDatabase) { showToast('Firebase non connesso'); return; }
+  // Convert array to object keyed by item.id
+  const obj = {};
+  items.forEach(item => {
+    const { _fbKey, _ufficio, _realIdx, ...clean } = item;
+    obj[clean.id] = clean;
+  });
+  await fbDatabase.ref(`aziende/${ufficio}`).set(obj);
+}
+
+async function fbAddItem(ufficio, item) {
+  if (!fbDatabase) { showToast('Firebase non connesso'); return; }
+  const { _fbKey, _ufficio, _realIdx, ...clean } = item;
+  await fbDatabase.ref(`aziende/${ufficio}/${clean.id}`).set(clean);
+}
+
+async function fbUpdateItem(ufficio, itemId, updates) {
+  if (!fbDatabase) { showToast('Firebase non connesso'); return; }
+  await fbDatabase.ref(`aziende/${ufficio}/${itemId}`).update(updates);
+}
+
+async function fbDeleteItem(ufficio, itemId) {
+  if (!fbDatabase) { showToast('Firebase non connesso'); return; }
+  await fbDatabase.ref(`aziende/${ufficio}/${itemId}`).remove();
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -561,7 +785,7 @@ function setUfficio(uf) {
   currentUfficio = uf;
   document.querySelectorAll('.uff-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`.uff-btn.${uf}`).classList.add('active');
-  renderAll(); renderAttive(); renderEvase(); renderChiuse(); renderAssunto();
+  renderCurrentTab();
   renderStats();
 }
 
@@ -612,6 +836,19 @@ const STATUS_CLASS = {
   assunto: 's-assunto',
 };
 
+function getList() {
+  if (currentUfficio === 'tutte') {
+    const c = DB.cesena.map(x => ({...x, _ufficio:'cesena'}));
+    const f = DB.forli.map(x  => ({...x, _ufficio:'forli'}));
+    return [...c, ...f];
+  }
+  return DB[currentUfficio].map(x => ({...x, _ufficio: currentUfficio}));
+}
+
+function getTaggedList() {
+  return getList().map((item, i) => ({ ...item, _realIdx: i }));
+}
+
 function fmtDate(d) {
   if (!d) return '—';
   const [y,m,day] = d.split('-');
@@ -629,7 +866,6 @@ function sortItems(arr, sortVal) {
   else if (sortVal === 'alpha')   a.sort((x,y) => x.nome.localeCompare(y.nome));
   return a;
 }
-
 function groupByMonth(arr) {
   const groups = {};
   arr.forEach(item => {
@@ -649,7 +885,6 @@ function renderItem(item, idx) {
     ? `<span class="status-badge" style="background:var(--bg-tertiary);color:var(--text-secondary);margin-left:4px">${item._ufficio === 'cesena' ? 'CE' : 'FC'}</span>`
     : '';
 
-  // note section
   const noteHtml = `
     <span id="noteDisplay-${idx}" class="note-edit-wrap">
       <span style="color:var(--text-secondary);font-size:12px">${item.note ? escHtml(item.note) : '<span style="color:var(--text-tertiary)">—</span>'}</span>
@@ -657,7 +892,7 @@ function renderItem(item, idx) {
     </span>
     <span id="noteEdit-${idx}" class="note-edit-wrap" style="display:none">
       <input class="note-inline-input" id="noteInput-${idx}" value="${escAttr(item.note||'')}" placeholder="Aggiungi nota…" />
-      <button class="btn-note-save"   onclick="saveNote(${idx})"   title="Salva"><i class="ti ti-check"  style="font-size:12px"></i></button>
+      <button class="btn-note-save"   onclick="saveNote(${idx}, '${escAttr(item.id+'')}')"   title="Salva"><i class="ti ti-check"  style="font-size:12px"></i></button>
       <button class="btn-note-cancel" onclick="cancelNote(${idx})" title="Annulla"><i class="ti ti-x" style="font-size:12px"></i></button>
     </span>`;
 
@@ -672,7 +907,7 @@ function renderItem(item, idx) {
     </div>
     <div class="item-actions">
       <span class="status-badge ${STATUS_CLASS[stato]}">${STATUS_LABELS[stato]}</span>
-      <select onchange="changeStatus(${idx}, this.value)" style="font-size:11px;padding:3px 6px;border-radius:6px;border:0.5px solid var(--border-medium);background:var(--bg-primary);color:var(--text-primary)">
+      <select onchange="changeStatus(${idx}, '${escAttr(item.id+'')}', this.value)" style="font-size:11px;padding:3px 6px;border-radius:6px;border:0.5px solid var(--border-medium);background:var(--bg-primary);color:var(--text-primary)">
         <option value="">Cambia…</option>
         <option value="pending">In attesa</option>
         <option value="attiva">Attiva</option>
@@ -680,7 +915,7 @@ function renderItem(item, idx) {
         <option value="chiusa">Chiusa</option>
         <option value="assunto">Ha assunto</option>
       </select>
-      <button class="btn btn-sm btn-danger" onclick="deleteItem(${idx})" title="Elimina"><i class="ti ti-trash"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="deleteItem(${idx}, '${escAttr(item.id+'')}')" title="Elimina"><i class="ti ti-trash"></i></button>
     </div>
   </div>`;
 }
@@ -693,7 +928,7 @@ function renderList(containerId, items, sortVal, byMonth) {
   if (!items.length) { el.innerHTML = '<div class="empty-state">Nessun elemento</div>'; return; }
   const sorted = sortItems(items, sortVal);
   if (!byMonth || sortVal !== 'month') {
-    el.innerHTML = sorted.map((item, i) => renderItem(item, item._realIdx)).join('');
+    el.innerHTML = sorted.map((item) => renderItem(item, item._realIdx)).join('');
   } else {
     const groups = groupByMonth(sorted);
     let html = '';
@@ -703,24 +938,6 @@ function renderList(containerId, items, sortVal, byMonth) {
     });
     el.innerHTML = html;
   }
-}
-
-function tagWithRealIdx(list) {
-  // Add _realIdx pointing to actual index in DB[ufficio]
-  return list.map(item => {
-    if (currentUfficio === 'tutte') {
-      const arr = DB[item._ufficio];
-      const ri = arr.findIndex(x => x === DB[item._ufficio].find(y => y.id === item.id));
-      // use id-based lookup
-      item._realIdx = arr.findIndex(x => x.id === item.id) + (item._ufficio === 'forli' ? 100000 : 0);
-    }
-    return item;
-  });
-}
-
-function getTaggedList() {
-  const raw = getList();
-  return raw.map((item, i) => ({ ...item, _realIdx: i }));
 }
 
 function renderAll() {
@@ -753,13 +970,13 @@ function startEditNote(idx) {
   document.getElementById(`noteEdit-${idx}`).style.display = 'inline-flex';
   document.getElementById(`noteInput-${idx}`).focus();
 }
-function saveNote(idx) {
+async function saveNote(idx, itemId) {
   const val = document.getElementById(`noteInput-${idx}`).value.trim();
   const item = getTaggedList().find(x => x._realIdx === idx);
   if (!item) return;
-  const arr = currentUfficio === 'tutte' ? DB[item._ufficio] : DB[currentUfficio];
-  const realItem = arr.find(x => x.id === item.id);
-  if (realItem) { realItem.note = val; saveData(); renderCurrentTab(); showToast('Nota aggiornata'); }
+  const uf = currentUfficio === 'tutte' ? item._ufficio : currentUfficio;
+  await fbUpdateItem(uf, itemId, { note: val });
+  showToast('Nota aggiornata');
 }
 function cancelNote(idx) {
   document.getElementById(`noteDisplay-${idx}`).style.display = 'inline-flex';
@@ -769,42 +986,37 @@ function cancelNote(idx) {
 /* ═══════════════════════════════════════════════════════════
    ACTIONS
    ═══════════════════════════════════════════════════════════ */
-function addCompany() {
+async function addCompany() {
   const nome = document.getElementById('inputNome').value.trim();
   if (!nome) { showToast('Inserisci il nome azienda'); return; }
   const stato = document.getElementById('inputStato').value;
   const data  = document.getElementById('inputData').value;
   const note  = document.getElementById('inputNote').value.trim();
   const writeUfficio = currentUfficio === 'tutte' ? 'cesena' : currentUfficio;
-  DB[writeUfficio].push({ id: Date.now(), nome, stato, data, note });
-  saveData();
+  const newItem = { id: Date.now(), nome, stato, data, note };
+  await fbAddItem(writeUfficio, newItem);
   document.getElementById('inputNome').value = '';
   document.getElementById('inputStato').value = 'pending';
-  document.getElementById('inputData').value = '';
+  document.getElementById('inputData').value = new Date().toISOString().slice(0,10);
   document.getElementById('inputNote').value = '';
-  renderCurrentTab();
   showToast(`"${nome}" aggiunta (${writeUfficio})`);
 }
 
-function changeStatus(idx, newStato) {
+async function changeStatus(idx, itemId, newStato) {
   if (!newStato) return;
-  const list = getTaggedList();
-  const item = list.find(x => x._realIdx === idx);
+  const item = getTaggedList().find(x => x._realIdx === idx);
   if (!item) return;
-  const arr = currentUfficio === 'tutte' ? DB[item._ufficio] : DB[currentUfficio];
-  const realItem = arr.find(x => x.id === item.id);
-  if (realItem) { realItem.stato = newStato; saveData(); renderCurrentTab(); showToast('Stato aggiornato'); }
+  const uf = currentUfficio === 'tutte' ? item._ufficio : currentUfficio;
+  await fbUpdateItem(uf, itemId, { stato: newStato });
+  showToast('Stato aggiornato');
 }
 
-function deleteItem(idx) {
-  const list = getTaggedList();
-  const item = list.find(x => x._realIdx === idx);
+async function deleteItem(idx, itemId) {
+  const item = getTaggedList().find(x => x._realIdx === idx);
   if (!item) return;
   if (!confirm(`Eliminare "${item.nome}"?`)) return;
   const uf = currentUfficio === 'tutte' ? item._ufficio : currentUfficio;
-  DB[uf] = DB[uf].filter(x => x.id !== item.id);
-  saveData();
-  renderCurrentTab();
+  await fbDeleteItem(uf, itemId);
   showToast('Azienda eliminata');
 }
 
@@ -814,7 +1026,7 @@ function deleteItem(idx) {
 function exportCSV(tabName) {
   let items;
   const all = getTaggedList();
-  if (tabName === 'all')     items = all;
+  if (tabName === 'all')          items = all;
   else if (tabName === 'attive')  items = all.filter(x => x.stato === 'attiva');
   else if (tabName === 'evase')   items = all.filter(x => x.stato === 'evasa');
   else if (tabName === 'chiuse')  items = all.filter(x => x.stato === 'chiusa');
@@ -886,14 +1098,25 @@ function escAttr(s) {
 /* ═══════════════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════════════ */
-// set today as default date
 document.getElementById('inputData').value = new Date().toISOString().slice(0,10);
 renderStats();
 
-// keyboard shortcut: Enter in nome field → add
 document.getElementById('inputNome').addEventListener('keydown', e => {
   if (e.key === 'Enter') addCompany();
 });
+
+// Auto-init if config already saved
+(function() {
+  const cfg = loadConfig();
+  if (cfg && cfg.apiKey && cfg.databaseURL) {
+    _fbConfig = cfg;
+    document.getElementById('fb-config-overlay').style.display = 'none';
+    document.getElementById('btn-skip-config').style.display = '';
+    initFirebase(cfg);
+  } else {
+    setStatus('config', '<i class="ti ti-settings" style="font-size:13px"></i> Firebase non configurato — inserisci le credenziali per sincronizzare');
+  }
+})();
 </script>
 </body>
 </html>
