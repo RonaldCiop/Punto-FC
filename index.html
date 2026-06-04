@@ -4,824 +4,820 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestione Aziende Commerciale</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    /* ── Reset & base ─────────────────────────────────────── */
+    /* ===== RESET & BASE ===== */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg-primary:   #ffffff;
-      --bg-secondary: #f5f5f3;
-      --bg-tertiary:  #ebebea;
-      --text-primary:   #1a1a18;
-      --text-secondary: #6b6b68;
-      --text-tertiary:  #9b9b97;
-      --border-light:  rgba(0,0,0,.10);
-      --border-medium: rgba(0,0,0,.18);
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      /* semantic */
-      --green-bg:   #EAF3DE; --green-text:   #27500A;
-      --red-bg:     #FCEBEB; --red-text:     #A32D2D;
-      --amber-bg:   #FAEEDA; --amber-text:   #633806;
-      --blue-bg:    #E6F1FB; --blue-text:    #185FA5;
-      --info-bg:    #E6F1FB; --info-text:    #185FA5;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-primary:   #1e1e1c;
-        --bg-secondary: #2a2a28;
-        --bg-tertiary:  #333330;
-        --text-primary:   #f0f0ec;
-        --text-secondary: #a0a09c;
-        --text-tertiary:  #6b6b68;
-        --border-light:  rgba(255,255,255,.10);
-        --border-medium: rgba(255,255,255,.18);
-        --green-bg:   #173404; --green-text:   #C0DD97;
-        --red-bg:     #501313; --red-text:     #F7C1C1;
-        --amber-bg:   #412402; --amber-text:   #FAC775;
-        --blue-bg:    #042C53; --blue-text:    #B5D4F4;
-        --info-bg:    #042C53; --info-text:    #B5D4F4;
-      }
-    }
-
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      font-size: 15px;
-      line-height: 1.5;
-      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100dvh;
     }
 
-    /* ── Layout shell ─────────────────────────────────────── */
-    .shell {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 1.5rem 1rem 4rem;
-    }
-
-    /* ── Header ───────────────────────────────────────────── */
+    /* ===== LAYOUT ===== */
     .app-header {
+      background: #1a365d;
+      color: #fff;
+      padding: 14px 20px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .app-title {
+    .app-header h1 { font-size: 1.15rem; font-weight: 600; letter-spacing: 0.3px; }
+    .app-header .subtitle { font-size: 0.78rem; opacity: 0.75; margin-top: 1px; }
+
+    .main-nav {
       display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--text-primary);
+      gap: 0;
+      background: #2d3748;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
-    .app-title i { font-size: 22px; color: var(--info-text); }
-
-    /* ── Ufficio switcher ─────────────────────────────────── */
-    .ufficio-switcher { display: flex; gap: 6px; }
-    .uff-btn {
-      padding: 6px 18px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-medium);
-      background: transparent;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      transition: all .15s;
-    }
-    .uff-btn:hover { background: var(--bg-secondary); }
-    .uff-btn.cesena.active  { background: var(--info-bg);  color: var(--info-text);  border-color: transparent; }
-    .uff-btn.forli.active   { background: var(--green-bg); color: var(--green-text); border-color: transparent; }
-
-    /* ── Stat cards ───────────────────────────────────────── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-      gap: 8px;
-      margin-bottom: 1.5rem;
-    }
-    .stat-card {
-      background: var(--bg-primary);
-      border: 0.5px solid var(--border-light);
-      border-radius: var(--radius-md);
-      padding: .75rem 1rem;
-    }
-    .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-    .stat-val   { font-size: 24px; font-weight: 600; }
-
-    /* ── Nav tabs ─────────────────────────────────────────── */
-    .nav-tabs {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      border-bottom: 0.5px solid var(--border-light);
-      padding-bottom: 8px;
-      margin-bottom: 1rem;
-    }
-    .nav-tab {
-      padding: 5px 14px;
-      border-radius: var(--radius-md);
+    .main-nav::-webkit-scrollbar { display: none; }
+    .nav-btn {
+      flex: 1;
+      min-width: 80px;
+      padding: 11px 8px 9px;
+      background: none;
       border: none;
-      background: transparent;
-      cursor: pointer;
-      font-size: 13px;
+      color: #a0aec0;
+      font-size: 0.72rem;
       font-weight: 500;
-      color: var(--text-secondary);
-      transition: all .15s;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s, color 0.15s;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
     }
-    .nav-tab:hover { background: var(--bg-secondary); color: var(--text-primary); }
-    .nav-tab.active { background: var(--bg-secondary); color: var(--text-primary); }
+    .nav-btn i { font-size: 1.1rem; }
+    .nav-btn:hover { background: rgba(255,255,255,0.07); color: #e2e8f0; }
+    .nav-btn.active { color: #63b3ed; border-bottom-color: #63b3ed; background: rgba(99,179,237,0.08); }
 
-    /* ── Section card ─────────────────────────────────────── */
-    .section {
-      background: var(--bg-primary);
-      border: 0.5px solid var(--border-light);
-      border-radius: var(--radius-lg);
-      padding: 1rem 1.25rem;
-      margin-bottom: 1rem;
+    .main-content { padding: 16px; max-width: 900px; margin: 0 auto; }
+
+    /* ===== TABS / VIEWS ===== */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ===== CARD ===== */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
     }
-    .section-title {
-      font-size: 15px;
+    .card-title {
+      font-size: 0.85rem;
       font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 1rem;
+      color: #4a5568;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
+    .card-title i { color: #63b3ed; }
 
-    /* ── Form ─────────────────────────────────────────────── */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.5fr 1fr 1.5fr auto;
-      gap: 10px;
-      align-items: end;
+    /* ===== FORM ===== */
+    .form-group { margin-bottom: 12px; }
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 4px;
     }
-    @media (max-width: 680px) {
-      .form-grid { grid-template-columns: 1fr 1fr; }
-      .form-grid .btn-add { grid-column: 1 / -1; }
-    }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
-
-    input[type="text"],
-    input[type="date"],
-    select {
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
       width: 100%;
-      padding: 7px 10px;
-      font-size: 13px;
-      border: 0.5px solid var(--border-medium);
-      border-radius: var(--radius-md);
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      padding: 9px 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #1a202c;
+      background: #f7fafc;
+      transition: border-color 0.15s, box-shadow 0.15s;
       outline: none;
-      transition: border-color .15s;
     }
-    input[type="text"]:focus,
-    input[type="date"]:focus,
-    select:focus { border-color: var(--info-text); box-shadow: 0 0 0 3px rgba(24,95,165,.12); }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #63b3ed;
+      box-shadow: 0 0 0 3px rgba(99,179,237,0.18);
+      background: #fff;
+    }
+    .form-group textarea { resize: vertical; min-height: 70px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
 
-    /* ── Buttons ──────────────────────────────────────────── */
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--border-medium);
-      background: transparent;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-primary);
-      white-space: nowrap;
-      transition: all .15s;
-    }
-    .btn:hover { background: var(--bg-secondary); }
-    .btn-primary { background: var(--info-bg); color: var(--info-text); border-color: transparent; }
-    .btn-primary:hover { opacity: .85; background: var(--info-bg); }
-    .btn-sm { padding: 4px 10px; font-size: 12px; }
-    .btn-danger { color: var(--red-text); border-color: transparent; background: transparent; }
-    .btn-danger:hover { background: var(--red-bg); }
-    .btn-export { margin-left: auto; font-size: 12px; }
-
-    /* ── List controls ────────────────────────────────────── */
-    .list-controls {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .list-controls select { width: auto; font-size: 12px; padding: 5px 8px; }
-
-    /* ── Company items ────────────────────────────────────── */
-    .company-list { display: flex; flex-direction: column; gap: 6px; }
-
-    .company-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 9px 12px;
-      background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--border-light);
-      gap: 12px;
-      transition: border-color .15s;
-    }
-    .company-item:hover { border-color: var(--border-medium); }
-
-    .company-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-    .company-name {
-      font-size: 14px;
+      gap: 7px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.875rem;
       font-weight: 600;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
     }
-    .company-meta { font-size: 12px; color: var(--text-secondary); }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: #3182ce; color: #fff; }
+    .btn-primary:hover { background: #2b6cb0; box-shadow: 0 2px 8px rgba(49,130,206,0.3); }
+    .btn-success { background: #38a169; color: #fff; }
+    .btn-success:hover { background: #2f855a; }
+    .btn-danger { background: #e53e3e; color: #fff; }
+    .btn-danger:hover { background: #c53030; }
+    .btn-sm { padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #e2e8f0;
+      color: #4a5568;
+    }
+    .btn-outline:hover { background: #f7fafc; border-color: #cbd5e0; }
+    .btn-csv { background: #276749; color: #fff; }
+    .btn-csv:hover { background: #22543d; }
 
-    .item-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .item-actions select { width: auto; font-size: 11px; padding: 3px 6px; }
+    /* ===== STATS ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 12px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border-top: 3px solid transparent;
+    }
+    .stat-card.attive { border-top-color: #3182ce; }
+    .stat-card.evase { border-top-color: #38a169; }
+    .stat-card.chiuse { border-top-color: #e53e3e; }
+    .stat-card.assunto { border-top-color: #d69e2e; }
+    .stat-card.totale { border-top-color: #805ad5; }
+    .stat-value { font-size: 1.8rem; font-weight: 700; color: #1a202c; line-height: 1; }
+    .stat-label { font-size: 0.7rem; color: #718096; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
 
-    /* ── Status badges ────────────────────────────────────── */
-    .status-badge {
-      font-size: 11px;
+    /* ===== TABLE ===== */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    thead { background: #edf2f7; }
+    th {
+      padding: 9px 10px;
+      text-align: left;
+      font-weight: 600;
+      color: #4a5568;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    td {
+      padding: 9px 10px;
+      border-bottom: 1px solid #f0f4f8;
+      vertical-align: middle;
+    }
+    tr:hover td { background: #f7fafc; }
+    tr:last-child td { border-bottom: none; }
+
+    /* ===== BADGE ===== */
+    .badge {
+      display: inline-block;
       padding: 3px 9px;
       border-radius: 20px;
+      font-size: 0.7rem;
       font-weight: 600;
       white-space: nowrap;
-      letter-spacing: .2px;
     }
-    .s-evasa   { background: var(--green-bg); color: var(--green-text); }
-    .s-chiusa  { background: var(--red-bg);   color: var(--red-text);   }
-    .s-assunto { background: var(--amber-bg); color: var(--amber-text); }
-    .s-pending { background: var(--bg-tertiary); color: var(--text-secondary);
-                 border: 0.5px solid var(--border-light); }
+    .badge-pending { background: #fefcbf; color: #744210; }
+    .badge-active  { background: #bee3f8; color: #1a365d; }
+    .badge-evasa   { background: #c6f6d5; color: #1c4532; }
+    .badge-chiusa  { background: #fed7d7; color: #63171b; }
+    .badge-assunto { background: #faf089; color: #744210; }
 
-    /* ── Ufficio badge ────────────────────────────────────── */
-    .uff-badge {
-      font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 20px;
-      font-weight: 500;
-    }
-    .uff-cesena { background: var(--info-bg);  color: var(--info-text);  }
-    .uff-forli  { background: var(--green-bg); color: var(--green-text); }
-
-    /* ── Month header ─────────────────────────────────────── */
-    .month-header {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      padding: 4px 0;
-      border-bottom: 0.5px solid var(--border-light);
-      margin: 10px 0 4px;
+    /* ===== FILTRI ===== */
+    .filters-bar {
       display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
       align-items: center;
-      gap: 6px;
     }
-    .month-header:first-child { margin-top: 0; }
+    .filters-bar select,
+    .filters-bar input[type="text"] {
+      padding: 7px 10px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      background: #fff;
+      color: #1a202c;
+      outline: none;
+    }
+    .filters-bar select:focus,
+    .filters-bar input:focus { border-color: #63b3ed; }
 
-    /* ── Empty state ──────────────────────────────────────── */
-    .empty {
+    /* ===== SECTION TABS (sub-nav nelle view) ===== */
+    .subtabs {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .subtab-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid #e2e8f0;
+      background: #fff;
+      color: #4a5568;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .subtab-btn:hover { background: #ebf8ff; border-color: #90cdf4; color: #2b6cb0; }
+    .subtab-btn.active { background: #3182ce; border-color: #3182ce; color: #fff; }
+
+    /* ===== NOTE MODAL ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 14px;
+      padding: 22px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .modal-box h3 { font-size: 1rem; margin-bottom: 10px; color: #1a202c; }
+    .modal-box p { font-size: 0.88rem; color: #4a5568; line-height: 1.55; white-space: pre-wrap; }
+    .modal-actions { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; }
+
+    /* ===== EDIT MODAL ===== */
+    #editModal .modal-box { max-width: 480px; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
       text-align: center;
-      padding: 2rem;
-      color: var(--text-tertiary);
-      font-size: 13px;
+      padding: 36px 16px;
+      color: #a0aec0;
     }
-    .empty i { font-size: 32px; display: block; margin-bottom: 8px; }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+    .empty-state p { font-size: 0.88rem; }
 
-    /* ── Toast ────────────────────────────────────────────── */
-    .toast {
+    /* ===== TOAST ===== */
+    #toast {
       position: fixed;
       bottom: 24px;
-      right: 24px;
-      background: var(--text-primary);
-      color: var(--bg-primary);
-      padding: 10px 18px;
-      border-radius: var(--radius-md);
-      font-size: 13px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a202c;
+      color: #fff;
+      padding: 11px 22px;
+      border-radius: 24px;
+      font-size: 0.88rem;
       font-weight: 500;
-      opacity: 0;
-      transform: translateY(8px);
-      transition: all .25s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.22);
       z-index: 9999;
+      transition: transform 0.28s cubic-bezier(0.16,1,0.3,1), opacity 0.28s;
+      opacity: 0;
       pointer-events: none;
     }
-    .toast.show { opacity: 1; transform: translateY(0); }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ===== UTILS ===== */
+    .text-muted { color: #718096; font-size: 0.8rem; }
+    .mt-8 { margin-top: 8px; }
+    .d-flex { display: flex; gap: 6px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
-<div class="shell">
 
-  <!-- Header -->
-  <div class="app-header">
-    <div class="app-title">
-      <i class="ti ti-building-store"></i>
-      Gestione Aziende
-    </div>
-    <div class="ufficio-switcher">
-      <button class="uff-btn cesena active" onclick="switchUfficio('cesena')">Cesena</button>
-      <button class="uff-btn forli"         onclick="switchUfficio('forli')">Forlì</button>
-    </div>
+<!-- HEADER -->
+<header class="app-header">
+  <i class="fa-solid fa-briefcase fa-lg"></i>
+  <div>
+    <div class="app-header h1" style="font-size:1.1rem;font-weight:700;">Gestione Aziende</div>
+    <div class="app-header subtitle">Punto FC · Commerciale</div>
   </div>
+</header>
 
+<!-- NAVIGAZIONE PRINCIPALE (3 TASTI) -->
+<nav class="main-nav" id="mainNav">
+  <button class="nav-btn active" onclick="showView('inserisci',this)" id="navInserisci">
+    <i class="fa-solid fa-plus-circle"></i>
+    <span>Inserisci</span>
+  </button>
+  <button class="nav-btn" onclick="showView('elenco',this)" id="navElenco">
+    <i class="fa-solid fa-list"></i>
+    <span>Elenco</span>
+  </button>
+  <button class="nav-btn" onclick="showView('suddivisione',this)" id="navSuddivisione">
+    <i class="fa-solid fa-chart-bar"></i>
+    <span>Suddivisione</span>
+  </button>
+</nav>
+
+<!-- ========== VIEW: INSERISCI ========== -->
+<main class="main-content">
+<section class="view active" id="view-inserisci">
+  <div class="card">
+    <div class="card-title"><i class="fa-solid fa-building-circle-arrow-right"></i> Nuova azienda &mdash;</div>
+    <div class="form-group">
+      <label for="nomeAzienda">Nome azienda *</label>
+      <input type="text" id="nomeAzienda" placeholder="Es: Rossi Srl" autocomplete="off"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="statoRicerca">Stato ricerca</label>
+        <select id="statoRicerca">
+          <option value="pending">&mdash; in attesa &mdash;</option>
+          <option value="attiva">Attiva</option>
+          <option value="evasa">Evasa</option>
+          <option value="chiusa">Chiusa</option>
+          <option value="assunto">Hanno assunto da soli</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="dataInserimento">Data</label>
+        <input type="date" id="dataInserimento"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="noteAzienda">Note (opzionale)</label>
+      <textarea id="noteAzienda" placeholder="Referente, tel, settore..."></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="aggiungiAzienda()">
+      <i class="fa-solid fa-plus"></i> Aggiungi
+    </button>
+  </div>
+</section>
+
+<!-- ========== VIEW: ELENCO ========== -->
+<section class="view" id="view-elenco">
   <!-- Stats -->
-  <div class="stats-row" id="stats-row"></div>
+  <div class="stats-grid" id="statsGrid"></div>
 
-  <!-- Nav -->
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="switchView('inserisci')"><i class="ti ti-plus"></i> Inserisci</button>
-    <button class="nav-tab"        onclick="switchView('evase')"><i class="ti ti-check"></i> Evase</button>
-    <button class="nav-tab"        onclick="switchView('chiuse')"><i class="ti ti-x"></i> Chiuse</button>
-    <button class="nav-tab"        onclick="switchView('assunto')"><i class="ti ti-user-check"></i> Hanno assunto</button>
-    <button class="nav-tab"        onclick="switchView('tutte')"><i class="ti ti-layout-list"></i> Tutte</button>
-  </div>
-
-  <!-- ════════ VIEW: INSERISCI ════════ -->
-  <div id="view-inserisci">
-    <div class="section">
-      <div class="section-title">
-        <i class="ti ti-circle-plus"></i>
-        Nuova azienda —
-        <span id="ufficio-label" style="font-weight:400;font-size:13px;color:var(--text-secondary)"></span>
-      </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Nome azienda *</label>
-          <input type="text" id="inp-nome" placeholder="es. Mario Rossi Srl" />
-        </div>
-        <div class="form-group">
-          <label>Stato ricerca</label>
-          <select id="inp-stato">
-            <option value="pending">— in attesa —</option>
-            <option value="evasa">Evasa</option>
-            <option value="chiusa">Chiusa</option>
-            <option value="assunto">Hanno assunto da soli</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Data</label>
-          <input type="date" id="inp-data" />
-        </div>
-        <div class="form-group">
-          <label>Note (opzionale)</label>
-          <input type="text" id="inp-note" placeholder="Appunti..." />
-        </div>
-        <div class="form-group btn-add">
-          <label>&nbsp;</label>
-          <button class="btn btn-primary" onclick="addAzienda()">
-            <i class="ti ti-plus"></i> Aggiungi
-          </button>
-        </div>
-      </div>
+  <!-- Filtri -->
+  <div class="card" style="padding:14px;">
+    <div class="filters-bar">
+      <select id="filtroStato" onchange="renderElenco()">
+        <option value="">Tutti gli stati</option>
+        <option value="pending">In attesa</option>
+        <option value="attiva">Attiva</option>
+        <option value="evasa">Evasa</option>
+        <option value="chiusa">Chiusa</option>
+        <option value="assunto">Hanno assunto</option>
+      </select>
+      <select id="filtroOrdine" onchange="renderElenco()">
+        <option value="dataDesc">Data ↓ (recenti prima)</option>
+        <option value="dataAsc">Data ↑ (vecchi prima)</option>
+        <option value="alfa">Alfabetico A→Z</option>
+      </select>
+      <input type="text" id="filtroSearch" placeholder="🔍 cerca azienda..." oninput="renderElenco()" style="flex:1;min-width:120px;"/>
+      <button class="btn btn-csv btn-sm" onclick="esportaCSV('tutto')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
     </div>
-
-    <div class="section">
-      <div class="section-title">
-        <i class="ti ti-list"></i>
-        Elenco &nbsp;<span id="uff-badge-label"></span>
-        <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio, '')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
-      </div>
-      <div class="list-controls">
-        <select id="all-sort"   onchange="renderAll()">
-          <option value="data-desc">Data ↓ (recenti prima)</option>
-          <option value="data-asc">Data ↑ (vecchi prima)</option>
-          <option value="alfa">Alfabetico A→Z</option>
-        </select>
-        <select id="all-filter" onchange="renderAll()">
-          <option value="">Tutti gli stati</option>
-          <option value="pending">In attesa</option>
-          <option value="evasa">Evase</option>
-          <option value="chiusa">Chiuse</option>
-          <option value="assunto">Hanno assunto</option>
-        </select>
-      </div>
-      <div class="company-list" id="list-all"></div>
+    <div class="table-wrap">
+      <table id="tabellaElenco">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Azienda</th>
+            <th>Stato</th>
+            <th>Data</th>
+            <th>Note</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyElenco"></tbody>
+      </table>
+    </div>
+    <div id="emptyElenco" class="empty-state" style="display:none;">
+      <i class="fa-solid fa-inbox"></i>
+      <p>Nessuna azienda trovata.</p>
     </div>
   </div>
+</section>
 
-  <!-- ════════ VIEW: EVASE ════════ -->
-  <div id="view-evase" style="display:none">
-    <div class="section">
-      <div class="section-title" style="color:var(--green-text)">
-        <i class="ti ti-check"></i> Ricerche Evase
-        <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'evasa')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
-      </div>
-      <div class="list-controls">
-        <select id="evase-sort" onchange="renderFiltered('evasa')">
-          <option value="data-desc">Data ↓</option>
-          <option value="data-asc">Data ↑</option>
+<!-- ========== VIEW: SUDDIVISIONE ========== -->
+<section class="view" id="view-suddivisione">
+
+  <!-- ATTIVE -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span><i class="fa-solid fa-circle-check" style="color:#3182ce;"></i> Ricerche Attive</span>
+      <div class="d-flex">
+        <button class="btn btn-csv btn-sm" onclick="esportaCSV('attiva')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
+        <select class="btn btn-sm btn-outline" onchange="renderSub('attiva',this.value)" style="padding:5px 8px;font-size:0.75rem;">
+          <option value="dataDesc">Data ↓</option>
+          <option value="dataAsc">Data ↑</option>
           <option value="alfa">Alfabetico</option>
           <option value="mese">Per mese</option>
         </select>
       </div>
-      <div class="company-list" id="list-evase"></div>
     </div>
+    <div class="table-wrap"><table><thead><tr><th>Azienda</th><th>Data</th><th>Note</th><th></th></tr></thead><tbody id="sub-attiva"></tbody></table></div>
+    <div id="empty-attiva" class="empty-state" style="display:none;"><i class="fa-solid fa-inbox"></i><p>Nessuna ricerca attiva.</p></div>
   </div>
 
-  <!-- ════════ VIEW: CHIUSE ════════ -->
-  <div id="view-chiuse" style="display:none">
-    <div class="section">
-      <div class="section-title" style="color:var(--red-text)">
-        <i class="ti ti-x"></i> Ricerche Chiuse
-        <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'chiusa')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
-      </div>
-      <div class="list-controls">
-        <select id="chiuse-sort" onchange="renderFiltered('chiusa')">
-          <option value="data-desc">Data ↓</option>
-          <option value="data-asc">Data ↑</option>
+  <!-- EVASE -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span><i class="fa-solid fa-check-double" style="color:#38a169;"></i> Ricerche Evase</span>
+      <div class="d-flex">
+        <button class="btn btn-csv btn-sm" onclick="esportaCSV('evasa')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
+        <select class="btn btn-sm btn-outline" onchange="renderSub('evasa',this.value)" style="padding:5px 8px;font-size:0.75rem;">
+          <option value="dataDesc">Data ↓</option>
+          <option value="dataAsc">Data ↑</option>
           <option value="alfa">Alfabetico</option>
           <option value="mese">Per mese</option>
         </select>
       </div>
-      <div class="company-list" id="list-chiuse"></div>
     </div>
+    <div class="table-wrap"><table><thead><tr><th>Azienda</th><th>Data</th><th>Note</th><th></th></tr></thead><tbody id="sub-evasa"></tbody></table></div>
+    <div id="empty-evasa" class="empty-state" style="display:none;"><i class="fa-solid fa-inbox"></i><p>Nessuna ricerca evasa.</p></div>
   </div>
 
-  <!-- ════════ VIEW: HANNO ASSUNTO ════════ -->
-  <div id="view-assunto" style="display:none">
-    <div class="section">
-      <div class="section-title" style="color:var(--amber-text)">
-        <i class="ti ti-user-check"></i> Hanno assunto da soli
-        <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'assunto')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
-      </div>
-      <div class="list-controls">
-        <select id="assunto-sort" onchange="renderFiltered('assunto')">
-          <option value="data-desc">Data ↓</option>
-          <option value="data-asc">Data ↑</option>
+  <!-- CHIUSE -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span><i class="fa-solid fa-circle-xmark" style="color:#e53e3e;"></i> Ricerche Chiuse</span>
+      <div class="d-flex">
+        <button class="btn btn-csv btn-sm" onclick="esportaCSV('chiusa')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
+        <select class="btn btn-sm btn-outline" onchange="renderSub('chiusa',this.value)" style="padding:5px 8px;font-size:0.75rem;">
+          <option value="dataDesc">Data ↓</option>
+          <option value="dataAsc">Data ↑</option>
           <option value="alfa">Alfabetico</option>
           <option value="mese">Per mese</option>
         </select>
       </div>
-      <div class="company-list" id="list-assunto"></div>
     </div>
+    <div class="table-wrap"><table><thead><tr><th>Azienda</th><th>Data</th><th>Note</th><th></th></tr></thead><tbody id="sub-chiusa"></tbody></table></div>
+    <div id="empty-chiusa" class="empty-state" style="display:none;"><i class="fa-solid fa-inbox"></i><p>Nessuna ricerca chiusa.</p></div>
   </div>
 
-  <!-- ════════ VIEW: TUTTE ════════ -->
-  <div id="view-tutte" style="display:none">
-    <div class="section">
-      <div class="section-title">
-        <i class="ti ti-layout-list"></i> Tutte le aziende — entrambi gli uffici
-        <button class="btn btn-sm btn-export" onclick="exportCSV('', '')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
-      </div>
-      <div class="list-controls">
-        <select id="tutte-sort"  onchange="renderTutte()">
-          <option value="data-desc">Data ↓</option>
-          <option value="data-asc">Data ↑</option>
+  <!-- HANNO ASSUNTO -->
+  <div class="card">
+    <div class="card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span><i class="fa-solid fa-user-check" style="color:#d69e2e;"></i> Hanno assunto da soli</span>
+      <div class="d-flex">
+        <button class="btn btn-csv btn-sm" onclick="esportaCSV('assunto')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
+        <select class="btn btn-sm btn-outline" onchange="renderSub('assunto',this.value)" style="padding:5px 8px;font-size:0.75rem;">
+          <option value="dataDesc">Data ↓</option>
+          <option value="dataAsc">Data ↑</option>
           <option value="alfa">Alfabetico</option>
-        </select>
-        <select id="tutte-uff"   onchange="renderTutte()">
-          <option value="">Entrambi gli uffici</option>
-          <option value="cesena">Solo Cesena</option>
-          <option value="forli">Solo Forlì</option>
-        </select>
-        <select id="tutte-stato" onchange="renderTutte()">
-          <option value="">Tutti gli stati</option>
-          <option value="pending">In attesa</option>
-          <option value="evasa">Evase</option>
-          <option value="chiusa">Chiuse</option>
-          <option value="assunto">Hanno assunto</option>
+          <option value="mese">Per mese</option>
         </select>
       </div>
-      <div class="company-list" id="list-tutte"></div>
     </div>
+    <div class="table-wrap"><table><thead><tr><th>Azienda</th><th>Data</th><th>Note</th><th></th></tr></thead><tbody id="sub-assunto"></tbody></table></div>
+    <div id="empty-assunto" class="empty-state" style="display:none;"><i class="fa-solid fa-inbox"></i><p>Nessuna azienda in questa categoria.</p></div>
   </div>
 
+</section>
+</main>
+
+<!-- MODAL NOTE -->
+<div class="modal-overlay" id="noteModal">
+  <div class="modal-box">
+    <h3><i class="fa-solid fa-sticky-note"></i> Note azienda</h3>
+    <p id="noteModalText"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('noteModal')"><i class="fa-solid fa-xmark"></i> Chiudi</button>
+    </div>
+  </div>
 </div>
 
-<!-- Toast notification -->
-<div class="toast" id="toast"></div>
+<!-- MODAL EDIT -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box" id="editModalBox">
+    <h3><i class="fa-solid fa-pen"></i> Modifica azienda</h3>
+    <input type="hidden" id="editId"/>
+    <div class="form-group">
+      <label>Nome azienda *</label>
+      <input type="text" id="editNome"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Stato</label>
+        <select id="editStato">
+          <option value="pending">In attesa</option>
+          <option value="attiva">Attiva</option>
+          <option value="evasa">Evasa</option>
+          <option value="chiusa">Chiusa</option>
+          <option value="assunto">Hanno assunto da soli</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="editData"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Note</label>
+      <textarea id="editNote"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('editModal')"><i class="fa-solid fa-xmark"></i> Annulla</button>
+      <button class="btn btn-primary btn-sm" onclick="salvaModifica()"><i class="fa-solid fa-floppy-disk"></i> Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
 
 <script>
-/* ── Data layer ──────────────────────────────────────────── */
-const STORAGE_KEY = 'gestione_aziende_v2';
+// ===== STORAGE =====
+const STORAGE_KEY = 'puntofc_aziende_v2';
 
 function loadData() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch(e) { return []; }
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
 }
-function saveData(d) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
-  catch(e) { showToast('Errore salvataggio dati!'); }
+function saveData(arr) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
 }
 
-let data = loadData();
-let nextId = data.length ? Math.max(...data.map(d => d.id)) + 1 : 1;
-let currentUfficio = 'cesena';
-let currentView    = 'inserisci';
+let aziende = loadData();
 
-/* ── Toast ───────────────────────────────────────────────── */
+// ===== DATE DEFAULT =====
+document.getElementById('dataInserimento').valueAsDate = new Date();
+
+// ===== NAVIGATION =====
+function showView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'elenco') renderElenco();
+  if (name === 'suddivisione') renderSuddivisione();
+}
+
+// ===== ADD =====
+function aggiungiAzienda() {
+  const nome = document.getElementById('nomeAzienda').value.trim();
+  if (!nome) { showToast('⚠️ Inserisci il nome azienda!'); return; }
+  const stato = document.getElementById('statoRicerca').value;
+  const data  = document.getElementById('dataInserimento').value || today();
+  const note  = document.getElementById('noteAzienda').value.trim();
+
+  aziende.push({ id: Date.now(), nome, stato, data, note });
+  saveData(aziende);
+
+  document.getElementById('nomeAzienda').value = '';
+  document.getElementById('statoRicerca').value = 'pending';
+  document.getElementById('noteAzienda').value = '';
+  document.getElementById('dataInserimento').valueAsDate = new Date();
+
+  showToast('✅ Azienda aggiunta!');
+}
+
+// ===== STATS =====
+function renderStats() {
+  const counts = { attiva:0, evasa:0, chiusa:0, assunto:0, tot: aziende.length };
+  aziende.forEach(a => { if (counts[a.stato] !== undefined) counts[a.stato]++; });
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card attive"><div class="stat-value">${counts.attiva}</div><div class="stat-label">Attive</div></div>
+    <div class="stat-card evase"><div class="stat-value">${counts.evasa}</div><div class="stat-label">Evase</div></div>
+    <div class="stat-card chiuse"><div class="stat-value">${counts.chiusa}</div><div class="stat-label">Chiuse</div></div>
+    <div class="stat-card assunto"><div class="stat-value">${counts.assunto}</div><div class="stat-label">Hanno assunto</div></div>
+    <div class="stat-card totale"><div class="stat-value">${counts.tot}</div><div class="stat-label">Totale</div></div>`;
+}
+
+// ===== ELENCO =====
+function renderElenco() {
+  renderStats();
+  const filtroStato = document.getElementById('filtroStato').value;
+  const ordine      = document.getElementById('filtroOrdine').value;
+  const search      = document.getElementById('filtroSearch').value.toLowerCase();
+
+  let list = aziende.filter(a => {
+    if (filtroStato && a.stato !== filtroStato) return false;
+    if (search && !a.nome.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  list = sortList(list, ordine);
+
+  const tbody = document.getElementById('tbodyElenco');
+  const empty = document.getElementById('emptyElenco');
+
+  if (!list.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = list.map((a,i) => `
+    <tr>
+      <td class="text-muted">${i+1}</td>
+      <td><strong>${esc(a.nome)}</strong></td>
+      <td>${badgeHtml(a.stato)}</td>
+      <td class="text-muted">${fmtData(a.data)}</td>
+      <td>${a.note ? `<button class="btn btn-outline btn-sm" onclick="apriNote(${a.id})"><i class="fa-solid fa-note-sticky"></i></button>` : '<span class="text-muted">—</span>'}</td>
+      <td>
+        <div class="d-flex">
+          <button class="btn btn-outline btn-sm" onclick="apriEdit(${a.id})"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="eliminaAzienda(${a.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+// ===== SUDDIVISIONE =====
+function renderSuddivisione() {
+  ['attiva','evasa','chiusa','assunto'].forEach(s => renderSub(s, 'dataDesc'));
+}
+
+function renderSub(stato, ordine) {
+  let list = aziende.filter(a => a.stato === stato);
+  list = sortList(list, ordine);
+
+  const tbody = document.getElementById('sub-' + stato);
+  const empty = document.getElementById('empty-' + stato);
+
+  if (!list.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  if (ordine === 'mese') {
+    const gruppi = {};
+    list.forEach(a => {
+      const k = a.data ? a.data.substring(0,7) : '?';
+      if (!gruppi[k]) gruppi[k] = [];
+      gruppi[k].push(a);
+    });
+    tbody.innerHTML = Object.keys(gruppi).sort((a,b)=>b.localeCompare(a)).map(mese => `
+      <tr><td colspan="4" style="background:#f7fafc;font-size:0.75rem;font-weight:700;color:#4a5568;padding:6px 10px;letter-spacing:0.5px;">${fmtMese(mese)}</td></tr>
+      ${gruppi[mese].map(a => rowSub(a)).join('')}`).join('');
+  } else {
+    tbody.innerHTML = list.map(rowSub).join('');
+  }
+}
+
+function rowSub(a) {
+  return `<tr>
+    <td><strong>${esc(a.nome)}</strong></td>
+    <td class="text-muted">${fmtData(a.data)}</td>
+    <td>${a.note ? `<button class="btn btn-outline btn-sm" onclick="apriNote(${a.id})"><i class="fa-solid fa-note-sticky"></i></button>` : '<span class="text-muted">—</span>'}</td>
+    <td>
+      <div class="d-flex">
+        <button class="btn btn-outline btn-sm" onclick="apriEdit(${a.id})"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="eliminaAzienda(${a.id})"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+// ===== EDIT =====
+function apriEdit(id) {
+  const a = aziende.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('editId').value   = id;
+  document.getElementById('editNome').value  = a.nome;
+  document.getElementById('editStato').value = a.stato;
+  document.getElementById('editData').value  = a.data;
+  document.getElementById('editNote').value  = a.note || '';
+  openModal('editModal');
+}
+
+function salvaModifica() {
+  const id    = parseInt(document.getElementById('editId').value);
+  const nome  = document.getElementById('editNome').value.trim();
+  if (!nome) { showToast('⚠️ Nome obbligatorio!'); return; }
+  const stato = document.getElementById('editStato').value;
+  const data  = document.getElementById('editData').value;
+  const note  = document.getElementById('editNote').value.trim();
+
+  const idx = aziende.findIndex(a => a.id === id);
+  if (idx === -1) return;
+  aziende[idx] = { id, nome, stato, data, note };
+  saveData(aziende);
+  closeModal('editModal');
+  renderElenco();
+  showToast('✅ Modificato!');
+}
+
+// ===== DELETE =====
+function eliminaAzienda(id) {
+  if (!confirm('Eliminare questa azienda?')) return;
+  aziende = aziende.filter(a => a.id !== id);
+  saveData(aziende);
+  renderElenco();
+  showToast('🗑️ Eliminato!');
+}
+
+// ===== NOTE =====
+function apriNote(id) {
+  const a = aziende.find(x => x.id === id);
+  if (!a || !a.note) return;
+  document.getElementById('noteModalText').textContent = a.note;
+  openModal('noteModal');
+}
+
+// ===== MODAL =====
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ===== CSV =====
+function esportaCSV(filtro) {
+  let list = filtro === 'tutto' ? aziende : aziende.filter(a => a.stato === filtro);
+  if (!list.length) { showToast('Nessun dato da esportare'); return; }
+  const header = 'Nome,Stato,Data,Note';
+  const rows   = list.map(a => `"${a.nome}","${labelStato(a.stato)}","${a.data}","${(a.note||'').replace(/"/g,'""')}"`);
+  const csv    = [header, ...rows].join('\n');
+  const blob   = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
+  const url    = URL.createObjectURL(blob);
+  const link   = document.createElement('a');
+  link.href    = url;
+  link.download = `aziende_${filtro}_${today()}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 CSV esportato!');
+}
+
+// ===== UTILS =====
+function sortList(list, ordine) {
+  return [...list].sort((a,b) => {
+    if (ordine === 'dataDesc') return (b.data||'').localeCompare(a.data||'');
+    if (ordine === 'dataAsc')  return (a.data||'').localeCompare(b.data||'');
+    if (ordine === 'alfa')     return a.nome.localeCompare(b.nome, 'it');
+    return 0;
+  });
+}
+
+function badgeHtml(stato) {
+  const map = {
+    pending: ['badge-pending','In attesa'],
+    attiva:  ['badge-active', 'Attiva'],
+    evasa:   ['badge-evasa',  'Evasa'],
+    chiusa:  ['badge-chiusa', 'Chiusa'],
+    assunto: ['badge-assunto','Hanno assunto'],
+  };
+  const [cls, label] = map[stato] || ['badge-pending', stato];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function labelStato(stato) {
+  return { pending:'In attesa', attiva:'Attiva', evasa:'Evasa', chiusa:'Chiusa', assunto:'Hanno assunto' }[stato] || stato;
+}
+
+function fmtData(d) {
+  if (!d) return '—';
+  const [y,m,dd] = d.split('-');
+  return `${dd}/${m}/${y}`;
+}
+
+function fmtMese(m) {
+  if (!m || m === '?') return 'Data sconosciuta';
+  const [y, mo] = m.split('-');
+  const nomi = ['','Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  return `${nomi[parseInt(mo)]} ${y}`;
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function esc(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
 }
 
-/* ── Ufficio switch ──────────────────────────────────────── */
-function switchUfficio(u) {
-  currentUfficio = u;
-  document.querySelectorAll('.uff-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.uff-btn.' + u).classList.add('active');
-  updateLabels();
-  renderStats();
-  renderCurrentView();
-}
-
-function updateLabels() {
-  const label = currentUfficio === 'cesena' ? 'Ufficio Cesena' : 'Ufficio Forlì';
-  document.getElementById('ufficio-label').textContent = label;
-  document.getElementById('uff-badge-label').innerHTML =
-    `<span class="uff-badge uff-${currentUfficio}">${label}</span>`;
-}
-
-/* ── View switch ─────────────────────────────────────────── */
-const VIEWS = ['inserisci', 'evase', 'chiuse', 'assunto', 'tutte'];
-
-function switchView(v) {
-  currentView = v;
-  VIEWS.forEach(x => {
-    document.getElementById('view-' + x).style.display = x === v ? 'block' : 'none';
-  });
-  document.querySelectorAll('.nav-tab').forEach((b, i) => {
-    b.classList.toggle('active', VIEWS[i] === v);
-  });
-  renderCurrentView();
-}
-
-function renderCurrentView() {
-  if (currentView === 'inserisci') renderAll();
-  else if (currentView === 'evase')   renderFiltered('evasa');
-  else if (currentView === 'chiuse')  renderFiltered('chiusa');
-  else if (currentView === 'assunto') renderFiltered('assunto');
-  else if (currentView === 'tutte')   renderTutte();
-}
-
-/* ── Add / Edit / Delete ─────────────────────────────────── */
-function addAzienda() {
-  const nome = document.getElementById('inp-nome').value.trim();
-  if (!nome) { showToast('⚠ Inserisci il nome dell\'azienda'); return; }
-
-  const stato  = document.getElementById('inp-stato').value;
-  const dataV  = document.getElementById('inp-data').value;
-  const note   = document.getElementById('inp-note').value.trim();
-
-  data.push({ id: nextId++, nome, ufficio: currentUfficio, stato, data: dataV, note });
-  saveData(data);
-
-  document.getElementById('inp-nome').value  = '';
-  document.getElementById('inp-stato').value = 'pending';
-  document.getElementById('inp-note').value  = '';
-
-  renderStats();
-  renderAll();
-  showToast('✓ Azienda aggiunta');
-}
-
-function deleteAzienda(id) {
-  if (!confirm('Eliminare questa azienda?')) return;
-  data = data.filter(d => d.id !== id);
-  saveData(data);
-  renderStats();
-  renderCurrentView();
-  showToast('Azienda eliminata');
-}
-
-function changeStato(id, newStato) {
-  if (!newStato) return;
-  const item = data.find(d => d.id === id);
-  if (!item) return;
-  item.stato = newStato;
-  if (!item.data && newStato !== 'pending')
-    item.data = new Date().toISOString().slice(0, 10);
-  saveData(data);
-  renderStats();
-  renderCurrentView();
-  showToast('✓ Stato aggiornato');
-}
-
-/* ── Sorting helpers ─────────────────────────────────────── */
-const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
-              'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-
-function formatDate(d) {
-  if (!d) return '—';
-  const [y, m, g] = d.split('-');
-  return `${g}/${m}/${y}`;
-}
-
-function getMeseAnno(d) {
-  if (!d) return 'Senza data';
-  const [y, m] = d.split('-');
-  return `${MESI[parseInt(m) - 1]} ${y}`;
-}
-
-function sortItems(items, sortVal) {
-  const copy = [...items];
-  if      (sortVal === 'data-desc') copy.sort((a, b) => (b.data || '').localeCompare(a.data || ''));
-  else if (sortVal === 'data-asc')  copy.sort((a, b) => (a.data || '').localeCompare(b.data || ''));
-  else if (sortVal === 'alfa')      copy.sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
-  return copy;
-}
-
-/* ── Render helpers ──────────────────────────────────────── */
-const STATO_MAP = {
-  evasa:   { label: 'Evasa',            cls: 's-evasa'   },
-  chiusa:  { label: 'Chiusa',           cls: 's-chiusa'  },
-  assunto: { label: 'Hanno assunto',    cls: 's-assunto' },
-  pending: { label: 'In attesa',        cls: 's-pending' },
-};
-
-function renderCompanyItem(item, showUfficio = false) {
-  const s = STATO_MAP[item.stato] || STATO_MAP.pending;
-  const uffLabel = item.ufficio === 'cesena' ? 'Cesena' : 'Forlì';
-  const uffBadge = showUfficio
-    ? `<span class="uff-badge uff-${item.ufficio}" style="margin-left:4px">${uffLabel}</span>`
-    : '';
-  return `
-    <div class="company-item">
-      <div class="company-info">
-        <span class="company-name">${escHtml(item.nome)}</span>
-        <span class="company-meta">
-          <i class="ti ti-calendar" style="font-size:12px;vertical-align:-1px"></i>
-          ${formatDate(item.data)}
-          ${item.note ? ' · ' + escHtml(item.note) : ''}
-          ${uffBadge}
-        </span>
-      </div>
-      <div class="item-actions">
-        <span class="status-badge ${s.cls}">${s.label}</span>
-        <select onchange="changeStato(${item.id}, this.value)" title="Cambia stato">
-          <option value="" disabled selected>Modifica stato</option>
-          <option value="pending">In attesa</option>
-          <option value="evasa">Evasa</option>
-          <option value="chiusa">Chiusa</option>
-          <option value="assunto">Hanno assunto</option>
-        </select>
-        <button class="btn btn-danger btn-sm" onclick="deleteAzienda(${item.id})" title="Elimina">
-          <i class="ti ti-trash"></i>
-        </button>
-      </div>
-    </div>`;
-}
-
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
-}
-
-function emptyState(msg = 'Nessuna azienda trovata') {
-  return `<div class="empty"><i class="ti ti-inbox"></i>${msg}</div>`;
-}
-
-/* ── Render: elenco principale ───────────────────────────── */
-function renderAll() {
-  const sortVal   = document.getElementById('all-sort').value;
-  const filterVal = document.getElementById('all-filter').value;
-  let items = data.filter(d => d.ufficio === currentUfficio);
-  if (filterVal) items = items.filter(d => d.stato === filterVal);
-  items = sortItems(items, sortVal);
-
-  const el = document.getElementById('list-all');
-  el.innerHTML = items.length
-    ? items.map(i => renderCompanyItem(i)).join('')
-    : emptyState('Nessuna azienda inserita per questo ufficio');
-}
-
-/* ── Render: elenchi filtrati per stato ──────────────────── */
-const FILTER_CONFIG = {
-  evasa:   { sortId: 'evase-sort',   listId: 'list-evase'   },
-  chiusa:  { sortId: 'chiuse-sort',  listId: 'list-chiuse'  },
-  assunto: { sortId: 'assunto-sort', listId: 'list-assunto' },
-};
-
-function renderFiltered(stato) {
-  const { sortId, listId } = FILTER_CONFIG[stato];
-  const sortVal = document.getElementById(sortId).value;
-  let items = data.filter(d => d.ufficio === currentUfficio && d.stato === stato);
-  const el  = document.getElementById(listId);
-
-  if (!items.length) { el.innerHTML = emptyState('Nessuna azienda in questo elenco'); return; }
-
-  if (sortVal === 'mese') {
-    const sorted  = sortItems(items, 'data-desc');
-    const grouped = {};
-    sorted.forEach(i => {
-      const m = getMeseAnno(i.data);
-      if (!grouped[m]) grouped[m] = [];
-      grouped[m].push(i);
-    });
-    el.innerHTML = Object.entries(grouped).map(([mese, list]) =>
-      `<div class="month-header"><i class="ti ti-calendar"></i> ${mese}</div>` +
-      list.map(i => renderCompanyItem(i)).join('')
-    ).join('');
-  } else {
-    el.innerHTML = sortItems(items, sortVal).map(i => renderCompanyItem(i)).join('');
-  }
-}
-
-/* ── Render: vista "tutte" ───────────────────────────────── */
-function renderTutte() {
-  const sortVal  = document.getElementById('tutte-sort').value;
-  const uffFilter = document.getElementById('tutte-uff').value;
-  const statoFilter = document.getElementById('tutte-stato').value;
-  let items = [...data];
-  if (uffFilter)    items = items.filter(d => d.ufficio === uffFilter);
-  if (statoFilter)  items = items.filter(d => d.stato   === statoFilter);
-  items = sortItems(items, sortVal);
-
-  const el = document.getElementById('list-tutte');
-  el.innerHTML = items.length
-    ? items.map(i => renderCompanyItem(i, true)).join('')
-    : emptyState();
-}
-
-/* ── Render: stats ───────────────────────────────────────── */
-function renderStats() {
-  const mine    = data.filter(d => d.ufficio === currentUfficio);
-  const evase   = mine.filter(d => d.stato === 'evasa').length;
-  const chiuse  = mine.filter(d => d.stato === 'chiusa').length;
-  const assunto = mine.filter(d => d.stato === 'assunto').length;
-  const pending = mine.filter(d => d.stato === 'pending').length;
-
-  document.getElementById('stats-row').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-label">Totale aziende</div>
-      <div class="stat-val">${mine.length}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" style="color:var(--green-text)">Evase</div>
-      <div class="stat-val"  style="color:var(--green-text)">${evase}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" style="color:var(--red-text)">Chiuse</div>
-      <div class="stat-val"  style="color:var(--red-text)">${chiuse}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" style="color:var(--amber-text)">Hanno assunto</div>
-      <div class="stat-val"  style="color:var(--amber-text)">${assunto}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">In attesa</div>
-      <div class="stat-val">${pending}</div>
-    </div>`;
-}
-
-/* ── CSV export ──────────────────────────────────────────── */
-function exportCSV(ufficio, stato) {
-  let items = [...data];
-  if (ufficio) items = items.filter(d => d.ufficio === ufficio);
-  if (stato)   items = items.filter(d => d.stato   === stato);
-
-  const header = ['Nome', 'Ufficio', 'Stato', 'Data', 'Note'];
-  const rows = items.map(i => [
-    i.nome,
-    i.ufficio === 'cesena' ? 'Cesena' : 'Forlì',
-    STATO_MAP[i.stato]?.label || i.stato,
-    i.data || '',
-    i.note || '',
-  ]);
-
-  const csv = [header, ...rows]
-    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
-    .join('\n');
-
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  const uffLabel = ufficio ? (ufficio === 'cesena' ? 'Cesena' : 'Forli') : 'TuttiUffici';
-  const stLabel  = stato  ? ('_' + stato) : '';
-  a.download = `aziende_${uffLabel}${stLabel}_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('✓ CSV esportato');
-}
-
-/* ── Init ────────────────────────────────────────────────── */
-document.getElementById('inp-data').value = new Date().toISOString().slice(0, 10);
-updateLabels();
+// ===== INIT =====
 renderStats();
-renderAll();
 </script>
 </body>
 </html>
