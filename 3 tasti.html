@@ -294,110 +294,96 @@
     .s-evasa   { background: var(--green-bg); color: var(--green-text); }
     .s-chiusa  { background: var(--red-bg);   color: var(--red-text);   }
     .s-assunto { background: var(--amber-bg); color: var(--amber-text); }
-    .s-pending { background: var(--bg-tertiary); color: var(--text-secondary);
-                 border: 0.5px solid var(--border-light); }
-    .s-attiva  { background: var(--blue-bg);  color: var(--blue-text);
-                 border: 0.5px solid rgba(24,95,165,.25); }
+    .s-pending { background: var(--bg-tertiary); color: var(--text-secondary); }
+    .s-attiva  { background: var(--blue-bg);  color: var(--blue-text);  }
 
-    /* ── Ufficio badge ────────────────────────────────────── */
-    .uff-badge {
+    /* ── Month group headers ──────────────────────────────── */
+    .month-group-header {
       font-size: 11px;
-      padding: 2px 7px;
-      border-radius: 20px;
-      font-weight: 500;
-    }
-    .uff-cesena { background: var(--info-bg);  color: var(--info-text);  }
-    .uff-forli  { background: var(--green-bg); color: var(--green-text); }
-
-    /* ── Month header ─────────────────────────────────────── */
-    .month-header {
-      font-size: 12px;
       font-weight: 600;
-      color: var(--text-secondary);
-      padding: 4px 0;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      padding: 8px 0 4px;
       border-bottom: 0.5px solid var(--border-light);
-      margin: 10px 0 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      margin-bottom: 4px;
     }
-    .month-header:first-child { margin-top: 0; }
 
     /* ── Empty state ──────────────────────────────────────── */
-    .empty {
+    .empty-state {
       text-align: center;
-      padding: 2rem;
+      padding: 2rem 1rem;
       color: var(--text-tertiary);
       font-size: 13px;
     }
-    .empty i { font-size: 32px; display: block; margin-bottom: 8px; }
 
     /* ── Toast ────────────────────────────────────────────── */
-    .toast {
+    #toast {
       position: fixed;
       bottom: 24px;
-      right: 24px;
-      background: var(--text-primary);
-      color: var(--bg-primary);
-      padding: 10px 18px;
-      border-radius: var(--radius-md);
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a1a18;
+      color: #f0f0ec;
+      padding: 10px 20px;
+      border-radius: 20px;
       font-size: 13px;
       font-weight: 500;
       opacity: 0;
-      transform: translateY(8px);
-      transition: all .25s;
-      z-index: 9999;
+      transition: all .3s;
       pointer-events: none;
+      z-index: 1000;
+      white-space: nowrap;
     }
-    .toast.show { opacity: 1; transform: translateY(0); }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 <body>
+
 <div class="shell">
 
   <!-- Header -->
-  <div class="app-header">
+  <header class="app-header">
     <div class="app-title">
       <i class="ti ti-building-store"></i>
       Gestione Aziende
     </div>
     <div class="ufficio-switcher">
-      <button class="uff-btn cesena active" onclick="switchUfficio('cesena')">Cesena</button>
-      <button class="uff-btn forli"         onclick="switchUfficio('forli')">Forlì</button>
-      <button class="uff-btn tutte"         onclick="switchUfficio('tutte')"><i class="ti ti-building-community" style="font-size:13px;vertical-align:-1px"></i> Tutte le filiali</button>
+      <button class="uff-btn cesena active" onclick="setUfficio('cesena')">Cesena</button>
+      <button class="uff-btn forli"         onclick="setUfficio('forli')">Forlì</button>
+      <button class="uff-btn tutte"         onclick="setUfficio('tutte')">Tutte le filiali</button>
     </div>
-  </div>
+  </header>
 
-  <!-- Stats -->
-  <div class="stats-row" id="stats-row"></div>
+  <!-- Stat cards -->
+  <div class="stats-row" id="statsRow"></div>
 
-  <!-- Nav -->
+  <!-- Tabs -->
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="switchView('inserisci')"><i class="ti ti-plus"></i> Inserisci</button>
-    <button class="nav-tab"        onclick="switchView('attive')"><i class="ti ti-bolt"></i> Attive</button>
-    <button class="nav-tab"        onclick="switchView('evase')"><i class="ti ti-check"></i> Evase</button>
-    <button class="nav-tab"        onclick="switchView('chiuse')"><i class="ti ti-x"></i> Chiuse</button>
-    <button class="nav-tab"        onclick="switchView('assunto')"><i class="ti ti-user-check"></i> Hanno assunto</button>
-    <button class="nav-tab"        onclick="switchView('tutte')"><i class="ti ti-layout-list"></i> Tutte</button>
+    <button class="nav-tab active" data-tab="insert"  onclick="switchTab('insert')">Inserisci</button>
+    <button class="nav-tab"        data-tab="attive"  onclick="switchTab('attive')">Attive</button>
+    <button class="nav-tab"        data-tab="evase"   onclick="switchTab('evase')">Evase</button>
+    <button class="nav-tab"        data-tab="chiuse"  onclick="switchTab('chiuse')">Chiuse</button>
+    <button class="nav-tab"        data-tab="assunto" onclick="switchTab('assunto')">Hanno assunto</button>
+    <button class="nav-tab"        data-tab="all"     onclick="switchTab('all')">Tutte</button>
   </div>
 
-  <!-- ════════ VIEW: INSERISCI ════════ -->
-  <div id="view-inserisci">
+  <!-- ── TAB: INSERT ──────────────────────────────────────── -->
+  <div id="tab-insert">
     <div class="section">
-      <div class="section-title">
-        <i class="ti ti-circle-plus"></i>
-        Nuova azienda —
-        <span id="ufficio-label" style="font-weight:400;font-size:13px;color:var(--text-secondary)"></span>
-      </div>
+      <div class="section-title"><i class="ti ti-plus"></i> Nuova azienda &mdash;</div>
       <div class="form-grid">
         <div class="form-group">
           <label>Nome azienda *</label>
-          <input type="text" id="inp-nome" placeholder="es. Mario Rossi Srl" />
+          <input type="text" id="inputNome" placeholder="Es. Rossi Srl" />
         </div>
         <div class="form-group">
           <label>Stato ricerca</label>
-          <select id="inp-stato">
-            <option value="pending">— in attesa —</option>
+          <select id="inputStato">
+            <option value="pending">&mdash; in attesa &mdash;</option>
             <option value="attiva">Attiva</option>
             <option value="evasa">Evasa</option>
             <option value="chiusa">Chiusa</option>
@@ -406,36 +392,33 @@
         </div>
         <div class="form-group">
           <label>Data</label>
-          <input type="date" id="inp-data" />
+          <input type="date" id="inputData" />
         </div>
         <div class="form-group">
           <label>Note (opzionale)</label>
-          <input type="text" id="inp-note" placeholder="Appunti..." />
+          <input type="text" id="inputNote" placeholder="Es. richiedono elettricisti" />
         </div>
-        <div class="form-group btn-add">
-          <label>&nbsp;</label>
-          <button class="btn btn-primary" onclick="addAzienda()">
-            <i class="ti ti-plus"></i> Aggiungi
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">
-        <i class="ti ti-list"></i>
-        Elenco &nbsp;<span id="uff-badge-label"></span>
-        <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio, '')">
-          <i class="ti ti-download"></i> Esporta CSV
+        <button class="btn btn-primary btn-add" onclick="addCompany()">
+          <i class="ti ti-check"></i> Aggiungi
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: ELENCO (all) ─────────────────────────────────── -->
+  <div id="tab-all" style="display:none">
+    <div class="section">
+      <div class="section-title" style="justify-content:space-between">
+        <span><i class="ti ti-list"></i> Elenco</span>
+        <button class="btn btn-sm btn-export" onclick="exportCSV('all')"><i class="ti ti-download"></i> Esporta CSV</button>
+      </div>
       <div class="list-controls">
-        <select id="all-sort"   onchange="renderAll()">
-          <option value="data-desc">Data ↓ (recenti prima)</option>
-          <option value="data-asc">Data ↑ (vecchi prima)</option>
-          <option value="alfa">Alfabetico A→Z</option>
+        <select id="sortAll" onchange="renderAll()">
+          <option value="dateDesc">Data ↓ (recenti prima)</option>
+          <option value="dateAsc">Data ↑ (vecchi prima)</option>
+          <option value="alpha">Alfabetico A→Z</option>
         </select>
-        <select id="all-filter" onchange="renderAll()">
+        <select id="filterAll" onchange="renderAll()">
           <option value="">Tutti gli stati</option>
           <option value="pending">In attesa</option>
           <option value="attiva">Attiva</option>
@@ -444,540 +427,473 @@
           <option value="assunto">Hanno assunto</option>
         </select>
       </div>
-      <div class="company-list" id="list-all"></div>
+      <div class="company-list" id="listAll"></div>
     </div>
   </div>
 
-  <!-- ════════ VIEW: ATTIVE ════════ -->
-  <div id="view-attive" style="display:none">
+  <!-- ── TAB: ATTIVE ───────────────────────────────────────── -->
+  <div id="tab-attive" style="display:none">
     <div class="section">
-      <div class="section-title" style="color:var(--blue-text)">
-        <i class="ti ti-bolt"></i> Ricerche Attive
-        <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'attiva')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
+      <div class="section-title" style="justify-content:space-between">
+        <span><i class="ti ti-loader"></i> Ricerche Attive</span>
+        <button class="btn btn-sm btn-export" onclick="exportCSV('attive')"><i class="ti ti-download"></i> Esporta CSV</button>
       </div>
       <div class="list-controls">
-        <select id="attive-sort" onchange="renderFiltered('attiva')">
-          <option value="data-desc">Data ↓</option>
-          <option value="data-asc">Data ↑</option>
-          <option value="alfa">Alfabetico</option>
-          <option value="mese">Per mese</option>
+        <select id="sortAttive" onchange="renderAttive()">
+          <option value="dateDesc">Data ↓</option>
+          <option value="dateAsc">Data ↑</option>
+          <option value="alpha">Alfabetico</option>
+          <option value="month">Per mese</option>
         </select>
       </div>
-      <div class="company-list" id="list-attive"></div>
+      <div class="company-list" id="listAttive"></div>
     </div>
   </div>
 
-  <!-- ════════ VIEW: EVASE ════════ -->
-  <div id="view-evase" style="display:none">
+  <!-- ── TAB: EVASE ────────────────────────────────────────── -->
+  <div id="tab-evase" style="display:none">
     <div class="section">
-      <div class="section-title" style="color:var(--green-text)">
-        <i class="ti ti-check"></i> Ricerche Evase
-        <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'evasa')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
+      <div class="section-title" style="justify-content:space-between">
+        <span><i class="ti ti-circle-check"></i> Ricerche Evase</span>
+        <button class="btn btn-sm btn-export" onclick="exportCSV('evase')"><i class="ti ti-download"></i> Esporta CSV</button>
       </div>
       <div class="list-controls">
-        <select id="evase-sort" onchange="renderFiltered('evasa')">
-          <option value="data-desc">Data ↓</option>
-          <option value="data-asc">Data ↑</option>
-          <option value="alfa">Alfabetico</option>
-          <option value="mese">Per mese</option>
+        <select id="sortEvase" onchange="renderEvase()">
+          <option value="dateDesc">Data ↓</option>
+          <option value="dateAsc">Data ↑</option>
+          <option value="alpha">Alfabetico</option>
+          <option value="month">Per mese</option>
         </select>
       </div>
-      <div class="company-list" id="list-evase"></div>
+      <div class="company-list" id="listEvase"></div>
     </div>
   </div>
 
-  <!-- ════════ VIEW: CHIUSE ════════ -->
-  <div id="view-chiuse" style="display:none">
+  <!-- ── TAB: CHIUSE ───────────────────────────────────────── -->
+  <div id="tab-chiuse" style="display:none">
     <div class="section">
-      <div class="section-title" style="color:var(--red-text)">
-        <i class="ti ti-x"></i> Ricerche Chiuse
-        <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'chiusa')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
+      <div class="section-title" style="justify-content:space-between">
+        <span><i class="ti ti-circle-x"></i> Ricerche Chiuse</span>
+        <button class="btn btn-sm btn-export" onclick="exportCSV('chiuse')"><i class="ti ti-download"></i> Esporta CSV</button>
       </div>
       <div class="list-controls">
-        <select id="chiuse-sort" onchange="renderFiltered('chiusa')">
-          <option value="data-desc">Data ↓</option>
-          <option value="data-asc">Data ↑</option>
-          <option value="alfa">Alfabetico</option>
-          <option value="mese">Per mese</option>
+        <select id="sortChiuse" onchange="renderChiuse()">
+          <option value="dateDesc">Data ↓</option>
+          <option value="dateAsc">Data ↑</option>
+          <option value="alpha">Alfabetico</option>
+          <option value="month">Per mese</option>
         </select>
       </div>
-      <div class="company-list" id="list-chiuse"></div>
+      <div class="company-list" id="listChiuse"></div>
     </div>
   </div>
 
-  <!-- ════════ VIEW: HANNO ASSUNTO ════════ -->
-  <div id="view-assunto" style="display:none">
+  <!-- ── TAB: ASSUNTO ──────────────────────────────────────── -->
+  <div id="tab-assunto" style="display:none">
     <div class="section">
-      <div class="section-title" style="color:var(--amber-text)">
-        <i class="ti ti-user-check"></i> Hanno assunto da soli
-        <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'assunto')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
+      <div class="section-title" style="justify-content:space-between">
+        <span><i class="ti ti-user-check"></i> Hanno assunto da soli</span>
+        <button class="btn btn-sm btn-export" onclick="exportCSV('assunto')"><i class="ti ti-download"></i> Esporta CSV</button>
       </div>
       <div class="list-controls">
-        <select id="assunto-sort" onchange="renderFiltered('assunto')">
-          <option value="data-desc">Data ↓</option>
-          <option value="data-asc">Data ↑</option>
-          <option value="alfa">Alfabetico</option>
-          <option value="mese">Per mese</option>
+        <select id="sortAssunto" onchange="renderAssunto()">
+          <option value="dateDesc">Data ↓</option>
+          <option value="dateAsc">Data ↑</option>
+          <option value="alpha">Alfabetico</option>
+          <option value="month">Per mese</option>
         </select>
       </div>
-      <div class="company-list" id="list-assunto"></div>
+      <div class="company-list" id="listAssunto"></div>
     </div>
   </div>
 
-  <!-- ════════ VIEW: TUTTE ════════ -->
-  <div id="view-tutte" style="display:none">
-    <div class="section">
-      <div class="section-title">
-        <i class="ti ti-layout-list"></i> Tutte le aziende — entrambi gli uffici
-        <button class="btn btn-sm btn-export" onclick="exportCSV('', '')">
-          <i class="ti ti-download"></i> Esporta CSV
-        </button>
-      </div>
-      <div class="list-controls">
-        <select id="tutte-sort"  onchange="renderTutte()">
-          <option value="data-desc">Data ↓</option>
-          <option value="data-asc">Data ↑</option>
-          <option value="alfa">Alfabetico</option>
-        </select>
-        <select id="tutte-uff"   onchange="renderTutte()">
-          <option value="">Entrambi gli uffici</option>
-          <option value="cesena">Solo Cesena</option>
-          <option value="forli">Solo Forlì</option>
-        </select>
-        <select id="tutte-stato" onchange="renderTutte()">
-          <option value="">Tutti gli stati</option>
-          <option value="pending">In attesa</option>
-          <option value="attiva">Attiva</option>
-          <option value="evasa">Evase</option>
-          <option value="chiusa">Chiuse</option>
-          <option value="assunto">Hanno assunto</option>
-        </select>
-      </div>
-      <div class="company-list" id="list-tutte"></div>
-    </div>
-  </div>
+  <!-- ── TAB: TUTTE (vista combinata) ─────────────────────── -->
+  <!-- Note: "Tutte" tab is handled by tab-all above -->
 
-</div>
+</div><!-- /shell -->
 
-<!-- Toast notification -->
-<div class="toast" id="toast"></div>
+<div id="toast"></div>
 
 <script>
-/* ── Data layer ──────────────────────────────────────────── */
-const STORAGE_KEY = 'gestione_aziende_v2';
+/* ═══════════════════════════════════════════════════════════
+   DATA LAYER
+   ═══════════════════════════════════════════════════════════ */
+
+const STORAGE_KEY = 'gestione_aziende_v3';
 
 function loadData() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch(e) { return []; }
-}
-function saveData(d) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
-  catch(e) { showToast('Errore salvataggio dati!'); }
-}
-
-let data = loadData();
-let nextId = data.length ? Math.max(...data.map(d => d.id)) + 1 : 1;
-let currentUfficio = 'cesena';
-let currentView    = 'inserisci';
-
-/* ── Toast ───────────────────────────────────────────────── */
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { cesena: [], forli: [] };
+    const parsed = JSON.parse(raw);
+    // migrate old flat array
+    if (Array.isArray(parsed)) return { cesena: parsed, forli: [] };
+    return parsed;
+  } catch(e) { return { cesena: [], forli: [] }; }
 }
 
-/* ── Ufficio switch ──────────────────────────────────────── */
-function switchUfficio(u) {
-  currentUfficio = u;
-  document.querySelectorAll('.uff-btn').forEach(b => b.classList.remove('active'));
-  const sel = u === 'tutte' ? '.uff-btn.tutte' : '.uff-btn.' + u;
-  document.querySelector(sel).classList.add('active');
-  // When "tutte filiali" is selected, jump straight to the "Tutte" view
-  if (u === 'tutte') {
-    switchView('tutte');
-    return;
+function saveData() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(DB)); } catch(e) {}
+}
+
+let DB = loadData();
+let currentUfficio = 'cesena'; // 'cesena' | 'forli' | 'tutte'
+
+function getList() {
+  if (currentUfficio === 'tutte') {
+    // merge, tag with ufficio
+    const c = DB.cesena.map(x => ({...x, _ufficio:'cesena'}));
+    const f = DB.forli.map(x  => ({...x, _ufficio:'forli'}));
+    return [...c, ...f];
   }
-  updateLabels();
+  return DB[currentUfficio].map(x => ({...x, _ufficio: currentUfficio}));
+}
+
+function getWriteList() {
+  if (currentUfficio === 'tutte') return DB.cesena; // fallback: write to cesena
+  return DB[currentUfficio];
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UFFICIO SWITCHER
+   ═══════════════════════════════════════════════════════════ */
+function setUfficio(uf) {
+  currentUfficio = uf;
+  document.querySelectorAll('.uff-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.uff-btn.${uf}`).classList.add('active');
+  renderAll(); renderAttive(); renderEvase(); renderChiuse(); renderAssunto();
   renderStats();
-  renderCurrentView();
 }
 
-function updateLabels() {
-  let label;
-  if      (currentUfficio === 'cesena') label = 'Ufficio Cesena';
-  else if (currentUfficio === 'forli')  label = 'Ufficio Forlì';
-  else                                  label = 'Tutti gli uffici';
-  document.getElementById('ufficio-label').textContent = label;
-  document.getElementById('uff-badge-label').innerHTML =
-    `<span class="uff-badge uff-${currentUfficio}">${label}</span>`;
+/* ═══════════════════════════════════════════════════════════
+   STATS
+   ═══════════════════════════════════════════════════════════ */
+function renderStats() {
+  const list = getList();
+  const counts = {
+    total:   list.length,
+    attiva:  list.filter(x => x.stato === 'attiva').length,
+    evasa:   list.filter(x => x.stato === 'evasa').length,
+    chiusa:  list.filter(x => x.stato === 'chiusa').length,
+    assunto: list.filter(x => x.stato === 'assunto').length,
+    pending: list.filter(x => x.stato === 'pending' || !x.stato).length,
+  };
+  const cards = [
+    { label:'Totale',      val: counts.total,   color: 'var(--text-primary)' },
+    { label:'Attive',      val: counts.attiva,  color: 'var(--blue-text)'  },
+    { label:'Evase',       val: counts.evasa,   color: 'var(--green-text)' },
+    { label:'Chiuse',      val: counts.chiusa,  color: 'var(--red-text)'   },
+    { label:'Assunzioni',  val: counts.assunto, color: 'var(--amber-text)' },
+    { label:'In attesa',   val: counts.pending, color: 'var(--text-secondary)' },
+  ];
+  document.getElementById('statsRow').innerHTML = cards.map(c =>
+    `<div class="stat-card">
+       <div class="stat-label">${c.label}</div>
+       <div class="stat-val" style="color:${c.color}">${c.val}</div>
+     </div>`
+  ).join('');
 }
 
-/* ── View switch ─────────────────────────────────────────── */
-const VIEWS = ['inserisci', 'attive', 'evase', 'chiuse', 'assunto', 'tutte'];
-
-function switchView(v) {
-  currentView = v;
-  VIEWS.forEach(x => {
-    document.getElementById('view-' + x).style.display = x === v ? 'block' : 'none';
-  });
-  document.querySelectorAll('.nav-tab').forEach((b, i) => {
-    b.classList.toggle('active', VIEWS[i] === v);
-  });
-  renderCurrentView();
-}
-
-function renderCurrentView() {
-  if (currentView === 'inserisci') renderAll();
-  else if (currentView === 'attive')  renderFiltered('attiva');
-  else if (currentView === 'evase')   renderFiltered('evasa');
-  else if (currentView === 'chiuse')  renderFiltered('chiusa');
-  else if (currentView === 'assunto') renderFiltered('assunto');
-  else if (currentView === 'tutte')   renderTutte();
-}
-
-/* ── Add / Edit / Delete ─────────────────────────────────── */
-function addAzienda() {
-  const nome = document.getElementById('inp-nome').value.trim();
-  if (!nome) { showToast('⚠ Inserisci il nome dell\'azienda'); return; }
-
-  const stato  = document.getElementById('inp-stato').value;
-  const dataV  = document.getElementById('inp-data').value;
-  const note   = document.getElementById('inp-note').value.trim();
-
-  data.push({ id: nextId++, nome, ufficio: currentUfficio, stato, data: dataV, note });
-  saveData(data);
-
-  document.getElementById('inp-nome').value  = '';
-  document.getElementById('inp-stato').value = 'pending';
-  document.getElementById('inp-note').value  = '';
-
-  renderStats();
-  renderAll();
-  showToast('✓ Azienda aggiunta');
-}
-
-function deleteAzienda(id) {
-  if (!confirm('Eliminare questa azienda?')) return;
-  data = data.filter(d => d.id !== id);
-  saveData(data);
-  renderStats();
-  renderCurrentView();
-  showToast('Azienda eliminata');
-}
-
-function changeStato(id, newStato) {
-  if (!newStato) return;
-  const item = data.find(d => d.id === id);
-  if (!item) return;
-  item.stato = newStato;
-  if (!item.data && newStato !== 'pending')
-    item.data = new Date().toISOString().slice(0, 10);
-  saveData(data);
-  renderStats();
-  renderCurrentView();
-  showToast('✓ Stato aggiornato');
-}
-
-/* ── Sorting helpers ─────────────────────────────────────── */
-const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
-              'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-
-function formatDate(d) {
-  if (!d) return '—';
-  const [y, m, g] = d.split('-');
-  return `${g}/${m}/${y}`;
-}
-
-function getMeseAnno(d) {
-  if (!d) return 'Senza data';
-  const [y, m] = d.split('-');
-  return `${MESI[parseInt(m) - 1]} ${y}`;
-}
-
-function sortItems(items, sortVal) {
-  const copy = [...items];
-  if      (sortVal === 'data-desc') copy.sort((a, b) => (b.data || '').localeCompare(a.data || ''));
-  else if (sortVal === 'data-asc')  copy.sort((a, b) => (a.data || '').localeCompare(b.data || ''));
-  else if (sortVal === 'alfa')      copy.sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
-  return copy;
-}
-
-/* ── Render helpers ──────────────────────────────────────── */
-const STATO_MAP = {
-  evasa:   { label: 'Evasa',            cls: 's-evasa'   },
-  chiusa:  { label: 'Chiusa',           cls: 's-chiusa'  },
-  assunto: { label: 'Hanno assunto',    cls: 's-assunto' },
-  pending: { label: 'In attesa',        cls: 's-pending' },
-  attiva:  { label: 'Attiva',           cls: 's-attiva'  },
+/* ═══════════════════════════════════════════════════════════
+   HELPERS
+   ═══════════════════════════════════════════════════════════ */
+const STATUS_LABELS = {
+  pending: 'In attesa',
+  attiva:  'Attiva',
+  evasa:   'Evasa',
+  chiusa:  'Chiusa',
+  assunto: 'Ha assunto',
+};
+const STATUS_CLASS = {
+  pending: 's-pending',
+  attiva:  's-attiva',
+  evasa:   's-evasa',
+  chiusa:  's-chiusa',
+  assunto: 's-assunto',
 };
 
-function renderCompanyItem(item, showUfficio = false) {
-  const s = STATO_MAP[item.stato] || STATO_MAP.pending;
-  const uffLabel = item.ufficio === 'cesena' ? 'Cesena' : 'Forlì';
-  const uffBadge = showUfficio
-    ? `<span class="uff-badge uff-${item.ufficio}" style="margin-left:4px">${uffLabel}</span>`
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+function monthLabel(d) {
+  if (!d) return 'Senza data';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('it-IT', { month:'long', year:'numeric' });
+}
+function sortItems(arr, sortVal) {
+  const a = [...arr];
+  if (sortVal === 'dateDesc') a.sort((x,y) => (y.data||'').localeCompare(x.data||''));
+  else if (sortVal === 'dateAsc') a.sort((x,y) => (x.data||'').localeCompare(y.data||''));
+  else if (sortVal === 'alpha')   a.sort((x,y) => x.nome.localeCompare(y.nome));
+  return a;
+}
+
+function groupByMonth(arr) {
+  const groups = {};
+  arr.forEach(item => {
+    const key = monthLabel(item.data);
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(item);
+  });
+  return groups;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER ITEM
+   ═══════════════════════════════════════════════════════════ */
+function renderItem(item, idx) {
+  const stato = item.stato || 'pending';
+  const uffTag = currentUfficio === 'tutte'
+    ? `<span class="status-badge" style="background:var(--bg-tertiary);color:var(--text-secondary);margin-left:4px">${item._ufficio === 'cesena' ? 'CE' : 'FC'}</span>`
     : '';
 
+  // note section
   const noteHtml = `
-    <span class="note-edit-wrap" id="note-wrap-${item.id}">
-      ${item.note
-        ? `<span id="note-text-${item.id}">${escHtml(item.note)}</span>`
-        : `<span id="note-text-${item.id}" style="color:var(--text-tertiary);font-style:italic">nessuna nota</span>`
-      }
-      <button class="btn-note-edit" title="Modifica nota" onclick="startEditNote(${item.id})">
-        <i class="ti ti-pencil"></i>
-      </button>
+    <span id="noteDisplay-${idx}" class="note-edit-wrap">
+      <span style="color:var(--text-secondary);font-size:12px">${item.note ? escHtml(item.note) : '<span style="color:var(--text-tertiary)">—</span>'}</span>
+      <button class="btn-note-edit" onclick="startEditNote(${idx})" title="Modifica nota"><i class="ti ti-pencil" style="font-size:11px"></i></button>
+    </span>
+    <span id="noteEdit-${idx}" class="note-edit-wrap" style="display:none">
+      <input class="note-inline-input" id="noteInput-${idx}" value="${escAttr(item.note||'')}" placeholder="Aggiungi nota…" />
+      <button class="btn-note-save"   onclick="saveNote(${idx})"   title="Salva"><i class="ti ti-check"  style="font-size:12px"></i></button>
+      <button class="btn-note-cancel" onclick="cancelNote(${idx})" title="Annulla"><i class="ti ti-x" style="font-size:12px"></i></button>
     </span>`;
 
   return `
-    <div class="company-item">
-      <div class="company-info">
-        <span class="company-name">${escHtml(item.nome)}</span>
-        <span class="company-meta">
-          <i class="ti ti-calendar" style="font-size:12px;vertical-align:-1px"></i>
-          ${formatDate(item.data)}
-          &nbsp;·&nbsp;${noteHtml}
-          ${uffBadge}
-        </span>
+  <div class="company-item" id="item-${idx}">
+    <div class="company-info">
+      <div class="company-name">${escHtml(item.nome)} ${uffTag}</div>
+      <div class="company-meta">
+        ${item.data ? fmtDate(item.data) : '<span style="color:var(--text-tertiary)">Nessuna data</span>'}
+        &nbsp;·&nbsp; ${noteHtml}
       </div>
-      <div class="item-actions">
-        <span class="status-badge ${s.cls}">${s.label}</span>
-        <select onchange="changeStato(${item.id}, this.value)" title="Cambia stato">
-          <option value="" disabled selected>Modifica stato</option>
-          <option value="pending">In attesa</option>
-          <option value="attiva">Attiva</option>
-          <option value="evasa">Evasa</option>
-          <option value="chiusa">Chiusa</option>
-          <option value="assunto">Hanno assunto</option>
-        </select>
-        <button class="btn btn-danger btn-sm" onclick="deleteAzienda(${item.id})" title="Elimina">
-          <i class="ti ti-trash"></i>
-        </button>
-      </div>
-    </div>`;
-}
+    </div>
+    <div class="item-actions">
+      <span class="status-badge ${STATUS_CLASS[stato]}">${STATUS_LABELS[stato]}</span>
+      <select onchange="changeStatus(${idx}, this.value)" style="font-size:11px;padding:3px 6px;border-radius:6px;border:0.5px solid var(--border-medium);background:var(--bg-primary);color:var(--text-primary)">
+        <option value="">Cambia…</option>
+        <option value="pending">In attesa</option>
+        <option value="attiva">Attiva</option>
+        <option value="evasa">Evasa</option>
+        <option value="chiusa">Chiusa</option>
+        <option value="assunto">Ha assunto</option>
+      </select>
+      <button class="btn btn-sm btn-danger" onclick="deleteItem(${idx})" title="Elimina"><i class="ti ti-trash"></i></button>
+    </div>
+  </div>`;
 }
 
-/* ── Note inline editing ─────────────────────────────────── */
-function startEditNote(id) {
-  const item = data.find(d => d.id === id);
-  if (!item) return;
-  const wrap = document.getElementById('note-wrap-' + id);
-  if (!wrap) return;
-  wrap.innerHTML = `
-    <input class="note-inline-input" id="note-input-${id}"
-           type="text" value="${escHtml(item.note || '')}"
-           placeholder="Aggiungi nota..."
-           onkeydown="handleNoteKey(event, ${id})" />
-    <button class="btn-note-save"   title="Salva"    onclick="saveNote(${id})"><i class="ti ti-check"></i></button>
-    <button class="btn-note-cancel" title="Annulla"  onclick="cancelEditNote(${id})"><i class="ti ti-x"></i></button>`;
-  const inp = document.getElementById('note-input-' + id);
-  if (inp) { inp.focus(); inp.select(); }
-}
-
-function handleNoteKey(e, id) {
-  if (e.key === 'Enter') saveNote(id);
-  if (e.key === 'Escape') cancelEditNote(id);
-}
-
-function saveNote(id) {
-  const item = data.find(d => d.id === id);
-  if (!item) return;
-  const inp = document.getElementById('note-input-' + id);
-  if (!inp) return;
-  item.note = inp.value.trim();
-  saveData(data);
-  // Update just the note wrap without full re-render
-  const wrap = document.getElementById('note-wrap-' + id);
-  if (wrap) {
-    wrap.innerHTML = `
-      ${item.note
-        ? `<span id="note-text-${id}">${escHtml(item.note)}</span>`
-        : `<span id="note-text-${id}" style="color:var(--text-tertiary);font-style:italic">nessuna nota</span>`
-      }
-      <button class="btn-note-edit" title="Modifica nota" onclick="startEditNote(${id})">
-        <i class="ti ti-pencil"></i>
-      </button>`;
-  }
-  showToast('✓ Nota aggiornata');
-}
-
-function cancelEditNote(id) {
-  const item = data.find(d => d.id === id);
-  if (!item) return;
-  const wrap = document.getElementById('note-wrap-' + id);
-  if (wrap) {
-    wrap.innerHTML = `
-      ${item.note
-        ? `<span id="note-text-${id}">${escHtml(item.note)}</span>`
-        : `<span id="note-text-${id}" style="color:var(--text-tertiary);font-style:italic">nessuna nota</span>`
-      }
-      <button class="btn-note-edit" title="Modifica nota" onclick="startEditNote(${id})">
-        <i class="ti ti-pencil"></i>
-      </button>`;
-  }
-}
-
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
-}
-
-function emptyState(msg = 'Nessuna azienda trovata') {
-  return `<div class="empty"><i class="ti ti-inbox"></i>${msg}</div>`;
-}
-
-/* ── Render: elenco principale ───────────────────────────── */
-function renderAll() {
-  const sortVal   = document.getElementById('all-sort').value;
-  const filterVal = document.getElementById('all-filter').value;
-  let items = currentUfficio === 'tutte'
-    ? [...data]
-    : data.filter(d => d.ufficio === currentUfficio);
-  if (filterVal) items = items.filter(d => d.stato === filterVal);
-  items = sortItems(items, sortVal);
-
-  const el = document.getElementById('list-all');
-  el.innerHTML = items.length
-    ? items.map(i => renderCompanyItem(i, currentUfficio === 'tutte')).join('')
-    : emptyState('Nessuna azienda inserita per questo ufficio');
-}
-
-/* ── Render: elenchi filtrati per stato ──────────────────── */
-const FILTER_CONFIG = {
-  attiva:  { sortId: 'attive-sort',  listId: 'list-attive'  },
-  evasa:   { sortId: 'evase-sort',   listId: 'list-evase'   },
-  chiusa:  { sortId: 'chiuse-sort',  listId: 'list-chiuse'  },
-  assunto: { sortId: 'assunto-sort', listId: 'list-assunto' },
-};
-
-function renderFiltered(stato) {
-  const { sortId, listId } = FILTER_CONFIG[stato];
-  const sortVal = document.getElementById(sortId).value;
-  let items = currentUfficio === 'tutte'
-    ? data.filter(d => d.stato === stato)
-    : data.filter(d => d.ufficio === currentUfficio && d.stato === stato);
-  const el  = document.getElementById(listId);
-  const showUff = currentUfficio === 'tutte';
-
-  if (!items.length) { el.innerHTML = emptyState('Nessuna azienda in questo elenco'); return; }
-
-  if (sortVal === 'mese') {
-    const sorted  = sortItems(items, 'data-desc');
-    const grouped = {};
-    sorted.forEach(i => {
-      const m = getMeseAnno(i.data);
-      if (!grouped[m]) grouped[m] = [];
-      grouped[m].push(i);
-    });
-    el.innerHTML = Object.entries(grouped).map(([mese, list]) =>
-      `<div class="month-header"><i class="ti ti-calendar"></i> ${mese}</div>` +
-      list.map(i => renderCompanyItem(i, showUff)).join('')
-    ).join('');
+/* ═══════════════════════════════════════════════════════════
+   RENDER LISTS
+   ═══════════════════════════════════════════════════════════ */
+function renderList(containerId, items, sortVal, byMonth) {
+  const el = document.getElementById(containerId);
+  if (!items.length) { el.innerHTML = '<div class="empty-state">Nessun elemento</div>'; return; }
+  const sorted = sortItems(items, sortVal);
+  if (!byMonth || sortVal !== 'month') {
+    el.innerHTML = sorted.map((item, i) => renderItem(item, item._realIdx)).join('');
   } else {
-    el.innerHTML = sortItems(items, sortVal).map(i => renderCompanyItem(i, showUff)).join('');
+    const groups = groupByMonth(sorted);
+    let html = '';
+    Object.entries(groups).forEach(([label, grp]) => {
+      html += `<div class="month-group-header">${label} <span style="font-weight:400">(${grp.length})</span></div>`;
+      html += grp.map(item => renderItem(item, item._realIdx)).join('');
+    });
+    el.innerHTML = html;
   }
 }
 
-/* ── Render: vista "tutte" ───────────────────────────────── */
-function renderTutte() {
-  const sortVal  = document.getElementById('tutte-sort').value;
-  const uffFilter = document.getElementById('tutte-uff').value;
-  const statoFilter = document.getElementById('tutte-stato').value;
-  let items = [...data];
-  if (uffFilter)    items = items.filter(d => d.ufficio === uffFilter);
-  if (statoFilter)  items = items.filter(d => d.stato   === statoFilter);
-  items = sortItems(items, sortVal);
-
-  const el = document.getElementById('list-tutte');
-  el.innerHTML = items.length
-    ? items.map(i => renderCompanyItem(i, true)).join('')
-    : emptyState();
+function tagWithRealIdx(list) {
+  // Add _realIdx pointing to actual index in DB[ufficio]
+  return list.map(item => {
+    if (currentUfficio === 'tutte') {
+      const arr = DB[item._ufficio];
+      const ri = arr.findIndex(x => x === DB[item._ufficio].find(y => y.id === item.id));
+      // use id-based lookup
+      item._realIdx = arr.findIndex(x => x.id === item.id) + (item._ufficio === 'forli' ? 100000 : 0);
+    }
+    return item;
+  });
 }
 
-/* ── Render: stats ───────────────────────────────────────── */
-function renderStats() {
-  const mine    = currentUfficio === 'tutte' ? [...data] : data.filter(d => d.ufficio === currentUfficio);
-  const attive  = mine.filter(d => d.stato === 'attiva').length;
-  const evase   = mine.filter(d => d.stato === 'evasa').length;
-  const chiuse  = mine.filter(d => d.stato === 'chiusa').length;
-  const assunto = mine.filter(d => d.stato === 'assunto').length;
-  const pending = mine.filter(d => d.stato === 'pending').length;
-
-  document.getElementById('stats-row').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-label">Totale aziende</div>
-      <div class="stat-val">${mine.length}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" style="color:var(--blue-text)">Attive</div>
-      <div class="stat-val"  style="color:var(--blue-text)">${attive}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" style="color:var(--green-text)">Evase</div>
-      <div class="stat-val"  style="color:var(--green-text)">${evase}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" style="color:var(--red-text)">Chiuse</div>
-      <div class="stat-val"  style="color:var(--red-text)">${chiuse}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label" style="color:var(--amber-text)">Hanno assunto</div>
-      <div class="stat-val"  style="color:var(--amber-text)">${assunto}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">In attesa</div>
-      <div class="stat-val">${pending}</div>
-    </div>`;
+function getTaggedList() {
+  const raw = getList();
+  return raw.map((item, i) => ({ ...item, _realIdx: i }));
 }
 
-/* ── CSV export ──────────────────────────────────────────── */
-function exportCSV(ufficio, stato) {
-  let items = [...data];
-  if (ufficio) items = items.filter(d => d.ufficio === ufficio);
-  if (stato)   items = items.filter(d => d.stato   === stato);
+function renderAll() {
+  const all = getTaggedList();
+  const sortVal = document.getElementById('sortAll').value;
+  const filterVal = document.getElementById('filterAll').value;
+  const filtered = filterVal ? all.filter(x => (x.stato||'pending') === filterVal) : all;
+  renderList('listAll', filtered, sortVal, false);
+}
+function renderAttive()  { const l = getTaggedList().filter(x => x.stato==='attiva');  renderList('listAttive',  l, document.getElementById('sortAttive').value,  true); }
+function renderEvase()   { const l = getTaggedList().filter(x => x.stato==='evasa');   renderList('listEvase',   l, document.getElementById('sortEvase').value,   true); }
+function renderChiuse()  { const l = getTaggedList().filter(x => x.stato==='chiusa');  renderList('listChiuse',  l, document.getElementById('sortChiuse').value,  true); }
+function renderAssunto() { const l = getTaggedList().filter(x => x.stato==='assunto'); renderList('listAssunto', l, document.getElementById('sortAssunto').value, true); }
 
-  const header = ['Nome', 'Ufficio', 'Stato', 'Data', 'Note'];
-  const rows = items.map(i => [
-    i.nome,
-    i.ufficio === 'cesena' ? 'Cesena' : 'Forlì',
-    STATO_MAP[i.stato]?.label || i.stato,
-    i.data || '',
-    i.note || '',
-  ]);
+function renderCurrentTab() {
+  const active = document.querySelector('.nav-tab.active')?.dataset.tab;
+  if (active === 'all')     renderAll();
+  if (active === 'attive')  renderAttive();
+  if (active === 'evase')   renderEvase();
+  if (active === 'chiuse')  renderChiuse();
+  if (active === 'assunto') renderAssunto();
+  renderStats();
+}
 
-  const csv = [header, ...rows]
-    .map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))
-    .join('\n');
+/* ═══════════════════════════════════════════════════════════
+   NOTE INLINE EDIT
+   ═══════════════════════════════════════════════════════════ */
+function startEditNote(idx) {
+  document.getElementById(`noteDisplay-${idx}`).style.display = 'none';
+  document.getElementById(`noteEdit-${idx}`).style.display = 'inline-flex';
+  document.getElementById(`noteInput-${idx}`).focus();
+}
+function saveNote(idx) {
+  const val = document.getElementById(`noteInput-${idx}`).value.trim();
+  const item = getTaggedList().find(x => x._realIdx === idx);
+  if (!item) return;
+  const arr = currentUfficio === 'tutte' ? DB[item._ufficio] : DB[currentUfficio];
+  const realItem = arr.find(x => x.id === item.id);
+  if (realItem) { realItem.note = val; saveData(); renderCurrentTab(); showToast('Nota aggiornata'); }
+}
+function cancelNote(idx) {
+  document.getElementById(`noteDisplay-${idx}`).style.display = 'inline-flex';
+  document.getElementById(`noteEdit-${idx}`).style.display = 'none';
+}
 
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+/* ═══════════════════════════════════════════════════════════
+   ACTIONS
+   ═══════════════════════════════════════════════════════════ */
+function addCompany() {
+  const nome = document.getElementById('inputNome').value.trim();
+  if (!nome) { showToast('Inserisci il nome azienda'); return; }
+  const stato = document.getElementById('inputStato').value;
+  const data  = document.getElementById('inputData').value;
+  const note  = document.getElementById('inputNote').value.trim();
+  const writeUfficio = currentUfficio === 'tutte' ? 'cesena' : currentUfficio;
+  DB[writeUfficio].push({ id: Date.now(), nome, stato, data, note });
+  saveData();
+  document.getElementById('inputNome').value = '';
+  document.getElementById('inputStato').value = 'pending';
+  document.getElementById('inputData').value = '';
+  document.getElementById('inputNote').value = '';
+  renderCurrentTab();
+  showToast(`"${nome}" aggiunta (${writeUfficio})`);
+}
+
+function changeStatus(idx, newStato) {
+  if (!newStato) return;
+  const list = getTaggedList();
+  const item = list.find(x => x._realIdx === idx);
+  if (!item) return;
+  const arr = currentUfficio === 'tutte' ? DB[item._ufficio] : DB[currentUfficio];
+  const realItem = arr.find(x => x.id === item.id);
+  if (realItem) { realItem.stato = newStato; saveData(); renderCurrentTab(); showToast('Stato aggiornato'); }
+}
+
+function deleteItem(idx) {
+  const list = getTaggedList();
+  const item = list.find(x => x._realIdx === idx);
+  if (!item) return;
+  if (!confirm(`Eliminare "${item.nome}"?`)) return;
+  const uf = currentUfficio === 'tutte' ? item._ufficio : currentUfficio;
+  DB[uf] = DB[uf].filter(x => x.id !== item.id);
+  saveData();
+  renderCurrentTab();
+  showToast('Azienda eliminata');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EXPORT CSV
+   ═══════════════════════════════════════════════════════════ */
+function exportCSV(tabName) {
+  let items;
+  const all = getTaggedList();
+  if (tabName === 'all')     items = all;
+  else if (tabName === 'attive')  items = all.filter(x => x.stato === 'attiva');
+  else if (tabName === 'evase')   items = all.filter(x => x.stato === 'evasa');
+  else if (tabName === 'chiuse')  items = all.filter(x => x.stato === 'chiusa');
+  else if (tabName === 'assunto') items = all.filter(x => x.stato === 'assunto');
+  else items = all;
+
+  if (!items.length) { showToast('Nessun dato da esportare'); return; }
+
+  const header = currentUfficio === 'tutte'
+    ? 'Azienda,Stato,Data,Note,Filiale'
+    : 'Azienda,Stato,Data,Note';
+
+  const rows = items.map(x => {
+    const cols = [
+      `"${(x.nome||'').replace(/"/g,'""')}"`,
+      STATUS_LABELS[x.stato||'pending'],
+      x.data ? fmtDate(x.data) : '',
+      `"${(x.note||'').replace(/"/g,'""')}"`,
+    ];
+    if (currentUfficio === 'tutte') cols.push(x._ufficio === 'cesena' ? 'Cesena' : 'Forlì');
+    return cols.join(',');
+  });
+
+  const csv = '\uFEFF' + [header, ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href     = url;
-  const uffLabel = ufficio ? (ufficio === 'cesena' ? 'Cesena' : 'Forli') : 'TuttiUffici';
-  const stLabel  = stato  ? ('_' + stato) : '';
-  a.download = `aziende_${uffLabel}${stLabel}_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('✓ CSV esportato');
+  a.href = url; a.download = `aziende_${tabName}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
 }
 
-/* ── Init ────────────────────────────────────────────────── */
-document.getElementById('inp-data').value = new Date().toISOString().slice(0, 10);
-updateLabels();
+/* ═══════════════════════════════════════════════════════════
+   TAB SWITCHER
+   ═══════════════════════════════════════════════════════════ */
+const TABS = ['insert','all','attive','evase','chiuse','assunto'];
+function switchTab(name) {
+  TABS.forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = t === name ? '' : 'none';
+    document.querySelector(`[data-tab="${t}"]`)?.classList.toggle('active', t === name);
+  });
+  if (name === 'all')     renderAll();
+  if (name === 'attive')  renderAttive();
+  if (name === 'evase')   renderEvase();
+  if (name === 'chiuse')  renderChiuse();
+  if (name === 'assunto') renderAssunto();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST
+   ═══════════════════════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ESCAPE HELPERS
+   ═══════════════════════════════════════════════════════════ */
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════════ */
+// set today as default date
+document.getElementById('inputData').value = new Date().toISOString().slice(0,10);
 renderStats();
-renderAll();
+
+// keyboard shortcut: Enter in nome field → add
+document.getElementById('inputNome').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addCompany();
+});
 </script>
 </body>
 </html>
