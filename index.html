@@ -4,357 +4,340 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestione Aziende Commerciale</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <style>
-    /* ===== RESET & BASE ===== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+    :root {
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #1a202c;
+      --text-muted: #718096;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #3b82f6;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #f0f4f8;
-      color: #1a202c;
-      min-height: 100dvh;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      min-height: 100vh;
     }
 
-    /* ===== LAYOUT ===== */
-    .app-header {
-      background: #1a365d;
-      color: #fff;
-      padding: 14px 20px;
+    /* NAV */
+    .nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
       display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .app-header h1 { font-size: 1.15rem; font-weight: 600; letter-spacing: 0.3px; }
-    .app-header .subtitle { font-size: 0.78rem; opacity: 0.75; margin-top: 1px; }
-
-    .main-nav {
-      display: flex;
-      gap: 0;
-      background: #2d3748;
+      gap: 2px;
+      padding: 8px 16px 0;
       overflow-x: auto;
       scrollbar-width: none;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-    .main-nav::-webkit-scrollbar { display: none; }
+    .nav::-webkit-scrollbar { display: none; }
     .nav-btn {
-      flex: 1;
-      min-width: 80px;
-      padding: 11px 8px 9px;
-      background: none;
+      padding: 8px 16px;
       border: none;
-      color: #a0aec0;
-      font-size: 0.72rem;
+      background: none;
+      color: var(--text-muted);
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      transition: background 0.15s, color 0.15s;
-      border-bottom: 3px solid transparent;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
       white-space: nowrap;
+      transition: color 0.15s;
     }
-    .nav-btn i { font-size: 1.1rem; }
-    .nav-btn:hover { background: rgba(255,255,255,0.07); color: #e2e8f0; }
-    .nav-btn.active { color: #63b3ed; border-bottom-color: #63b3ed; background: rgba(99,179,237,0.08); }
+    .nav-btn:hover { color: var(--text); }
+    .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
 
-    .main-content { padding: 16px; max-width: 900px; margin: 0 auto; }
+    /* MAIN */
+    .main { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
 
-    /* ===== TABS / VIEWS ===== */
+    /* VIEWS */
     .view { display: none; }
     .view.active { display: block; }
 
-    /* ===== CARD ===== */
+    /* CARD */
     .card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 18px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
       margin-bottom: 16px;
+      box-shadow: var(--shadow);
     }
     .card-title {
-      font-size: 0.85rem;
+      font-size: 13px;
       font-weight: 600;
-      color: #4a5568;
+      color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
     }
-    .card-title i { color: #63b3ed; }
 
-    /* ===== FORM ===== */
+    /* FORM */
     .form-group { margin-bottom: 12px; }
     .form-group label {
       display: block;
-      font-size: 0.78rem;
+      font-size: 12px;
       font-weight: 600;
-      color: #4a5568;
-      margin-bottom: 4px;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
     .form-group input,
     .form-group select,
     .form-group textarea {
       width: 100%;
-      padding: 9px 12px;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      color: #1a202c;
-      background: #f7fafc;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
       outline: none;
+      transition: border-color 0.15s;
     }
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus {
-      border-color: #63b3ed;
-      box-shadow: 0 0 0 3px rgba(99,179,237,0.18);
-      background: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
     }
-    .form-group textarea { resize: vertical; min-height: 70px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-group textarea { resize: vertical; min-height: 72px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
 
+    /* BUTTONS */
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 9px 18px;
-      border-radius: 8px;
-      border: none;
-      font-size: 0.875rem;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 7px;
+      border: 1px solid transparent;
+      font-size: 13px;
       font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-    }
-    .btn:active { transform: scale(0.97); }
-    .btn-primary { background: #3182ce; color: #fff; }
-    .btn-primary:hover { background: #2b6cb0; box-shadow: 0 2px 8px rgba(49,130,206,0.3); }
-    .btn-success { background: #38a169; color: #fff; }
-    .btn-success:hover { background: #2f855a; }
-    .btn-danger { background: #e53e3e; color: #fff; }
-    .btn-danger:hover { background: #c53030; }
-    .btn-sm { padding: 5px 10px; font-size: 0.78rem; border-radius: 6px; }
-    .btn-outline {
-      background: transparent;
-      border: 1.5px solid #e2e8f0;
-      color: #4a5568;
-    }
-    .btn-outline:hover { background: #f7fafc; border-color: #cbd5e0; }
-    .btn-csv { background: #276749; color: #fff; }
-    .btn-csv:hover { background: #22543d; }
-
-    /* ===== STATS ===== */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .stat-card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 14px 12px;
-      text-align: center;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-      border-top: 3px solid transparent;
-    }
-    .stat-card.attive { border-top-color: #3182ce; }
-    .stat-card.evase { border-top-color: #38a169; }
-    .stat-card.chiuse { border-top-color: #e53e3e; }
-    .stat-card.assunto { border-top-color: #d69e2e; }
-    .stat-card.totale { border-top-color: #805ad5; }
-    .stat-value { font-size: 1.8rem; font-weight: 700; color: #1a202c; line-height: 1; }
-    .stat-label { font-size: 0.7rem; color: #718096; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
-
-    /* ===== TABLE ===== */
-    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    thead { background: #edf2f7; }
-    th {
-      padding: 9px 10px;
-      text-align: left;
-      font-weight: 600;
-      color: #4a5568;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-    td {
-      padding: 9px 10px;
-      border-bottom: 1px solid #f0f4f8;
-      vertical-align: middle;
-    }
-    tr:hover td { background: #f7fafc; }
-    tr:last-child td { border-bottom: none; }
-
-    /* ===== BADGE ===== */
-    .badge {
-      display: inline-block;
-      padding: 3px 9px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .badge-pending { background: #fefcbf; color: #744210; }
-    .badge-active  { background: #bee3f8; color: #1a365d; }
-    .badge-evasa   { background: #c6f6d5; color: #1c4532; }
-    .badge-chiusa  { background: #fed7d7; color: #63171b; }
-    .badge-assunto { background: #faf089; color: #744210; }
-
-    /* ===== FILTRI ===== */
-    .filters-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-      align-items: center;
-    }
-    .filters-bar select,
-    .filters-bar input[type="text"] {
-      padding: 7px 10px;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      background: #fff;
-      color: #1a202c;
-      outline: none;
-    }
-    .filters-bar select:focus,
-    .filters-bar input:focus { border-color: #63b3ed; }
-
-    /* ===== SECTION TABS (sub-nav nelle view) ===== */
-    .subtabs {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-    .subtab-btn {
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1.5px solid #e2e8f0;
-      background: #fff;
-      color: #4a5568;
-      font-size: 0.78rem;
-      font-weight: 500;
+      font-family: inherit;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .subtab-btn:hover { background: #ebf8ff; border-color: #90cdf4; color: #2b6cb0; }
-    .subtab-btn.active { background: #3182ce; border-color: #3182ce; color: #fff; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+    .btn-ghost { background: none; border-color: var(--border); color: var(--text-muted); }
+    .btn-ghost:hover { background: var(--bg); color: var(--text); }
+    .btn-danger { background: none; border-color: #fca5a5; color: var(--red); }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-csv { background: #f0fdf4; border-color: #86efac; color: #166534; }
+    .btn-csv:hover { background: #dcfce7; }
 
-    /* ===== NOTE MODAL ===== */
-    .modal-overlay {
+    /* STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 12px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
+    .stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .stat.c-attive  .stat-num { color: var(--blue); }
+    .stat.c-evase   .stat-num { color: var(--green); }
+    .stat.c-chiuse  .stat-num { color: var(--red); }
+    .stat.c-assunto .stat-num { color: var(--yellow); }
+    .stat.c-tot     .stat-num { color: var(--text); }
+
+    /* BADGE */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .b-pending { background: #fef9c3; color: #854d0e; }
+    .b-attiva  { background: #dbeafe; color: #1e40af; }
+    .b-evasa   { background: #dcfce7; color: #166534; }
+    .b-chiusa  { background: #fee2e2; color: #991b1b; }
+    .b-assunto { background: #fef3c7; color: #92400e; }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+
+    /* FILTERS */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+    .filters select, .filters input {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+    .filters input[type=text] { flex: 1; min-width: 120px; }
+    .filters select:focus, .filters input:focus { border-color: var(--primary); }
+
+    /* SUB-HEADER */
+    .sub-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .sub-header-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* EMPTY STATE */
+    .empty {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* MODAL */
+    .overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 999;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
       align-items: center;
       justify-content: center;
       padding: 16px;
     }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
+    .overlay.open { display: flex; }
+    .modal {
       background: #fff;
-      border-radius: 14px;
-      padding: 22px;
+      border-radius: 12px;
+      padding: 24px;
       width: 100%;
-      max-width: 420px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      max-width: 440px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
     }
-    .modal-box h3 { font-size: 1rem; margin-bottom: 10px; color: #1a202c; }
-    .modal-box p { font-size: 0.88rem; color: #4a5568; line-height: 1.55; white-space: pre-wrap; }
-    .modal-actions { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; }
+    .modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
 
-    /* ===== EDIT MODAL ===== */
-    #editModal .modal-box { max-width: 480px; }
-
-    /* ===== EMPTY STATE ===== */
-    .empty-state {
-      text-align: center;
-      padding: 36px 16px;
-      color: #a0aec0;
-    }
-    .empty-state i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
-    .empty-state p { font-size: 0.88rem; }
-
-    /* ===== TOAST ===== */
+    /* TOAST */
     #toast {
       position: fixed;
-      bottom: 24px;
+      bottom: 20px;
       left: 50%;
-      transform: translateX(-50%) translateY(80px);
+      transform: translateX(-50%) translateY(60px);
       background: #1a202c;
       color: #fff;
-      padding: 11px 22px;
+      padding: 10px 20px;
       border-radius: 24px;
-      font-size: 0.88rem;
+      font-size: 13px;
       font-weight: 500;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.22);
-      z-index: 9999;
-      transition: transform 0.28s cubic-bezier(0.16,1,0.3,1), opacity 0.28s;
+      z-index: 999;
       opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
       pointer-events: none;
+      white-space: nowrap;
     }
-    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ===== UTILS ===== */
-    .text-muted { color: #718096; font-size: 0.8rem; }
-    .mt-8 { margin-top: 8px; }
-    .d-flex { display: flex; gap: 6px; flex-wrap: wrap; }
+    /* FILIALE SELECTOR */
+    .filiale-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .fil-btn {
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .fil-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .fil-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="app-header">
-  <i class="fa-solid fa-briefcase fa-lg"></i>
-  <div>
-    <div class="app-header h1" style="font-size:1.1rem;font-weight:700;">Gestione Aziende</div>
-    <div class="app-header subtitle">Punto FC · Commerciale</div>
-  </div>
-</header>
-
-<!-- NAVIGAZIONE PRINCIPALE (3 TASTI) -->
-<nav class="main-nav" id="mainNav">
-  <button class="nav-btn active" onclick="showView('inserisci',this)" id="navInserisci">
-    <i class="fa-solid fa-plus-circle"></i>
-    <span>Inserisci</span>
-  </button>
-  <button class="nav-btn" onclick="showView('elenco',this)" id="navElenco">
-    <i class="fa-solid fa-list"></i>
-    <span>Elenco</span>
-  </button>
-  <button class="nav-btn" onclick="showView('suddivisione',this)" id="navSuddivisione">
-    <i class="fa-solid fa-chart-bar"></i>
-    <span>Suddivisione</span>
-  </button>
+<!-- NAV 3 TASTI -->
+<nav class="nav" id="mainNav">
+  <button class="nav-btn active" onclick="goView('inserisci', this)">Inserisci</button>
+  <button class="nav-btn" onclick="goView('elenco', this)">Attive</button>
+  <button class="nav-btn" onclick="goView('evase', this)">Evase</button>
+  <button class="nav-btn" onclick="goView('chiuse', this)">Chiuse</button>
+  <button class="nav-btn" onclick="goView('assunto', this)">Hanno assunto</button>
+  <button class="nav-btn" onclick="goView('tutte', this)">Tutte</button>
 </nav>
 
-<!-- ========== VIEW: INSERISCI ========== -->
-<main class="main-content">
-<section class="view active" id="view-inserisci">
+<div class="main">
+
+<!-- VIEW: INSERISCI -->
+<section class="view active" id="v-inserisci">
   <div class="card">
-    <div class="card-title"><i class="fa-solid fa-building-circle-arrow-right"></i> Nuova azienda &mdash;</div>
+    <div class="card-title">Nuova azienda &mdash;</div>
     <div class="form-group">
-      <label for="nomeAzienda">Nome azienda *</label>
-      <input type="text" id="nomeAzienda" placeholder="Es: Rossi Srl" autocomplete="off"/>
+      <label for="inp-nome">Nome azienda *</label>
+      <input id="inp-nome" type="text" placeholder="Es: Rossi Srl" autocomplete="off"/>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label for="statoRicerca">Stato ricerca</label>
-        <select id="statoRicerca">
+        <label for="inp-stato">Stato ricerca</label>
+        <select id="inp-stato">
           <option value="pending">&mdash; in attesa &mdash;</option>
           <option value="attiva">Attiva</option>
           <option value="evasa">Evasa</option>
@@ -363,168 +346,201 @@
         </select>
       </div>
       <div class="form-group">
-        <label for="dataInserimento">Data</label>
-        <input type="date" id="dataInserimento"/>
+        <label for="inp-data">Data</label>
+        <input id="inp-data" type="date"/>
       </div>
     </div>
     <div class="form-group">
-      <label for="noteAzienda">Note (opzionale)</label>
-      <textarea id="noteAzienda" placeholder="Referente, tel, settore..."></textarea>
+      <label for="inp-note">Note (opzionale)</label>
+      <textarea id="inp-note" placeholder="Referente, settore, tel..."></textarea>
     </div>
-    <button class="btn btn-primary" onclick="aggiungiAzienda()">
-      <i class="fa-solid fa-plus"></i> Aggiungi
-    </button>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="inp-filiale">Filiale</label>
+        <select id="inp-filiale">
+          <option value="cesena">Cesena</option>
+          <option value="forli">Forl&igrave;</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="add()">+ Aggiungi</button>
   </div>
 </section>
 
-<!-- ========== VIEW: ELENCO ========== -->
-<section class="view" id="view-elenco">
-  <!-- Stats -->
-  <div class="stats-grid" id="statsGrid"></div>
+<!-- VIEW: ATTIVE -->
+<section class="view" id="v-elenco">
+  <div id="stats-elenco" class="stats-row"></div>
+  <div class="card">
+    <div class="sub-header">
+      <span class="sub-header-title">Ricerche Attive</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-csv btn-sm" onclick="csv('attiva')">Esporta CSV</button>
+        <select class="btn btn-ghost btn-sm" onchange="renderView('elenco', null, this.value)">
+          <option value="dataDesc">Data &darr; (recenti prima)</option>
+          <option value="dataAsc">Data &uarr; (vecchi prima)</option>
+          <option value="alfa">Alfabetico A&rarr;Z</option>
+        </select>
+      </div>
+    </div>
+    <div class="filiale-bar" id="fil-elenco">
+      <button class="fil-btn active" data-fil="" onclick="setFil('elenco','',this)">Tutte le filiali</button>
+      <button class="fil-btn" data-fil="cesena" onclick="setFil('elenco','cesena',this)">Cesena</button>
+      <button class="fil-btn" data-fil="forli" onclick="setFil('elenco','forli',this)">Forl&igrave;</button>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>#</th><th>Azienda</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
+      <tbody id="tb-elenco"></tbody></table>
+    </div>
+    <div id="em-elenco" class="empty" style="display:none">Nessuna ricerca attiva.</div>
+  </div>
+</section>
 
-  <!-- Filtri -->
-  <div class="card" style="padding:14px;">
-    <div class="filters-bar">
-      <select id="filtroStato" onchange="renderElenco()">
+<!-- VIEW: EVASE -->
+<section class="view" id="v-evase">
+  <div class="card">
+    <div class="sub-header">
+      <span class="sub-header-title">Ricerche Evase</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-csv btn-sm" onclick="csv('evasa')">Esporta CSV</button>
+        <select class="btn btn-ghost btn-sm" onchange="renderView('evase', null, this.value)">
+          <option value="dataDesc">Data &darr;</option>
+          <option value="dataAsc">Data &uarr;</option>
+          <option value="alfa">Alfabetico</option>
+          <option value="mese">Per mese</option>
+        </select>
+      </div>
+    </div>
+    <div class="filiale-bar" id="fil-evase">
+      <button class="fil-btn active" data-fil="" onclick="setFil('evase','',this)">Tutte le filiali</button>
+      <button class="fil-btn" data-fil="cesena" onclick="setFil('evase','cesena',this)">Cesena</button>
+      <button class="fil-btn" data-fil="forli" onclick="setFil('evase','forli',this)">Forl&igrave;</button>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>#</th><th>Azienda</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
+      <tbody id="tb-evase"></tbody></table>
+    </div>
+    <div id="em-evase" class="empty" style="display:none">Nessuna ricerca evasa.</div>
+  </div>
+</section>
+
+<!-- VIEW: CHIUSE -->
+<section class="view" id="v-chiuse">
+  <div class="card">
+    <div class="sub-header">
+      <span class="sub-header-title">Ricerche Chiuse</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-csv btn-sm" onclick="csv('chiusa')">Esporta CSV</button>
+        <select class="btn btn-ghost btn-sm" onchange="renderView('chiuse', null, this.value)">
+          <option value="dataDesc">Data &darr;</option>
+          <option value="dataAsc">Data &uarr;</option>
+          <option value="alfa">Alfabetico</option>
+          <option value="mese">Per mese</option>
+        </select>
+      </div>
+    </div>
+    <div class="filiale-bar" id="fil-chiuse">
+      <button class="fil-btn active" data-fil="" onclick="setFil('chiuse','',this)">Tutte le filiali</button>
+      <button class="fil-btn" data-fil="cesena" onclick="setFil('chiuse','cesena',this)">Cesena</button>
+      <button class="fil-btn" data-fil="forli" onclick="setFil('chiuse','forli',this)">Forl&igrave;</button>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>#</th><th>Azienda</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
+      <tbody id="tb-chiuse"></tbody></table>
+    </div>
+    <div id="em-chiuse" class="empty" style="display:none">Nessuna ricerca chiusa.</div>
+  </div>
+</section>
+
+<!-- VIEW: HANNO ASSUNTO -->
+<section class="view" id="v-assunto">
+  <div class="card">
+    <div class="sub-header">
+      <span class="sub-header-title">Hanno assunto da soli</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-csv btn-sm" onclick="csv('assunto')">Esporta CSV</button>
+        <select class="btn btn-ghost btn-sm" onchange="renderView('assunto', null, this.value)">
+          <option value="dataDesc">Data &darr;</option>
+          <option value="dataAsc">Data &uarr;</option>
+          <option value="alfa">Alfabetico</option>
+          <option value="mese">Per mese</option>
+        </select>
+      </div>
+    </div>
+    <div class="filiale-bar" id="fil-assunto">
+      <button class="fil-btn active" data-fil="" onclick="setFil('assunto','',this)">Tutte le filiali</button>
+      <button class="fil-btn" data-fil="cesena" onclick="setFil('assunto','cesena',this)">Cesena</button>
+      <button class="fil-btn" data-fil="forli" onclick="setFil('assunto','forli',this)">Forl&igrave;</button>
+    </div>
+    <div class="table-wrap">
+      <table><thead><tr><th>#</th><th>Azienda</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
+      <tbody id="tb-assunto"></tbody></table>
+    </div>
+    <div id="em-assunto" class="empty" style="display:none">Nessuna azienda qui.</div>
+  </div>
+</section>
+
+<!-- VIEW: TUTTE -->
+<section class="view" id="v-tutte">
+  <div id="stats-tutte" class="stats-row"></div>
+  <div class="card">
+    <div class="sub-header">
+      <span class="sub-header-title">Tutte le aziende</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-csv btn-sm" onclick="csv('tutto')">Esporta CSV</button>
+        <select class="btn btn-ghost btn-sm" id="ord-tutte" onchange="renderView('tutte', null, this.value)">
+          <option value="dataDesc">Data &darr; (recenti prima)</option>
+          <option value="dataAsc">Data &uarr; (vecchi prima)</option>
+          <option value="alfa">Alfabetico A&rarr;Z</option>
+        </select>
+      </div>
+    </div>
+    <div class="filters">
+      <select id="fil-stato-tutte" onchange="renderView('tutte')">
         <option value="">Tutti gli stati</option>
         <option value="pending">In attesa</option>
         <option value="attiva">Attiva</option>
-        <option value="evasa">Evasa</option>
-        <option value="chiusa">Chiusa</option>
+        <option value="evasa">Evase</option>
+        <option value="chiusa">Chiuse</option>
         <option value="assunto">Hanno assunto</option>
       </select>
-      <select id="filtroOrdine" onchange="renderElenco()">
-        <option value="dataDesc">Data ↓ (recenti prima)</option>
-        <option value="dataAsc">Data ↑ (vecchi prima)</option>
-        <option value="alfa">Alfabetico A→Z</option>
-      </select>
-      <input type="text" id="filtroSearch" placeholder="🔍 cerca azienda..." oninput="renderElenco()" style="flex:1;min-width:120px;"/>
-      <button class="btn btn-csv btn-sm" onclick="esportaCSV('tutto')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
+      <input type="text" id="search-tutte" placeholder="🔍 cerca..." oninput="renderView('tutte')" />
+    </div>
+    <div class="filiale-bar" id="fil-tutte">
+      <button class="fil-btn active" data-fil="" onclick="setFil('tutte','',this)">Tutte le filiali</button>
+      <button class="fil-btn" data-fil="cesena" onclick="setFil('tutte','cesena',this)">Cesena</button>
+      <button class="fil-btn" data-fil="forli" onclick="setFil('tutte','forli',this)">Forl&igrave;</button>
     </div>
     <div class="table-wrap">
-      <table id="tabellaElenco">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Azienda</th>
-            <th>Stato</th>
-            <th>Data</th>
-            <th>Note</th>
-            <th>Azioni</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyElenco"></tbody>
-      </table>
+      <table><thead><tr><th>#</th><th>Azienda</th><th>Stato</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
+      <tbody id="tb-tutte"></tbody></table>
     </div>
-    <div id="emptyElenco" class="empty-state" style="display:none;">
-      <i class="fa-solid fa-inbox"></i>
-      <p>Nessuna azienda trovata.</p>
-    </div>
+    <div id="em-tutte" class="empty" style="display:none">Nessuna azienda trovata.</div>
   </div>
 </section>
 
-<!-- ========== VIEW: SUDDIVISIONE ========== -->
-<section class="view" id="view-suddivisione">
-
-  <!-- ATTIVE -->
-  <div class="card">
-    <div class="card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
-      <span><i class="fa-solid fa-circle-check" style="color:#3182ce;"></i> Ricerche Attive</span>
-      <div class="d-flex">
-        <button class="btn btn-csv btn-sm" onclick="esportaCSV('attiva')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
-        <select class="btn btn-sm btn-outline" onchange="renderSub('attiva',this.value)" style="padding:5px 8px;font-size:0.75rem;">
-          <option value="dataDesc">Data ↓</option>
-          <option value="dataAsc">Data ↑</option>
-          <option value="alfa">Alfabetico</option>
-          <option value="mese">Per mese</option>
-        </select>
-      </div>
-    </div>
-    <div class="table-wrap"><table><thead><tr><th>Azienda</th><th>Data</th><th>Note</th><th></th></tr></thead><tbody id="sub-attiva"></tbody></table></div>
-    <div id="empty-attiva" class="empty-state" style="display:none;"><i class="fa-solid fa-inbox"></i><p>Nessuna ricerca attiva.</p></div>
-  </div>
-
-  <!-- EVASE -->
-  <div class="card">
-    <div class="card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
-      <span><i class="fa-solid fa-check-double" style="color:#38a169;"></i> Ricerche Evase</span>
-      <div class="d-flex">
-        <button class="btn btn-csv btn-sm" onclick="esportaCSV('evasa')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
-        <select class="btn btn-sm btn-outline" onchange="renderSub('evasa',this.value)" style="padding:5px 8px;font-size:0.75rem;">
-          <option value="dataDesc">Data ↓</option>
-          <option value="dataAsc">Data ↑</option>
-          <option value="alfa">Alfabetico</option>
-          <option value="mese">Per mese</option>
-        </select>
-      </div>
-    </div>
-    <div class="table-wrap"><table><thead><tr><th>Azienda</th><th>Data</th><th>Note</th><th></th></tr></thead><tbody id="sub-evasa"></tbody></table></div>
-    <div id="empty-evasa" class="empty-state" style="display:none;"><i class="fa-solid fa-inbox"></i><p>Nessuna ricerca evasa.</p></div>
-  </div>
-
-  <!-- CHIUSE -->
-  <div class="card">
-    <div class="card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
-      <span><i class="fa-solid fa-circle-xmark" style="color:#e53e3e;"></i> Ricerche Chiuse</span>
-      <div class="d-flex">
-        <button class="btn btn-csv btn-sm" onclick="esportaCSV('chiusa')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
-        <select class="btn btn-sm btn-outline" onchange="renderSub('chiusa',this.value)" style="padding:5px 8px;font-size:0.75rem;">
-          <option value="dataDesc">Data ↓</option>
-          <option value="dataAsc">Data ↑</option>
-          <option value="alfa">Alfabetico</option>
-          <option value="mese">Per mese</option>
-        </select>
-      </div>
-    </div>
-    <div class="table-wrap"><table><thead><tr><th>Azienda</th><th>Data</th><th>Note</th><th></th></tr></thead><tbody id="sub-chiusa"></tbody></table></div>
-    <div id="empty-chiusa" class="empty-state" style="display:none;"><i class="fa-solid fa-inbox"></i><p>Nessuna ricerca chiusa.</p></div>
-  </div>
-
-  <!-- HANNO ASSUNTO -->
-  <div class="card">
-    <div class="card-title" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
-      <span><i class="fa-solid fa-user-check" style="color:#d69e2e;"></i> Hanno assunto da soli</span>
-      <div class="d-flex">
-        <button class="btn btn-csv btn-sm" onclick="esportaCSV('assunto')"><i class="fa-solid fa-file-csv"></i> Esporta CSV</button>
-        <select class="btn btn-sm btn-outline" onchange="renderSub('assunto',this.value)" style="padding:5px 8px;font-size:0.75rem;">
-          <option value="dataDesc">Data ↓</option>
-          <option value="dataAsc">Data ↑</option>
-          <option value="alfa">Alfabetico</option>
-          <option value="mese">Per mese</option>
-        </select>
-      </div>
-    </div>
-    <div class="table-wrap"><table><thead><tr><th>Azienda</th><th>Data</th><th>Note</th><th></th></tr></thead><tbody id="sub-assunto"></tbody></table></div>
-    <div id="empty-assunto" class="empty-state" style="display:none;"><i class="fa-solid fa-inbox"></i><p>Nessuna azienda in questa categoria.</p></div>
-  </div>
-
-</section>
-</main>
+</div><!-- /main -->
 
 <!-- MODAL NOTE -->
-<div class="modal-overlay" id="noteModal">
-  <div class="modal-box">
-    <h3><i class="fa-solid fa-sticky-note"></i> Note azienda</h3>
-    <p id="noteModalText"></p>
-    <div class="modal-actions">
-      <button class="btn btn-outline btn-sm" onclick="closeModal('noteModal')"><i class="fa-solid fa-xmark"></i> Chiudi</button>
+<div class="overlay" id="ov-note">
+  <div class="modal">
+    <h3>Note</h3>
+    <p id="note-text" style="font-size:14px;color:#4a5568;white-space:pre-wrap;line-height:1.6;"></p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeOv('ov-note')">Chiudi</button>
     </div>
   </div>
 </div>
 
 <!-- MODAL EDIT -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal-box" id="editModalBox">
-    <h3><i class="fa-solid fa-pen"></i> Modifica azienda</h3>
-    <input type="hidden" id="editId"/>
-    <div class="form-group">
-      <label>Nome azienda *</label>
-      <input type="text" id="editNome"/>
-    </div>
+<div class="overlay" id="ov-edit">
+  <div class="modal">
+    <h3>Modifica azienda</h3>
+    <input type="hidden" id="edit-id"/>
+    <div class="form-group"><label>Nome *</label><input type="text" id="edit-nome"/></div>
     <div class="form-row">
       <div class="form-group">
         <label>Stato</label>
-        <select id="editStato">
+        <select id="edit-stato">
           <option value="pending">In attesa</option>
           <option value="attiva">Attiva</option>
           <option value="evasa">Evasa</option>
@@ -532,18 +548,21 @@
           <option value="assunto">Hanno assunto da soli</option>
         </select>
       </div>
+      <div class="form-group"><label>Data</label><input type="date" id="edit-data"/></div>
+    </div>
+    <div class="form-row">
       <div class="form-group">
-        <label>Data</label>
-        <input type="date" id="editData"/>
+        <label>Filiale</label>
+        <select id="edit-filiale">
+          <option value="cesena">Cesena</option>
+          <option value="forli">Forl&igrave;</option>
+        </select>
       </div>
     </div>
-    <div class="form-group">
-      <label>Note</label>
-      <textarea id="editNote"></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-outline btn-sm" onclick="closeModal('editModal')"><i class="fa-solid fa-xmark"></i> Annulla</button>
-      <button class="btn btn-primary btn-sm" onclick="salvaModifica()"><i class="fa-solid fa-floppy-disk"></i> Salva</button>
+    <div class="form-group"><label>Note</label><textarea id="edit-note"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost btn-sm" onclick="closeOv('ov-edit')">Annulla</button>
+      <button class="btn btn-primary btn-sm" onclick="saveEdit()">Salva</button>
     </div>
   </div>
 </div>
@@ -552,272 +571,262 @@
 <div id="toast"></div>
 
 <script>
-// ===== STORAGE =====
-const STORAGE_KEY = 'puntofc_aziende_v2';
+const KEY = 'puntofc_v3';
+let db = [];
+try { db = JSON.parse(localStorage.getItem(KEY)) || []; } catch{}
+function save() { localStorage.setItem(KEY, JSON.stringify(db)); }
 
-function loadData() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch { return []; }
-}
-function saveData(arr) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-}
+// stato corrente filtri filiale per ogni view
+const filState = { elenco:'', evase:'', chiuse:'', assunto:'', tutte:'' };
+const ordState = { elenco:'dataDesc', evase:'dataDesc', chiuse:'dataDesc', assunto:'dataDesc', tutte:'dataDesc' };
 
-let aziende = loadData();
+// data di default
+document.getElementById('inp-data').valueAsDate = new Date();
 
-// ===== DATE DEFAULT =====
-document.getElementById('dataInserimento').valueAsDate = new Date();
-
-// ===== NAVIGATION =====
-function showView(name, btn) {
+// ===== NAVIGAZIONE =====
+function goView(name, btn) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
+  document.getElementById('v-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'elenco') renderElenco();
-  if (name === 'suddivisione') renderSuddivisione();
+  renderView(name);
+}
+
+// ===== FILIALE FILTER =====
+function setFil(view, val, btn) {
+  filState[view] = val;
+  document.querySelectorAll('#fil-'+view+' .fil-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderView(view);
 }
 
 // ===== ADD =====
-function aggiungiAzienda() {
-  const nome = document.getElementById('nomeAzienda').value.trim();
-  if (!nome) { showToast('⚠️ Inserisci il nome azienda!'); return; }
-  const stato = document.getElementById('statoRicerca').value;
-  const data  = document.getElementById('dataInserimento').value || today();
-  const note  = document.getElementById('noteAzienda').value.trim();
-
-  aziende.push({ id: Date.now(), nome, stato, data, note });
-  saveData(aziende);
-
-  document.getElementById('nomeAzienda').value = '';
-  document.getElementById('statoRicerca').value = 'pending';
-  document.getElementById('noteAzienda').value = '';
-  document.getElementById('dataInserimento').valueAsDate = new Date();
-
-  showToast('✅ Azienda aggiunta!');
-}
-
-// ===== STATS =====
-function renderStats() {
-  const counts = { attiva:0, evasa:0, chiusa:0, assunto:0, tot: aziende.length };
-  aziende.forEach(a => { if (counts[a.stato] !== undefined) counts[a.stato]++; });
-  document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-card attive"><div class="stat-value">${counts.attiva}</div><div class="stat-label">Attive</div></div>
-    <div class="stat-card evase"><div class="stat-value">${counts.evasa}</div><div class="stat-label">Evase</div></div>
-    <div class="stat-card chiuse"><div class="stat-value">${counts.chiusa}</div><div class="stat-label">Chiuse</div></div>
-    <div class="stat-card assunto"><div class="stat-value">${counts.assunto}</div><div class="stat-label">Hanno assunto</div></div>
-    <div class="stat-card totale"><div class="stat-value">${counts.tot}</div><div class="stat-label">Totale</div></div>`;
-}
-
-// ===== ELENCO =====
-function renderElenco() {
-  renderStats();
-  const filtroStato = document.getElementById('filtroStato').value;
-  const ordine      = document.getElementById('filtroOrdine').value;
-  const search      = document.getElementById('filtroSearch').value.toLowerCase();
-
-  let list = aziende.filter(a => {
-    if (filtroStato && a.stato !== filtroStato) return false;
-    if (search && !a.nome.toLowerCase().includes(search)) return false;
-    return true;
+function add() {
+  const nome = document.getElementById('inp-nome').value.trim();
+  if (!nome) { toast('⚠️ Inserisci il nome azienda'); return; }
+  db.push({
+    id: Date.now(),
+    nome,
+    stato: document.getElementById('inp-stato').value,
+    data: document.getElementById('inp-data').value || today(),
+    note: document.getElementById('inp-note').value.trim(),
+    filiale: document.getElementById('inp-filiale').value,
   });
-
-  list = sortList(list, ordine);
-
-  const tbody = document.getElementById('tbodyElenco');
-  const empty = document.getElementById('emptyElenco');
-
-  if (!list.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display = 'none';
-
-  tbody.innerHTML = list.map((a,i) => `
-    <tr>
-      <td class="text-muted">${i+1}</td>
-      <td><strong>${esc(a.nome)}</strong></td>
-      <td>${badgeHtml(a.stato)}</td>
-      <td class="text-muted">${fmtData(a.data)}</td>
-      <td>${a.note ? `<button class="btn btn-outline btn-sm" onclick="apriNote(${a.id})"><i class="fa-solid fa-note-sticky"></i></button>` : '<span class="text-muted">—</span>'}</td>
-      <td>
-        <div class="d-flex">
-          <button class="btn btn-outline btn-sm" onclick="apriEdit(${a.id})"><i class="fa-solid fa-pen"></i></button>
-          <button class="btn btn-danger btn-sm" onclick="eliminaAzienda(${a.id})"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      </td>
-    </tr>`).join('');
+  save();
+  document.getElementById('inp-nome').value = '';
+  document.getElementById('inp-stato').value = 'pending';
+  document.getElementById('inp-note').value = '';
+  document.getElementById('inp-data').valueAsDate = new Date();
+  toast('✅ Azienda aggiunta!');
 }
 
-// ===== SUDDIVISIONE =====
-function renderSuddivisione() {
-  ['attiva','evasa','chiusa','assunto'].forEach(s => renderSub(s, 'dataDesc'));
+// ===== RENDER =====
+function renderView(name, stato, ordine) {
+  if (ordine) ordState[name] = ordine;
+  const ord = ordState[name];
+  const fil = filState[name];
+
+  if (name === 'elenco')  renderTable('elenco',  'attiva',  ord, fil);
+  if (name === 'evase')   renderTable('evase',   'evasa',   ord, fil);
+  if (name === 'chiuse')  renderTable('chiuse',  'chiusa',  ord, fil);
+  if (name === 'assunto') renderTable('assunto', 'assunto', ord, fil);
+  if (name === 'tutte')   renderTutte(ord, fil);
 }
 
-function renderSub(stato, ordine) {
-  let list = aziende.filter(a => a.stato === stato);
-  list = sortList(list, ordine);
+function renderTable(id, stato, ord, fil) {
+  let list = db.filter(a => a.stato === stato);
+  if (fil) list = list.filter(a => a.filiale === fil);
+  list = sort(list, ord);
 
-  const tbody = document.getElementById('sub-' + stato);
-  const empty = document.getElementById('empty-' + stato);
+  const tbody = document.getElementById('tb-' + id);
+  const em    = document.getElementById('em-' + id);
 
-  if (!list.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
-  empty.style.display = 'none';
+  if (!list.length) { tbody.innerHTML = ''; em.style.display = 'block'; return; }
+  em.style.display = 'none';
 
-  if (ordine === 'mese') {
-    const gruppi = {};
-    list.forEach(a => {
-      const k = a.data ? a.data.substring(0,7) : '?';
-      if (!gruppi[k]) gruppi[k] = [];
-      gruppi[k].push(a);
-    });
-    tbody.innerHTML = Object.keys(gruppi).sort((a,b)=>b.localeCompare(a)).map(mese => `
-      <tr><td colspan="4" style="background:#f7fafc;font-size:0.75rem;font-weight:700;color:#4a5568;padding:6px 10px;letter-spacing:0.5px;">${fmtMese(mese)}</td></tr>
-      ${gruppi[mese].map(a => rowSub(a)).join('')}`).join('');
+  if (ord === 'mese') {
+    const grp = {};
+    list.forEach(a => { const k = (a.data||'').substring(0,7)||'?'; (grp[k]||(grp[k]=[])).push(a); });
+    tbody.innerHTML = Object.keys(grp).sort((a,b)=>b.localeCompare(a)).map((m,mi) =>
+      `<tr><td colspan="6" style="background:#f8fafc;font-size:11px;font-weight:700;color:#64748b;padding:6px 10px;">${fmtMese(m)}</td></tr>` +
+      grp[m].map((a,i) => rowNoStato(a, i+1)).join('')
+    ).join('');
   } else {
-    tbody.innerHTML = list.map(rowSub).join('');
+    tbody.innerHTML = list.map((a,i) => rowNoStato(a, i+1)).join('');
   }
+
+  // stats solo per elenco
+  if (id === 'elenco') renderStats('stats-elenco', fil);
 }
 
-function rowSub(a) {
+function renderTutte(ord, fil) {
+  let list = [...db];
+  if (fil) list = list.filter(a => a.filiale === fil);
+  const statoF  = document.getElementById('fil-stato-tutte').value;
+  const searchF = (document.getElementById('search-tutte').value||'').toLowerCase();
+  if (statoF) list = list.filter(a => a.stato === statoF);
+  if (searchF) list = list.filter(a => a.nome.toLowerCase().includes(searchF));
+  list = sort(list, ord);
+
+  const tbody = document.getElementById('tb-tutte');
+  const em    = document.getElementById('em-tutte');
+
+  if (!list.length) { tbody.innerHTML = ''; em.style.display = 'block'; return; }
+  em.style.display = 'none';
+  tbody.innerHTML = list.map((a,i) => rowConStato(a, i+1)).join('');
+  renderStats('stats-tutte', fil);
+}
+
+function rowNoStato(a, n) {
   return `<tr>
+    <td style="color:#94a3b8">${n}</td>
     <td><strong>${esc(a.nome)}</strong></td>
-    <td class="text-muted">${fmtData(a.data)}</td>
-    <td>${a.note ? `<button class="btn btn-outline btn-sm" onclick="apriNote(${a.id})"><i class="fa-solid fa-note-sticky"></i></button>` : '<span class="text-muted">—</span>'}</td>
-    <td>
-      <div class="d-flex">
-        <button class="btn btn-outline btn-sm" onclick="apriEdit(${a.id})"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn btn-danger btn-sm" onclick="eliminaAzienda(${a.id})"><i class="fa-solid fa-trash"></i></button>
-      </div>
-    </td>
+    <td style="color:#64748b;font-size:12px">${fmtFiliale(a.filiale)}</td>
+    <td style="color:#64748b">${fmtData(a.data)}</td>
+    <td>${a.note ? `<button class="btn btn-ghost btn-sm" onclick="showNote(${a.id})">📋</button>` : '<span style="color:#cbd5e0">—</span>'}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-ghost btn-sm" onclick="openEdit(${a.id})">✏️</button>
+      <button class="btn btn-danger btn-sm" onclick="del(${a.id})">🗑</button>
+    </div></td>
   </tr>`;
 }
 
-// ===== EDIT =====
-function apriEdit(id) {
-  const a = aziende.find(x => x.id === id);
-  if (!a) return;
-  document.getElementById('editId').value   = id;
-  document.getElementById('editNome').value  = a.nome;
-  document.getElementById('editStato').value = a.stato;
-  document.getElementById('editData').value  = a.data;
-  document.getElementById('editNote').value  = a.note || '';
-  openModal('editModal');
+function rowConStato(a, n) {
+  return `<tr>
+    <td style="color:#94a3b8">${n}</td>
+    <td><strong>${esc(a.nome)}</strong></td>
+    <td>${badge(a.stato)}</td>
+    <td style="color:#64748b;font-size:12px">${fmtFiliale(a.filiale)}</td>
+    <td style="color:#64748b">${fmtData(a.data)}</td>
+    <td>${a.note ? `<button class="btn btn-ghost btn-sm" onclick="showNote(${a.id})">📋</button>` : '<span style="color:#cbd5e0">—</span>'}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-ghost btn-sm" onclick="openEdit(${a.id})">✏️</button>
+      <button class="btn btn-danger btn-sm" onclick="del(${a.id})">🗑</button>
+    </div></td>
+  </tr>`;
 }
 
-function salvaModifica() {
-  const id    = parseInt(document.getElementById('editId').value);
-  const nome  = document.getElementById('editNome').value.trim();
-  if (!nome) { showToast('⚠️ Nome obbligatorio!'); return; }
-  const stato = document.getElementById('editStato').value;
-  const data  = document.getElementById('editData').value;
-  const note  = document.getElementById('editNote').value.trim();
+function renderStats(containerId, fil) {
+  let list = fil ? db.filter(a => a.filiale === fil) : db;
+  const c = { attiva:0, evasa:0, chiusa:0, assunto:0 };
+  list.forEach(a => { if(c[a.stato]!==undefined) c[a.stato]++; });
+  document.getElementById(containerId).innerHTML = `
+    <div class="stat c-attive"><div class="stat-num">${c.attiva}</div><div class="stat-lbl">Attive</div></div>
+    <div class="stat c-evase"><div class="stat-num">${c.evasa}</div><div class="stat-lbl">Evase</div></div>
+    <div class="stat c-chiuse"><div class="stat-num">${c.chiusa}</div><div class="stat-lbl">Chiuse</div></div>
+    <div class="stat c-assunto"><div class="stat-num">${c.assunto}</div><div class="stat-lbl">Hanno assunto</div></div>
+    <div class="stat c-tot"><div class="stat-num">${list.length}</div><div class="stat-lbl">Totale</div></div>`;
+}
 
-  const idx = aziende.findIndex(a => a.id === id);
-  if (idx === -1) return;
-  aziende[idx] = { id, nome, stato, data, note };
-  saveData(aziende);
-  closeModal('editModal');
-  renderElenco();
-  showToast('✅ Modificato!');
+// ===== EDIT =====
+function openEdit(id) {
+  const a = db.find(x => x.id === id); if (!a) return;
+  document.getElementById('edit-id').value      = id;
+  document.getElementById('edit-nome').value    = a.nome;
+  document.getElementById('edit-stato').value   = a.stato;
+  document.getElementById('edit-data').value    = a.data;
+  document.getElementById('edit-note').value    = a.note || '';
+  document.getElementById('edit-filiale').value = a.filiale || 'cesena';
+  openOv('ov-edit');
+}
+function saveEdit() {
+  const id   = parseInt(document.getElementById('edit-id').value);
+  const nome = document.getElementById('edit-nome').value.trim();
+  if (!nome) { toast('⚠️ Nome obbligatorio'); return; }
+  const idx = db.findIndex(a => a.id === id); if (idx < 0) return;
+  db[idx] = {
+    id,
+    nome,
+    stato:   document.getElementById('edit-stato').value,
+    data:    document.getElementById('edit-data').value,
+    note:    document.getElementById('edit-note').value.trim(),
+    filiale: document.getElementById('edit-filiale').value,
+  };
+  save(); closeOv('ov-edit');
+  // ri-render la view attiva
+  const active = document.querySelector('.nav-btn.active');
+  if (active) active.click();
+  toast('✅ Salvato!');
 }
 
 // ===== DELETE =====
-function eliminaAzienda(id) {
+function del(id) {
   if (!confirm('Eliminare questa azienda?')) return;
-  aziende = aziende.filter(a => a.id !== id);
-  saveData(aziende);
-  renderElenco();
-  showToast('🗑️ Eliminato!');
+  db = db.filter(a => a.id !== id);
+  save();
+  const active = document.querySelector('.nav-btn.active');
+  if (active) active.click();
+  toast('🗑 Eliminato!');
 }
 
 // ===== NOTE =====
-function apriNote(id) {
-  const a = aziende.find(x => x.id === id);
+function showNote(id) {
+  const a = db.find(x => x.id === id);
   if (!a || !a.note) return;
-  document.getElementById('noteModalText').textContent = a.note;
-  openModal('noteModal');
+  document.getElementById('note-text').textContent = a.note;
+  openOv('ov-note');
+}
+
+// ===== CSV =====
+function csv(filtro) {
+  let list = filtro === 'tutto' ? db : db.filter(a => a.stato === filtro);
+  if (!list.length) { toast('Nessun dato'); return; }
+  const hdr  = 'Nome,Stato,Filiale,Data,Note';
+  const rows = list.map(a => `"${a.nome}","${lblStato(a.stato)}","${fmtFiliale(a.filiale)}","${a.data}","${(a.note||'').replace(/"/g,'""')}"`);
+  const blob = new Blob(['\uFEFF'+[hdr,...rows].join('\n')], { type:'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const lnk  = document.createElement('a');
+  lnk.href = url; lnk.download = `aziende_${filtro}_${today()}.csv`;
+  lnk.click(); URL.revokeObjectURL(url);
+  toast('📥 CSV esportato!');
 }
 
 // ===== MODAL =====
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(m => {
-  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
-});
-
-// ===== CSV =====
-function esportaCSV(filtro) {
-  let list = filtro === 'tutto' ? aziende : aziende.filter(a => a.stato === filtro);
-  if (!list.length) { showToast('Nessun dato da esportare'); return; }
-  const header = 'Nome,Stato,Data,Note';
-  const rows   = list.map(a => `"${a.nome}","${labelStato(a.stato)}","${a.data}","${(a.note||'').replace(/"/g,'""')}"`);
-  const csv    = [header, ...rows].join('\n');
-  const blob   = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
-  const url    = URL.createObjectURL(blob);
-  const link   = document.createElement('a');
-  link.href    = url;
-  link.download = `aziende_${filtro}_${today()}.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
-  showToast('📥 CSV esportato!');
-}
+function openOv(id)  { document.getElementById(id).classList.add('open'); }
+function closeOv(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o =>
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
 
 // ===== UTILS =====
-function sortList(list, ordine) {
+function sort(list, ord) {
   return [...list].sort((a,b) => {
-    if (ordine === 'dataDesc') return (b.data||'').localeCompare(a.data||'');
-    if (ordine === 'dataAsc')  return (a.data||'').localeCompare(b.data||'');
-    if (ordine === 'alfa')     return a.nome.localeCompare(b.nome, 'it');
+    if (ord==='dataDesc') return (b.data||'').localeCompare(a.data||'');
+    if (ord==='dataAsc')  return (a.data||'').localeCompare(b.data||'');
+    if (ord==='alfa')     return a.nome.localeCompare(b.nome,'it');
     return 0;
   });
 }
-
-function badgeHtml(stato) {
-  const map = {
-    pending: ['badge-pending','In attesa'],
-    attiva:  ['badge-active', 'Attiva'],
-    evasa:   ['badge-evasa',  'Evasa'],
-    chiusa:  ['badge-chiusa', 'Chiusa'],
-    assunto: ['badge-assunto','Hanno assunto'],
-  };
-  const [cls, label] = map[stato] || ['badge-pending', stato];
-  return `<span class="badge ${cls}">${label}</span>`;
+function badge(stato) {
+  const m = { pending:['b-pending','In attesa'], attiva:['b-attiva','Attiva'], evasa:['b-evasa','Evasa'], chiusa:['b-chiusa','Chiusa'], assunto:['b-assunto','Hanno assunto'] };
+  const [c,l] = m[stato]||['b-pending',stato];
+  return `<span class="badge ${c}">${l}</span>`;
 }
-
-function labelStato(stato) {
-  return { pending:'In attesa', attiva:'Attiva', evasa:'Evasa', chiusa:'Chiusa', assunto:'Hanno assunto' }[stato] || stato;
+function lblStato(s) {
+  return { pending:'In attesa', attiva:'Attiva', evasa:'Evasa', chiusa:'Chiusa', assunto:'Hanno assunto' }[s]||s;
 }
-
 function fmtData(d) {
   if (!d) return '—';
-  const [y,m,dd] = d.split('-');
-  return `${dd}/${m}/${y}`;
+  const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`;
 }
-
 function fmtMese(m) {
-  if (!m || m === '?') return 'Data sconosciuta';
-  const [y, mo] = m.split('-');
-  const nomi = ['','Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-  return `${nomi[parseInt(mo)]} ${y}`;
+  if (!m||m==='?') return 'Data sconosciuta';
+  const [y,mo] = m.split('-');
+  const n = ['','Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  return `${n[parseInt(mo)]} ${y}`;
 }
-
-function today() {
-  return new Date().toISOString().split('T')[0];
+function fmtFiliale(f) {
+  return f === 'forli' ? 'Forlì' : f === 'cesena' ? 'Cesena' : '—';
 }
+function today() { return new Date().toISOString().split('T')[0]; }
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function esc(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-let toastTimer;
-function showToast(msg) {
+let _toastTimer;
+function toast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
 }
-
-// ===== INIT =====
-renderStats();
 </script>
 </body>
 </html>
