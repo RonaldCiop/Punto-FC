@@ -4,824 +4,765 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestione Aziende Commerciale</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
   <style>
+    /* ── Reset & base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg: #f5f7fa;
-      --surface: #ffffff;
-      --border: #e2e8f0;
-      --text: #1a202c;
-      --text-muted: #718096;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --green: #10b981;
-      --red: #ef4444;
-      --yellow: #f59e0b;
-      --blue: #3b82f6;
-      --radius: 10px;
-      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+      --bg-primary:   #ffffff;
+      --bg-secondary: #f5f5f3;
+      --bg-tertiary:  #ebebea;
+      --text-primary:   #1a1a18;
+      --text-secondary: #6b6b68;
+      --text-tertiary:  #9b9b97;
+      --border-light:  rgba(0,0,0,.10);
+      --border-medium: rgba(0,0,0,.18);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      /* semantic */
+      --green-bg:   #EAF3DE; --green-text:   #27500A;
+      --red-bg:     #FCEBEB; --red-text:     #A32D2D;
+      --amber-bg:   #FAEEDA; --amber-text:   #633806;
+      --blue-bg:    #E6F1FB; --blue-text:    #185FA5;
+      --info-bg:    #E6F1FB; --info-text:    #185FA5;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary:   #1e1e1c;
+        --bg-secondary: #2a2a28;
+        --bg-tertiary:  #333330;
+        --text-primary:   #f0f0ec;
+        --text-secondary: #a0a09c;
+        --text-tertiary:  #6b6b68;
+        --border-light:  rgba(255,255,255,.10);
+        --border-medium: rgba(255,255,255,.18);
+        --green-bg:   #173404; --green-text:   #C0DD97;
+        --red-bg:     #501313; --red-text:     #F7C1C1;
+        --amber-bg:   #412402; --amber-text:   #FAC775;
+        --blue-bg:    #042C53; --blue-text:    #B5D4F4;
+        --info-bg:    #042C53; --info-text:    #B5D4F4;
+      }
+    }
+
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-size: 15px;
+      line-height: 1.5;
       min-height: 100vh;
     }
 
-    /* NAV */
-    .nav {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 2px;
-      padding: 8px 16px 0;
-      overflow-x: auto;
-      scrollbar-width: none;
-      position: sticky;
-      top: 0;
-      z-index: 50;
+    /* ── Layout shell ─────────────────────────────────────── */
+    .shell {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
     }
-    .nav::-webkit-scrollbar { display: none; }
-    .nav-btn {
-      padding: 8px 16px;
-      border: none;
-      background: none;
-      color: var(--text-muted);
+
+    /* ── Header ───────────────────────────────────────────── */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .app-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .app-title i { font-size: 22px; color: var(--info-text); }
+
+    /* ── Ufficio switcher ─────────────────────────────────── */
+    .ufficio-switcher { display: flex; gap: 6px; }
+    .uff-btn {
+      padding: 6px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-medium);
+      background: transparent;
+      cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-      white-space: nowrap;
-      transition: color 0.15s;
+      color: var(--text-secondary);
+      transition: all .15s;
     }
-    .nav-btn:hover { color: var(--text); }
-    .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+    .uff-btn:hover { background: var(--bg-secondary); }
+    .uff-btn.cesena.active  { background: var(--info-bg);  color: var(--info-text);  border-color: transparent; }
+    .uff-btn.forli.active   { background: var(--green-bg); color: var(--green-text); border-color: transparent; }
+    .uff-btn.tutte.active   { background: var(--amber-bg); color: var(--amber-text); border-color: transparent; }
 
-    /* MAIN */
-    .main { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
-
-    /* VIEWS */
-    .view { display: none; }
-    .view.active { display: block; }
-
-    /* CARD */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow);
-    }
-    .card-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 16px;
-    }
-
-    /* FORM */
-    .form-group { margin-bottom: 12px; }
-    .form-group label {
-      display: block;
+    /* ── Note inline edit ─────────────────────────────────── */
+    .note-edit-wrap { display: inline-flex; align-items: center; gap: 4px; }
+    .note-inline-input {
       font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      font-size: 14px;
-      font-family: inherit;
-      color: var(--text);
-      background: #fff;
+      padding: 2px 6px;
+      border: 0.5px solid var(--border-medium);
+      border-radius: 4px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       outline: none;
-      transition: border-color 0.15s;
+      width: 160px;
     }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+    .note-inline-input:focus { border-color: var(--info-text); }
+    .btn-note-edit {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-tertiary); padding: 0 2px;
+      font-size: 13px; line-height: 1;
+      transition: color .15s;
     }
-    .form-group textarea { resize: vertical; min-height: 72px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+    .btn-note-edit:hover { color: var(--info-text); }
+    .btn-note-save {
+      background: none; border: none; cursor: pointer;
+      color: var(--green-text); padding: 0 2px;
+      font-size: 13px; line-height: 1;
+    }
+    .btn-note-cancel {
+      background: none; border: none; cursor: pointer;
+      color: var(--red-text); padding: 0 2px;
+      font-size: 13px; line-height: 1;
+    }
 
-    /* BUTTONS */
+    /* ── Stat cards ───────────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--bg-primary);
+      border: 0.5px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: .75rem 1rem;
+    }
+    .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+    .stat-val   { font-size: 24px; font-weight: 600; }
+
+    /* ── Nav tabs ─────────────────────────────────────────── */
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      border-bottom: 0.5px solid var(--border-light);
+      padding-bottom: 8px;
+      margin-bottom: 1rem;
+    }
+    .nav-tab {
+      padding: 5px 14px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all .15s;
+    }
+    .nav-tab:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .nav-tab.active { background: var(--bg-secondary); color: var(--text-primary); }
+
+    /* ── Section card ─────────────────────────────────────── */
+    .section {
+      background: var(--bg-primary);
+      border: 0.5px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Form ─────────────────────────────────────────────── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.5fr 1fr 1.5fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+    @media (max-width: 680px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid .btn-add { grid-column: 1 / -1; }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 13px;
+      border: 0.5px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color .15s;
+    }
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus { border-color: var(--info-text); box-shadow: 0 0 0 3px rgba(24,95,165,.12); }
+
+    /* ── Buttons ──────────────────────────────────────────── */
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 16px;
-      border-radius: 7px;
-      border: 1px solid transparent;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: inherit;
+      padding: 7px 14px;
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-medium);
+      background: transparent;
       cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
-    .btn-ghost { background: none; border-color: var(--border); color: var(--text-muted); }
-    .btn-ghost:hover { background: var(--bg); color: var(--text); }
-    .btn-danger { background: none; border-color: #fca5a5; color: var(--red); }
-    .btn-danger:hover { background: #fee2e2; }
-    .btn-csv { background: #f0fdf4; border-color: #86efac; color: #166534; }
-    .btn-csv:hover { background: #dcfce7; }
-
-    /* STATS */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 12px;
-      text-align: center;
-      box-shadow: var(--shadow);
-    }
-    .stat-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
-    .stat-lbl { font-size: 11px; color: var(--text-muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
-    .stat.c-attive  .stat-num { color: var(--blue); }
-    .stat.c-evase   .stat-num { color: var(--green); }
-    .stat.c-chiuse  .stat-num { color: var(--red); }
-    .stat.c-assunto .stat-num { color: var(--yellow); }
-    .stat.c-tot     .stat-num { color: var(--text); }
-
-    /* BADGE */
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .b-pending { background: #fef9c3; color: #854d0e; }
-    .b-attiva  { background: #dbeafe; color: #1e40af; }
-    .b-evasa   { background: #dcfce7; color: #166534; }
-    .b-chiusa  { background: #fee2e2; color: #991b1b; }
-    .b-assunto { background: #fef3c7; color: #92400e; }
-
-    /* TABLE */
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th {
-      padding: 8px 10px;
-      text-align: left;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-    td {
-      padding: 10px;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-    }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #fafafa; }
-
-    /* FILTERS */
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
-      align-items: center;
-    }
-    .filters select, .filters input {
-      padding: 6px 10px;
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      font-size: 13px;
-      font-family: inherit;
-      background: #fff;
-      color: var(--text);
-      outline: none;
-    }
-    .filters input[type=text] { flex: 1; min-width: 120px; }
-    .filters select:focus, .filters input:focus { border-color: var(--primary); }
-
-    /* SUB-HEADER */
-    .sub-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .sub-header-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    /* EMPTY STATE */
-    .empty {
-      text-align: center;
-      padding: 32px 16px;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    /* MODAL */
-    .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .overlay.open { display: flex; }
-    .modal {
-      background: #fff;
-      border-radius: 12px;
-      padding: 24px;
-      width: 100%;
-      max-width: 440px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    }
-    .modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
-    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
-
-    /* TOAST */
-    #toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(60px);
-      background: #1a202c;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 24px;
       font-size: 13px;
       font-weight: 500;
-      z-index: 999;
-      opacity: 0;
-      transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
-      pointer-events: none;
+      color: var(--text-primary);
+      white-space: nowrap;
+      transition: all .15s;
+    }
+    .btn:hover { background: var(--bg-secondary); }
+    .btn-primary { background: var(--info-bg); color: var(--info-text); border-color: transparent; }
+    .btn-primary:hover { opacity: .85; background: var(--info-bg); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+    .btn-danger { color: var(--red-text); border-color: transparent; background: transparent; }
+    .btn-danger:hover { background: var(--red-bg); }
+    .btn-export { margin-left: auto; font-size: 12px; }
+
+    /* ── List controls ────────────────────────────────────── */
+    .list-controls {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .list-controls select { width: auto; font-size: 12px; padding: 5px 8px; }
+
+    /* ── Company items ────────────────────────────────────── */
+    .company-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .company-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 0.5px solid var(--border-light);
+      gap: 12px;
+      transition: border-color .15s;
+    }
+    .company-item:hover { border-color: var(--border-medium); }
+
+    .company-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+    .company-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .company-meta { font-size: 12px; color: var(--text-secondary); }
+
+    .item-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .item-actions select { width: auto; font-size: 11px; padding: 3px 6px; }
+
+    /* ── Status badges ────────────────────────────────────── */
+    .status-badge {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-weight: 600;
+      white-space: nowrap;
+      letter-spacing: .2px;
+    }
+    .s-evasa   { background: var(--green-bg); color: var(--green-text); }
+    .s-chiusa  { background: var(--red-bg);   color: var(--red-text);   }
+    .s-assunto { background: var(--amber-bg); color: var(--amber-text); }
+    .s-pending { background: var(--bg-tertiary); color: var(--text-secondary); }
+    .s-attiva  { background: var(--info-bg);  color: var(--info-text);  }
+
+    /* ── Month separator ─────────────────────────────────── */
+    .month-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      padding: 10px 0 4px;
+    }
+
+    /* ── Toast ────────────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: #18181b; color: #fafaf9;
+      padding: 9px 20px; border-radius: 24px;
+      font-size: 13px; font-weight: 500;
+      z-index: 9999; opacity: 0; pointer-events: none;
+      transition: all .25s cubic-bezier(.16,1,.3,1);
       white-space: nowrap;
     }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* FILIALE SELECTOR */
-    .filiale-bar {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
+    /* ── Empty state ──────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-tertiary);
+      font-size: 13px;
     }
-    .fil-btn {
-      padding: 5px 14px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .fil-btn:hover { border-color: var(--primary); color: var(--primary); }
-    .fil-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
   </style>
 </head>
 <body>
+<div class="shell">
 
-<!-- NAV 3 TASTI -->
-<nav class="nav" id="mainNav">
-  <button class="nav-btn active" onclick="goView('inserisci', this)">Inserisci</button>
-  <button class="nav-btn" onclick="goView('elenco', this)">Attive</button>
-  <button class="nav-btn" onclick="goView('evase', this)">Evase</button>
-  <button class="nav-btn" onclick="goView('chiuse', this)">Chiuse</button>
-  <button class="nav-btn" onclick="goView('assunto', this)">Hanno assunto</button>
-  <button class="nav-btn" onclick="goView('tutte', this)">Tutte</button>
-</nav>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-title">
+      <i class="ti ti-building-skyscraper"></i>
+      Gestione Aziende
+    </div>
+    <div class="ufficio-switcher">
+      <button class="uff-btn cesena active" onclick="setUfficio('cesena',this)">Cesena</button>
+      <button class="uff-btn forli"  onclick="setUfficio('forli',this)">Forl&igrave;</button>
+      <button class="uff-btn tutte"  onclick="setUfficio('tutte',this)">Tutte</button>
+    </div>
+  </header>
 
-<div class="main">
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow"></div>
 
-<!-- VIEW: INSERISCI -->
-<section class="view active" id="v-inserisci">
-  <div class="card">
-    <div class="card-title">Nuova azienda &mdash;</div>
-    <div class="form-group">
-      <label for="inp-nome">Nome azienda *</label>
-      <input id="inp-nome" type="text" placeholder="Es: Rossi Srl" autocomplete="off"/>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label for="inp-stato">Stato ricerca</label>
-        <select id="inp-stato">
-          <option value="pending">&mdash; in attesa &mdash;</option>
-          <option value="attiva">Attiva</option>
-          <option value="evasa">Evasa</option>
-          <option value="chiusa">Chiusa</option>
-          <option value="assunto">Hanno assunto da soli</option>
-        </select>
+  <!-- Nav tabs -->
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="setTab('inserisci',this)">Inserisci</button>
+    <button class="nav-tab" onclick="setTab('attive',this)">Attive</button>
+    <button class="nav-tab" onclick="setTab('evase',this)">Evase</button>
+    <button class="nav-tab" onclick="setTab('chiuse',this)">Chiuse</button>
+    <button class="nav-tab" onclick="setTab('assunto',this)">Hanno assunto</button>
+    <button class="nav-tab" onclick="setTab('tutte',this)">Tutte</button>
+  </nav>
+
+  <!-- ══ TAB: INSERISCI ══ -->
+  <div id="tab-inserisci" class="tab-content">
+    <div class="section">
+      <div class="section-title"><i class="ti ti-plus"></i> Nuova azienda</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome azienda *</label>
+          <input type="text" id="inp-nome" placeholder="Es: Rossi Srl" autocomplete="off"/>
+        </div>
+        <div class="form-group">
+          <label>Stato</label>
+          <select id="inp-stato">
+            <option value="pending">— in attesa —</option>
+            <option value="attiva">Attiva</option>
+            <option value="evasa">Evasa</option>
+            <option value="chiusa">Chiusa</option>
+            <option value="assunto">Hanno assunto da soli</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="inp-data"/>
+        </div>
+        <div class="form-group">
+          <label>Note</label>
+          <input type="text" id="inp-note" placeholder="Opzionale…"/>
+        </div>
+        <button class="btn btn-primary btn-add" onclick="addAzienda()">
+          <i class="ti ti-plus"></i> Aggiungi
+        </button>
       </div>
-      <div class="form-group">
-        <label for="inp-data">Data</label>
-        <input id="inp-data" type="date"/>
-      </div>
     </div>
-    <div class="form-group">
-      <label for="inp-note">Note (opzionale)</label>
-      <textarea id="inp-note" placeholder="Referente, settore, tel..."></textarea>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label for="inp-filiale">Filiale</label>
-        <select id="inp-filiale">
-          <option value="cesena">Cesena</option>
-          <option value="forli">Forl&igrave;</option>
-        </select>
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="add()">+ Aggiungi</button>
   </div>
-</section>
 
-<!-- VIEW: ATTIVE -->
-<section class="view" id="v-elenco">
-  <div id="stats-elenco" class="stats-row"></div>
-  <div class="card">
-    <div class="sub-header">
-      <span class="sub-header-title">Ricerche Attive</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn btn-csv btn-sm" onclick="csv('attiva')">Esporta CSV</button>
-        <select class="btn btn-ghost btn-sm" onchange="renderView('elenco', null, this.value)">
-          <option value="dataDesc">Data &darr; (recenti prima)</option>
-          <option value="dataAsc">Data &uarr; (vecchi prima)</option>
-          <option value="alfa">Alfabetico A&rarr;Z</option>
+  <!-- ══ TAB: ATTIVE ══ -->
+  <div id="tab-attive" class="tab-content" style="display:none">
+    <div class="section">
+      <div class="section-title">
+        <i class="ti ti-circle-check"></i> Ricerche Attive
+        <button class="btn btn-sm btn-export" onclick="exportCSV('attiva')"><i class="ti ti-download"></i> CSV</button>
+      </div>
+      <div class="list-controls">
+        <select onchange="renderList('attiva',this.value)">
+          <option value="dataDesc">Data ↓</option>
+          <option value="dataAsc">Data ↑</option>
+          <option value="alfa">Alfabetico</option>
         </select>
       </div>
+      <div class="company-list" id="list-attiva"></div>
+      <div class="empty-state" id="empty-attiva" style="display:none">Nessuna ricerca attiva.</div>
     </div>
-    <div class="filiale-bar" id="fil-elenco">
-      <button class="fil-btn active" data-fil="" onclick="setFil('elenco','',this)">Tutte le filiali</button>
-      <button class="fil-btn" data-fil="cesena" onclick="setFil('elenco','cesena',this)">Cesena</button>
-      <button class="fil-btn" data-fil="forli" onclick="setFil('elenco','forli',this)">Forl&igrave;</button>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>#</th><th>Azienda</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
-      <tbody id="tb-elenco"></tbody></table>
-    </div>
-    <div id="em-elenco" class="empty" style="display:none">Nessuna ricerca attiva.</div>
   </div>
-</section>
 
-<!-- VIEW: EVASE -->
-<section class="view" id="v-evase">
-  <div class="card">
-    <div class="sub-header">
-      <span class="sub-header-title">Ricerche Evase</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn btn-csv btn-sm" onclick="csv('evasa')">Esporta CSV</button>
-        <select class="btn btn-ghost btn-sm" onchange="renderView('evase', null, this.value)">
-          <option value="dataDesc">Data &darr;</option>
-          <option value="dataAsc">Data &uarr;</option>
+  <!-- ══ TAB: EVASE ══ -->
+  <div id="tab-evase" class="tab-content" style="display:none">
+    <div class="section">
+      <div class="section-title">
+        <i class="ti ti-check"></i> Ricerche Evase
+        <button class="btn btn-sm btn-export" onclick="exportCSV('evasa')"><i class="ti ti-download"></i> CSV</button>
+      </div>
+      <div class="list-controls">
+        <select onchange="renderList('evasa',this.value)">
+          <option value="dataDesc">Data ↓</option>
+          <option value="dataAsc">Data ↑</option>
           <option value="alfa">Alfabetico</option>
           <option value="mese">Per mese</option>
         </select>
       </div>
+      <div class="company-list" id="list-evasa"></div>
+      <div class="empty-state" id="empty-evasa" style="display:none">Nessuna ricerca evasa.</div>
     </div>
-    <div class="filiale-bar" id="fil-evase">
-      <button class="fil-btn active" data-fil="" onclick="setFil('evase','',this)">Tutte le filiali</button>
-      <button class="fil-btn" data-fil="cesena" onclick="setFil('evase','cesena',this)">Cesena</button>
-      <button class="fil-btn" data-fil="forli" onclick="setFil('evase','forli',this)">Forl&igrave;</button>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>#</th><th>Azienda</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
-      <tbody id="tb-evase"></tbody></table>
-    </div>
-    <div id="em-evase" class="empty" style="display:none">Nessuna ricerca evasa.</div>
   </div>
-</section>
 
-<!-- VIEW: CHIUSE -->
-<section class="view" id="v-chiuse">
-  <div class="card">
-    <div class="sub-header">
-      <span class="sub-header-title">Ricerche Chiuse</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn btn-csv btn-sm" onclick="csv('chiusa')">Esporta CSV</button>
-        <select class="btn btn-ghost btn-sm" onchange="renderView('chiuse', null, this.value)">
-          <option value="dataDesc">Data &darr;</option>
-          <option value="dataAsc">Data &uarr;</option>
+  <!-- ══ TAB: CHIUSE ══ -->
+  <div id="tab-chiuse" class="tab-content" style="display:none">
+    <div class="section">
+      <div class="section-title">
+        <i class="ti ti-circle-x"></i> Ricerche Chiuse
+        <button class="btn btn-sm btn-export" onclick="exportCSV('chiusa')"><i class="ti ti-download"></i> CSV</button>
+      </div>
+      <div class="list-controls">
+        <select onchange="renderList('chiusa',this.value)">
+          <option value="dataDesc">Data ↓</option>
+          <option value="dataAsc">Data ↑</option>
           <option value="alfa">Alfabetico</option>
           <option value="mese">Per mese</option>
         </select>
       </div>
+      <div class="company-list" id="list-chiusa"></div>
+      <div class="empty-state" id="empty-chiusa" style="display:none">Nessuna ricerca chiusa.</div>
     </div>
-    <div class="filiale-bar" id="fil-chiuse">
-      <button class="fil-btn active" data-fil="" onclick="setFil('chiuse','',this)">Tutte le filiali</button>
-      <button class="fil-btn" data-fil="cesena" onclick="setFil('chiuse','cesena',this)">Cesena</button>
-      <button class="fil-btn" data-fil="forli" onclick="setFil('chiuse','forli',this)">Forl&igrave;</button>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>#</th><th>Azienda</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
-      <tbody id="tb-chiuse"></tbody></table>
-    </div>
-    <div id="em-chiuse" class="empty" style="display:none">Nessuna ricerca chiusa.</div>
   </div>
-</section>
 
-<!-- VIEW: HANNO ASSUNTO -->
-<section class="view" id="v-assunto">
-  <div class="card">
-    <div class="sub-header">
-      <span class="sub-header-title">Hanno assunto da soli</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn btn-csv btn-sm" onclick="csv('assunto')">Esporta CSV</button>
-        <select class="btn btn-ghost btn-sm" onchange="renderView('assunto', null, this.value)">
-          <option value="dataDesc">Data &darr;</option>
-          <option value="dataAsc">Data &uarr;</option>
+  <!-- ══ TAB: HANNO ASSUNTO ══ -->
+  <div id="tab-assunto" class="tab-content" style="display:none">
+    <div class="section">
+      <div class="section-title">
+        <i class="ti ti-user-check"></i> Hanno assunto da soli
+        <button class="btn btn-sm btn-export" onclick="exportCSV('assunto')"><i class="ti ti-download"></i> CSV</button>
+      </div>
+      <div class="list-controls">
+        <select onchange="renderList('assunto',this.value)">
+          <option value="dataDesc">Data ↓</option>
+          <option value="dataAsc">Data ↑</option>
           <option value="alfa">Alfabetico</option>
           <option value="mese">Per mese</option>
         </select>
       </div>
+      <div class="company-list" id="list-assunto"></div>
+      <div class="empty-state" id="empty-assunto" style="display:none">Nessuna azienda.</div>
     </div>
-    <div class="filiale-bar" id="fil-assunto">
-      <button class="fil-btn active" data-fil="" onclick="setFil('assunto','',this)">Tutte le filiali</button>
-      <button class="fil-btn" data-fil="cesena" onclick="setFil('assunto','cesena',this)">Cesena</button>
-      <button class="fil-btn" data-fil="forli" onclick="setFil('assunto','forli',this)">Forl&igrave;</button>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>#</th><th>Azienda</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
-      <tbody id="tb-assunto"></tbody></table>
-    </div>
-    <div id="em-assunto" class="empty" style="display:none">Nessuna azienda qui.</div>
   </div>
-</section>
 
-<!-- VIEW: TUTTE -->
-<section class="view" id="v-tutte">
-  <div id="stats-tutte" class="stats-row"></div>
-  <div class="card">
-    <div class="sub-header">
-      <span class="sub-header-title">Tutte le aziende</span>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn btn-csv btn-sm" onclick="csv('tutto')">Esporta CSV</button>
-        <select class="btn btn-ghost btn-sm" id="ord-tutte" onchange="renderView('tutte', null, this.value)">
-          <option value="dataDesc">Data &darr; (recenti prima)</option>
-          <option value="dataAsc">Data &uarr; (vecchi prima)</option>
-          <option value="alfa">Alfabetico A&rarr;Z</option>
-        </select>
+  <!-- ══ TAB: TUTTE ══ -->
+  <div id="tab-tutte" class="tab-content" style="display:none">
+    <div class="section">
+      <div class="section-title">
+        <i class="ti ti-list"></i> Tutte le aziende
+        <button class="btn btn-sm btn-export" onclick="exportCSV('tutte')"><i class="ti ti-download"></i> CSV</button>
       </div>
-    </div>
-    <div class="filters">
-      <select id="fil-stato-tutte" onchange="renderView('tutte')">
-        <option value="">Tutti gli stati</option>
-        <option value="pending">In attesa</option>
-        <option value="attiva">Attiva</option>
-        <option value="evasa">Evase</option>
-        <option value="chiusa">Chiuse</option>
-        <option value="assunto">Hanno assunto</option>
-      </select>
-      <input type="text" id="search-tutte" placeholder="🔍 cerca..." oninput="renderView('tutte')" />
-    </div>
-    <div class="filiale-bar" id="fil-tutte">
-      <button class="fil-btn active" data-fil="" onclick="setFil('tutte','',this)">Tutte le filiali</button>
-      <button class="fil-btn" data-fil="cesena" onclick="setFil('tutte','cesena',this)">Cesena</button>
-      <button class="fil-btn" data-fil="forli" onclick="setFil('tutte','forli',this)">Forl&igrave;</button>
-    </div>
-    <div class="table-wrap">
-      <table><thead><tr><th>#</th><th>Azienda</th><th>Stato</th><th>Filiale</th><th>Data</th><th>Note</th><th>Azioni</th></tr></thead>
-      <tbody id="tb-tutte"></tbody></table>
-    </div>
-    <div id="em-tutte" class="empty" style="display:none">Nessuna azienda trovata.</div>
-  </div>
-</section>
-
-</div><!-- /main -->
-
-<!-- MODAL NOTE -->
-<div class="overlay" id="ov-note">
-  <div class="modal">
-    <h3>Note</h3>
-    <p id="note-text" style="font-size:14px;color:#4a5568;white-space:pre-wrap;line-height:1.6;"></p>
-    <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeOv('ov-note')">Chiudi</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL EDIT -->
-<div class="overlay" id="ov-edit">
-  <div class="modal">
-    <h3>Modifica azienda</h3>
-    <input type="hidden" id="edit-id"/>
-    <div class="form-group"><label>Nome *</label><input type="text" id="edit-nome"/></div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Stato</label>
-        <select id="edit-stato">
+      <div class="list-controls">
+        <select onchange="renderList('tutte',this.value)">
+          <option value="dataDesc">Data ↓</option>
+          <option value="dataAsc">Data ↑</option>
+          <option value="alfa">Alfabetico</option>
+          <option value="mese">Per mese</option>
+        </select>
+        <select id="fil-stato" onchange="renderList('tutte')">
+          <option value="">Tutti gli stati</option>
           <option value="pending">In attesa</option>
           <option value="attiva">Attiva</option>
-          <option value="evasa">Evasa</option>
-          <option value="chiusa">Chiusa</option>
-          <option value="assunto">Hanno assunto da soli</option>
+          <option value="evasa">Evase</option>
+          <option value="chiusa">Chiuse</option>
+          <option value="assunto">Hanno assunto</option>
         </select>
+        <input type="text" id="search-input" placeholder="🔍 cerca…" oninput="renderList('tutte')" style="width:auto;flex:1;min-width:100px;font-size:12px;padding:5px 8px;"/>
       </div>
-      <div class="form-group"><label>Data</label><input type="date" id="edit-data"/></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Filiale</label>
-        <select id="edit-filiale">
-          <option value="cesena">Cesena</option>
-          <option value="forli">Forl&igrave;</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group"><label>Note</label><textarea id="edit-note"></textarea></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost btn-sm" onclick="closeOv('ov-edit')">Annulla</button>
-      <button class="btn btn-primary btn-sm" onclick="saveEdit()">Salva</button>
+      <div class="company-list" id="list-tutte"></div>
+      <div class="empty-state" id="empty-tutte" style="display:none">Nessuna azienda trovata.</div>
     </div>
   </div>
-</div>
 
-<!-- TOAST -->
+</div><!-- /shell -->
+
+<!-- Toast -->
 <div id="toast"></div>
 
 <script>
-const KEY = 'puntofc_v3';
+/* ── Storage ── */
+const STORAGE_KEY = 'puntofc_v4';
 let db = [];
-try { db = JSON.parse(localStorage.getItem(KEY)) || []; } catch{}
-function save() { localStorage.setItem(KEY, JSON.stringify(db)); }
+try { db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch {}
+const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
 
-// stato corrente filtri filiale per ogni view
-const filState = { elenco:'', evase:'', chiuse:'', assunto:'', tutte:'' };
-const ordState = { elenco:'dataDesc', evase:'dataDesc', chiuse:'dataDesc', assunto:'dataDesc', tutte:'dataDesc' };
+/* ── State ── */
+let currentUfficio = 'cesena';
+const ordState = {};
 
-// data di default
+/* ── Init ── */
 document.getElementById('inp-data').valueAsDate = new Date();
+renderStats();
+renderList('attiva');
 
-// ===== NAVIGAZIONE =====
-function goView(name, btn) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('v-' + name).classList.add('active');
+/* ══ UFFICIO ══ */
+function setUfficio(val, btn) {
+  currentUfficio = val;
+  document.querySelectorAll('.uff-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderView(name);
+  refreshActiveTab();
+  renderStats();
 }
 
-// ===== FILIALE FILTER =====
-function setFil(view, val, btn) {
-  filState[view] = val;
-  document.querySelectorAll('#fil-'+view+' .fil-btn').forEach(b => b.classList.remove('active'));
+/* ══ TAB NAV ══ */
+let currentTab = 'inserisci';
+function setTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
   btn.classList.add('active');
-  renderView(view);
+  currentTab = name;
+  if (name !== 'inserisci') renderList(name === 'tutte' ? 'tutte' : statusFromTab(name));
 }
 
-// ===== ADD =====
-function add() {
+function statusFromTab(tab) {
+  return { attive:'attiva', evase:'evasa', chiuse:'chiusa', assunto:'assunto' }[tab] || tab;
+}
+
+function refreshActiveTab() {
+  if (currentTab !== 'inserisci') {
+    const stat = currentTab === 'tutte' ? 'tutte' : statusFromTab(currentTab);
+    renderList(stat, ordState[stat]);
+  }
+}
+
+/* ══ ADD ══ */
+function addAzienda() {
   const nome = document.getElementById('inp-nome').value.trim();
-  if (!nome) { toast('⚠️ Inserisci il nome azienda'); return; }
+  if (!nome) { showToast('⚠️ Inserisci il nome azienda'); return; }
   db.push({
-    id: Date.now(),
+    id:      Date.now(),
     nome,
-    stato: document.getElementById('inp-stato').value,
-    data: document.getElementById('inp-data').value || today(),
-    note: document.getElementById('inp-note').value.trim(),
-    filiale: document.getElementById('inp-filiale').value,
+    stato:   document.getElementById('inp-stato').value,
+    data:    document.getElementById('inp-data').value || today(),
+    note:    document.getElementById('inp-note').value.trim(),
+    ufficio: currentUfficio === 'tutte' ? 'cesena' : currentUfficio,
   });
   save();
-  document.getElementById('inp-nome').value = '';
+  document.getElementById('inp-nome').value  = '';
   document.getElementById('inp-stato').value = 'pending';
-  document.getElementById('inp-note').value = '';
+  document.getElementById('inp-note').value  = '';
   document.getElementById('inp-data').valueAsDate = new Date();
-  toast('✅ Azienda aggiunta!');
+  renderStats();
+  showToast('✅ Azienda aggiunta!');
 }
 
-// ===== RENDER =====
-function renderView(name, stato, ordine) {
-  if (ordine) ordState[name] = ordine;
-  const ord = ordState[name];
-  const fil = filState[name];
-
-  if (name === 'elenco')  renderTable('elenco',  'attiva',  ord, fil);
-  if (name === 'evase')   renderTable('evase',   'evasa',   ord, fil);
-  if (name === 'chiuse')  renderTable('chiuse',  'chiusa',  ord, fil);
-  if (name === 'assunto') renderTable('assunto', 'assunto', ord, fil);
-  if (name === 'tutte')   renderTutte(ord, fil);
+/* ══ STATS ══ */
+function renderStats() {
+  const filtered = currentUfficio === 'tutte' ? db : db.filter(a => a.ufficio === currentUfficio);
+  const c = { attiva:0, evasa:0, chiusa:0, assunto:0, pending:0 };
+  filtered.forEach(a => { if (c[a.stato] !== undefined) c[a.stato]++; });
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Attive</div>  <div class="stat-val" style="color:var(--info-text)">${c.attiva}</div></div>
+    <div class="stat-card"><div class="stat-label">Evase</div>   <div class="stat-val" style="color:var(--green-text)">${c.evasa}</div></div>
+    <div class="stat-card"><div class="stat-label">Chiuse</div>  <div class="stat-val" style="color:var(--red-text)">${c.chiusa}</div></div>
+    <div class="stat-card"><div class="stat-label">Assunto</div> <div class="stat-val" style="color:var(--amber-text)">${c.assunto}</div></div>
+    <div class="stat-card"><div class="stat-label">Totale</div>  <div class="stat-val">${filtered.length}</div></div>`;
 }
 
-function renderTable(id, stato, ord, fil) {
-  let list = db.filter(a => a.stato === stato);
-  if (fil) list = list.filter(a => a.filiale === fil);
-  list = sort(list, ord);
+/* ══ RENDER LIST ══ */
+function renderList(key, ord) {
+  if (ord) ordState[key] = ord;
+  const curOrd = ordState[key] || 'dataDesc';
 
-  const tbody = document.getElementById('tb-' + id);
-  const em    = document.getElementById('em-' + id);
+  let list = key === 'tutte' ? [...db] : db.filter(a => a.stato === key);
 
-  if (!list.length) { tbody.innerHTML = ''; em.style.display = 'block'; return; }
-  em.style.display = 'none';
+  // ufficio filter
+  if (currentUfficio !== 'tutte') list = list.filter(a => a.ufficio === currentUfficio);
 
-  if (ord === 'mese') {
-    const grp = {};
-    list.forEach(a => { const k = (a.data||'').substring(0,7)||'?'; (grp[k]||(grp[k]=[])).push(a); });
-    tbody.innerHTML = Object.keys(grp).sort((a,b)=>b.localeCompare(a)).map((m,mi) =>
-      `<tr><td colspan="6" style="background:#f8fafc;font-size:11px;font-weight:700;color:#64748b;padding:6px 10px;">${fmtMese(m)}</td></tr>` +
-      grp[m].map((a,i) => rowNoStato(a, i+1)).join('')
-    ).join('');
-  } else {
-    tbody.innerHTML = list.map((a,i) => rowNoStato(a, i+1)).join('');
+  // extra filters for tutte
+  if (key === 'tutte') {
+    const sf = document.getElementById('fil-stato').value;
+    const ss = (document.getElementById('search-input').value || '').toLowerCase();
+    if (sf) list = list.filter(a => a.stato === sf);
+    if (ss) list = list.filter(a => a.nome.toLowerCase().includes(ss));
   }
 
-  // stats solo per elenco
-  if (id === 'elenco') renderStats('stats-elenco', fil);
+  list = sortList(list, curOrd);
+
+  const containerId = 'list-' + key;
+  const emptyId     = 'empty-' + key;
+  const container   = document.getElementById(containerId);
+  const emptyEl     = document.getElementById(emptyId);
+
+  if (!list.length) {
+    container.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  if (curOrd === 'mese') {
+    const groups = {};
+    list.forEach(a => {
+      const k = (a.data || '').substring(0, 7) || '?';
+      (groups[k] || (groups[k] = [])).push(a);
+    });
+    container.innerHTML = Object.keys(groups).sort((a,b)=>b.localeCompare(a)).map(m =>
+      `<div class="month-header">${fmtMese(m)}</div>` + groups[m].map(a => itemHtml(a, key)).join('')
+    ).join('');
+  } else {
+    container.innerHTML = list.map(a => itemHtml(a, key)).join('');
+  }
 }
 
-function renderTutte(ord, fil) {
-  let list = [...db];
-  if (fil) list = list.filter(a => a.filiale === fil);
-  const statoF  = document.getElementById('fil-stato-tutte').value;
-  const searchF = (document.getElementById('search-tutte').value||'').toLowerCase();
-  if (statoF) list = list.filter(a => a.stato === statoF);
-  if (searchF) list = list.filter(a => a.nome.toLowerCase().includes(searchF));
-  list = sort(list, ord);
-
-  const tbody = document.getElementById('tb-tutte');
-  const em    = document.getElementById('em-tutte');
-
-  if (!list.length) { tbody.innerHTML = ''; em.style.display = 'block'; return; }
-  em.style.display = 'none';
-  tbody.innerHTML = list.map((a,i) => rowConStato(a, i+1)).join('');
-  renderStats('stats-tutte', fil);
+/* ══ ITEM HTML ══ */
+function itemHtml(a, key) {
+  const showStatus = key === 'tutte';
+  return `
+  <div class="company-item" id="item-${a.id}">
+    <div class="company-info">
+      <div class="company-name">${esc(a.nome)}</div>
+      <div class="company-meta">
+        ${fmtData(a.data)}
+        ${a.ufficio ? ' · ' + cap(a.ufficio) : ''}
+        ${showStatus ? ' · <span class="status-badge s-'+a.stato+'">' + lblStato(a.stato) + '</span>' : ''}
+      </div>
+    </div>
+    <div class="note-edit-wrap" id="note-wrap-${a.id}">
+      ${noteViewHtml(a)}
+    </div>
+    <div class="item-actions">
+      <select onchange="changeStato(${a.id},this.value)">
+        <option value="pending"  ${a.stato==='pending'  ?'selected':''}>In attesa</option>
+        <option value="attiva"   ${a.stato==='attiva'   ?'selected':''}>Attiva</option>
+        <option value="evasa"    ${a.stato==='evasa'    ?'selected':''}>Evasa</option>
+        <option value="chiusa"   ${a.stato==='chiusa'   ?'selected':''}>Chiusa</option>
+        <option value="assunto"  ${a.stato==='assunto'  ?'selected':''}>Assunto</option>
+      </select>
+      <button class="btn btn-sm btn-danger" onclick="delAzienda(${a.id})"><i class="ti ti-trash"></i></button>
+    </div>
+  </div>`;
 }
 
-function rowNoStato(a, n) {
-  return `<tr>
-    <td style="color:#94a3b8">${n}</td>
-    <td><strong>${esc(a.nome)}</strong></td>
-    <td style="color:#64748b;font-size:12px">${fmtFiliale(a.filiale)}</td>
-    <td style="color:#64748b">${fmtData(a.data)}</td>
-    <td>${a.note ? `<button class="btn btn-ghost btn-sm" onclick="showNote(${a.id})">📋</button>` : '<span style="color:#cbd5e0">—</span>'}</td>
-    <td><div style="display:flex;gap:4px">
-      <button class="btn btn-ghost btn-sm" onclick="openEdit(${a.id})">✏️</button>
-      <button class="btn btn-danger btn-sm" onclick="del(${a.id})">🗑</button>
-    </div></td>
-  </tr>`;
+function noteViewHtml(a) {
+  if (a.note) {
+    return `<span style="font-size:12px;color:var(--text-secondary);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(a.note)}">${esc(a.note)}</span>
+            <button class="btn-note-edit" onclick="editNote(${a.id})" title="Modifica nota"><i class="ti ti-edit"></i></button>`;
+  }
+  return `<button class="btn-note-edit" onclick="editNote(${a.id})" title="Aggiungi nota"><i class="ti ti-note-plus"></i></button>`;
 }
 
-function rowConStato(a, n) {
-  return `<tr>
-    <td style="color:#94a3b8">${n}</td>
-    <td><strong>${esc(a.nome)}</strong></td>
-    <td>${badge(a.stato)}</td>
-    <td style="color:#64748b;font-size:12px">${fmtFiliale(a.filiale)}</td>
-    <td style="color:#64748b">${fmtData(a.data)}</td>
-    <td>${a.note ? `<button class="btn btn-ghost btn-sm" onclick="showNote(${a.id})">📋</button>` : '<span style="color:#cbd5e0">—</span>'}</td>
-    <td><div style="display:flex;gap:4px">
-      <button class="btn btn-ghost btn-sm" onclick="openEdit(${a.id})">✏️</button>
-      <button class="btn btn-danger btn-sm" onclick="del(${a.id})">🗑</button>
-    </div></td>
-  </tr>`;
-}
-
-function renderStats(containerId, fil) {
-  let list = fil ? db.filter(a => a.filiale === fil) : db;
-  const c = { attiva:0, evasa:0, chiusa:0, assunto:0 };
-  list.forEach(a => { if(c[a.stato]!==undefined) c[a.stato]++; });
-  document.getElementById(containerId).innerHTML = `
-    <div class="stat c-attive"><div class="stat-num">${c.attiva}</div><div class="stat-lbl">Attive</div></div>
-    <div class="stat c-evase"><div class="stat-num">${c.evasa}</div><div class="stat-lbl">Evase</div></div>
-    <div class="stat c-chiuse"><div class="stat-num">${c.chiusa}</div><div class="stat-lbl">Chiuse</div></div>
-    <div class="stat c-assunto"><div class="stat-num">${c.assunto}</div><div class="stat-lbl">Hanno assunto</div></div>
-    <div class="stat c-tot"><div class="stat-num">${list.length}</div><div class="stat-lbl">Totale</div></div>`;
-}
-
-// ===== EDIT =====
-function openEdit(id) {
+/* ── Note inline editing ── */
+function editNote(id) {
   const a = db.find(x => x.id === id); if (!a) return;
-  document.getElementById('edit-id').value      = id;
-  document.getElementById('edit-nome').value    = a.nome;
-  document.getElementById('edit-stato').value   = a.stato;
-  document.getElementById('edit-data').value    = a.data;
-  document.getElementById('edit-note').value    = a.note || '';
-  document.getElementById('edit-filiale').value = a.filiale || 'cesena';
-  openOv('ov-edit');
+  const wrap = document.getElementById('note-wrap-' + id);
+  wrap.innerHTML = `
+    <input class="note-inline-input" id="note-inp-${id}" value="${esc(a.note||'')}" placeholder="Nota…" />
+    <button class="btn-note-save" onclick="saveNote(${id})" title="Salva"><i class="ti ti-check"></i></button>
+    <button class="btn-note-cancel" onclick="cancelNote(${id})" title="Annulla"><i class="ti ti-x"></i></button>`;
+  document.getElementById('note-inp-' + id).focus();
+  document.getElementById('note-inp-' + id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveNote(id);
+    if (e.key === 'Escape') cancelNote(id);
+  });
 }
-function saveEdit() {
-  const id   = parseInt(document.getElementById('edit-id').value);
-  const nome = document.getElementById('edit-nome').value.trim();
-  if (!nome) { toast('⚠️ Nome obbligatorio'); return; }
+function saveNote(id) {
+  const inp = document.getElementById('note-inp-' + id);
   const idx = db.findIndex(a => a.id === id); if (idx < 0) return;
-  db[idx] = {
-    id,
-    nome,
-    stato:   document.getElementById('edit-stato').value,
-    data:    document.getElementById('edit-data').value,
-    note:    document.getElementById('edit-note').value.trim(),
-    filiale: document.getElementById('edit-filiale').value,
-  };
-  save(); closeOv('ov-edit');
-  // ri-render la view attiva
-  const active = document.querySelector('.nav-btn.active');
-  if (active) active.click();
-  toast('✅ Salvato!');
+  db[idx].note = inp.value.trim();
+  save();
+  const wrap = document.getElementById('note-wrap-' + id);
+  wrap.innerHTML = noteViewHtml(db[idx]);
+  showToast('✅ Nota salvata!');
+}
+function cancelNote(id) {
+  const a = db.find(x => x.id === id); if (!a) return;
+  document.getElementById('note-wrap-' + id).innerHTML = noteViewHtml(a);
 }
 
-// ===== DELETE =====
-function del(id) {
+/* ── Change stato inline ── */
+function changeStato(id, newStato) {
+  const idx = db.findIndex(a => a.id === id); if (idx < 0) return;
+  db[idx].stato = newStato;
+  save();
+  renderStats();
+  refreshActiveTab();
+  showToast('✅ Stato aggiornato!');
+}
+
+/* ── Delete ── */
+function delAzienda(id) {
   if (!confirm('Eliminare questa azienda?')) return;
   db = db.filter(a => a.id !== id);
   save();
-  const active = document.querySelector('.nav-btn.active');
-  if (active) active.click();
-  toast('🗑 Eliminato!');
+  renderStats();
+  refreshActiveTab();
+  showToast('🗑 Eliminato!');
 }
 
-// ===== NOTE =====
-function showNote(id) {
-  const a = db.find(x => x.id === id);
-  if (!a || !a.note) return;
-  document.getElementById('note-text').textContent = a.note;
-  openOv('ov-note');
-}
-
-// ===== CSV =====
-function csv(filtro) {
-  let list = filtro === 'tutto' ? db : db.filter(a => a.stato === filtro);
-  if (!list.length) { toast('Nessun dato'); return; }
-  const hdr  = 'Nome,Stato,Filiale,Data,Note';
-  const rows = list.map(a => `"${a.nome}","${lblStato(a.stato)}","${fmtFiliale(a.filiale)}","${a.data}","${(a.note||'').replace(/"/g,'""')}"`);
-  const blob = new Blob(['\uFEFF'+[hdr,...rows].join('\n')], { type:'text/csv;charset=utf-8;' });
+/* ══ CSV ══ */
+function exportCSV(key) {
+  let list = key === 'tutte' ? db : db.filter(a => a.stato === key);
+  if (currentUfficio !== 'tutte') list = list.filter(a => a.ufficio === currentUfficio);
+  if (!list.length) { showToast('Nessun dato da esportare'); return; }
+  const hdr  = 'Nome,Stato,Ufficio,Data,Note';
+  const rows = list.map(a =>
+    `"${a.nome}","${lblStato(a.stato)}","${cap(a.ufficio||'')}","${a.data||\'\'","${(a.note||'').replace(/"/g,'""')}"`
+  );
+  const csv  = [hdr, ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
-  const lnk  = document.createElement('a');
-  lnk.href = url; lnk.download = `aziende_${filtro}_${today()}.csv`;
-  lnk.click(); URL.revokeObjectURL(url);
-  toast('📥 CSV esportato!');
+  const a    = document.createElement('a');
+  a.href = url; a.download = `aziende_${key}_${today()}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 CSV esportato!');
 }
 
-// ===== MODAL =====
-function openOv(id)  { document.getElementById(id).classList.add('open'); }
-function closeOv(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.overlay').forEach(o =>
-  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
-
-// ===== UTILS =====
-function sort(list, ord) {
-  return [...list].sort((a,b) => {
-    if (ord==='dataDesc') return (b.data||'').localeCompare(a.data||'');
-    if (ord==='dataAsc')  return (a.data||'').localeCompare(b.data||'');
-    if (ord==='alfa')     return a.nome.localeCompare(b.nome,'it');
+/* ══ UTILS ══ */
+function sortList(list, ord) {
+  return [...list].sort((a, b) => {
+    if (ord === 'dataDesc') return (b.data||'').localeCompare(a.data||'');
+    if (ord === 'dataAsc')  return (a.data||'').localeCompare(b.data||'');
+    if (ord === 'alfa')     return a.nome.localeCompare(b.nome, 'it');
     return 0;
   });
 }
-function badge(stato) {
-  const m = { pending:['b-pending','In attesa'], attiva:['b-attiva','Attiva'], evasa:['b-evasa','Evasa'], chiusa:['b-chiusa','Chiusa'], assunto:['b-assunto','Hanno assunto'] };
-  const [c,l] = m[stato]||['b-pending',stato];
-  return `<span class="badge ${c}">${l}</span>`;
-}
 function lblStato(s) {
-  return { pending:'In attesa', attiva:'Attiva', evasa:'Evasa', chiusa:'Chiusa', assunto:'Hanno assunto' }[s]||s;
+  return { pending:'In attesa', attiva:'Attiva', evasa:'Evasa', chiusa:'Chiusa', assunto:'Hanno assunto' }[s] || s;
 }
 function fmtData(d) {
   if (!d) return '—';
   const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`;
 }
 function fmtMese(m) {
-  if (!m||m==='?') return 'Data sconosciuta';
+  if (!m || m==='?') return 'Data sconosciuta';
   const [y,mo] = m.split('-');
   const n = ['','Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
   return `${n[parseInt(mo)]} ${y}`;
 }
-function fmtFiliale(f) {
-  return f === 'forli' ? 'Forlì' : f === 'cesena' ? 'Cesena' : '—';
-}
 function today() { return new Date().toISOString().split('T')[0]; }
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function cap(s)  { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
 let _toastTimer;
-function toast(msg) {
+function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   clearTimeout(_toastTimer);
