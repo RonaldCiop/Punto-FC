@@ -6,883 +6,225 @@
   <title>Gestione Aziende Commerciale</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
   <style>
-    /* ── Reset & base ─────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg-primary:   #ffffff;
-      --bg-secondary: #f5f5f3;
-      --bg-tertiary:  #ebebea;
-      --text-primary:   #1a1a18;
-      --text-secondary: #6b6b68;
-      --text-tertiary:  #9b9b97;
-      --border-light:  rgba(0,0,0,.10);
-      --border-medium: rgba(0,0,0,.18);
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      /* semantic */
-      --green-bg:   #EAF3DE; --green-text:   #27500A;
-      --red-bg:     #FCEBEB; --red-text:     #A32D2D;
-      --amber-bg:   #FAEEDA; --amber-text:   #633806;
-      --blue-bg:    #E6F1FB; --blue-text:    #185FA5;
-      --info-bg:    #E6F1FB; --info-text:    #185FA5;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-primary:   #1e1e1c;
-        --bg-secondary: #2a2a28;
-        --bg-tertiary:  #333330;
-        --text-primary:   #f0f0ec;
-        --text-secondary: #a0a09c;
-        --text-tertiary:  #6b6b68;
-        --border-light:  rgba(255,255,255,.10);
-        --border-medium: rgba(255,255,255,.18);
-        --green-bg:   #173404; --green-text:   #C0DD97;
-        --red-bg:     #501313; --red-text:     #F7C1C1;
-        --amber-bg:   #412402; --amber-text:   #FAC775;
-        --blue-bg:    #042C53; --blue-text:    #B5D4F4;
-        --info-bg:    #042C53; --info-text:    #B5D4F4;
-      }
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      font-size: 15px;
-      line-height: 1.5;
-      min-height: 100vh;
-    }
-
-    /* ── Layout shell ─────────────────────────────────────── */
-    .shell {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 1.5rem 1rem 4rem;
-    }
-
-    /* ── Header ───────────────────────────────────────────── */
-    .app-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 1.5rem;
-    }
-    .app-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-    .app-title i { font-size: 22px; color: var(--info-text); }
-
-    /* ── Ufficio switcher ─────────────────────────────────── */
-    .ufficio-switcher { display: flex; gap: 6px; }
-    .uff-btn {
-      padding: 6px 18px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-medium);
-      background: transparent;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      transition: all .15s;
-    }
-    .uff-btn:hover { background: var(--bg-secondary); }
-    .uff-btn.cesena.active  { background: var(--info-bg);  color: var(--info-text);  border-color: transparent; }
-    .uff-btn.forli.active   { background: var(--green-bg); color: var(--green-text); border-color: transparent; }
-    .uff-btn.tutte.active   { background: var(--amber-bg); color: var(--amber-text); border-color: transparent; }
-
-    /* ── Note inline edit ─────────────────────────────────── */
-    .note-edit-wrap { display: inline-flex; align-items: center; gap: 4px; }
-    .note-inline-input {
-      font-size: 12px;
-      padding: 2px 6px;
-      border: 0.5px solid var(--border-medium);
-      border-radius: 4px;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      outline: none;
-      width: 160px;
-    }
-    .note-inline-input:focus { border-color: var(--info-text); }
-    .btn-note-edit {
-      background: none; border: none; cursor: pointer;
-      color: var(--text-tertiary); padding: 0 2px;
-      font-size: 13px; line-height: 1;
-      transition: color .15s;
-    }
-    .btn-note-edit:hover { color: var(--info-text); }
-    .btn-note-save {
-      background: none; border: none; cursor: pointer;
-      color: var(--green-text); padding: 0 2px;
-      font-size: 13px; line-height: 1;
-    }
-    .btn-note-cancel {
-      background: none; border: none; cursor: pointer;
-      color: var(--red-text); padding: 0 2px;
-      font-size: 13px; line-height: 1;
-    }
-
-    /* ── Stat cards ───────────────────────────────────────── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-      gap: 8px;
-      margin-bottom: 1.5rem;
-    }
-    .stat-card {
-      background: var(--bg-primary);
-      border: 0.5px solid var(--border-light);
-      border-radius: var(--radius-md);
-      padding: .75rem 1rem;
-    }
-    .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
-    .stat-val   { font-size: 24px; font-weight: 600; }
-
-    /* ── 3 big nav buttons ────────────────────────────────── */
-    .nav-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 1.25rem;
-    }
-    .nav-3-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 16px 8px;
-      border-radius: var(--radius-lg);
-      border: 0.5px solid var(--border-light);
-      background: var(--bg-primary);
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      transition: all .15s;
-    }
-    .nav-3-btn i { font-size: 22px; }
-    .nav-3-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
-    .nav-3-btn.active {
-      background: var(--info-bg);
-      color: var(--info-text);
-      border-color: transparent;
-    }
-
-    /* ── Nav tabs (sub-navigation) ────────────────────────── */
-    .nav-tabs {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      border-bottom: 0.5px solid var(--border-light);
-      padding-bottom: 8px;
-      margin-bottom: 1rem;
-    }
-    .nav-tab {
-      padding: 5px 14px;
-      border-radius: var(--radius-md);
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      transition: all .15s;
-    }
-    .nav-tab:hover { background: var(--bg-secondary); color: var(--text-primary); }
-    .nav-tab.active { background: var(--bg-secondary); color: var(--text-primary); }
-
-    /* ── Section card ─────────────────────────────────────── */
-    .section {
-      background: var(--bg-primary);
-      border: 0.5px solid var(--border-light);
-      border-radius: var(--radius-lg);
-      padding: 1rem 1.25rem;
-      margin-bottom: 1rem;
-    }
-    .section-title {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* ── Form ─────────────────────────────────────────────── */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.5fr 1fr 1.5fr auto;
-      gap: 10px;
-      align-items: end;
-    }
-    @media (max-width: 680px) {
-      .form-grid { grid-template-columns: 1fr 1fr; }
-      .form-grid .btn-add { grid-column: 1 / -1; }
-    }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
-
-    input[type="text"],
-    input[type="date"],
-    select {
-      width: 100%;
-      padding: 7px 10px;
-      font-size: 13px;
-      border: 0.5px solid var(--border-medium);
-      border-radius: var(--radius-md);
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color .15s;
-    }
-    input[type="text"]:focus,
-    input[type="date"]:focus,
-    select:focus { border-color: var(--info-text); box-shadow: 0 0 0 3px rgba(24,95,165,.12); }
-
-    /* ── Buttons ──────────────────────────────────────────── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--border-medium);
-      background: transparent;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-primary);
-      white-space: nowrap;
-      transition: all .15s;
-    }
-    .btn:hover { background: var(--bg-secondary); }
-    .btn-primary { background: var(--info-bg); color: var(--info-text); border-color: transparent; }
-    .btn-primary:hover { opacity: .85; background: var(--info-bg); }
-    .btn-sm { padding: 4px 10px; font-size: 12px; }
-    .btn-danger { color: var(--red-text); border-color: transparent; background: transparent; }
-    .btn-danger:hover { background: var(--red-bg); }
-    .btn-export { margin-left: auto; font-size: 12px; }
-
-    /* ── List controls ────────────────────────────────────── */
-    .list-controls {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .list-controls select { width: auto; font-size: 12px; padding: 5px 8px; }
-
-    /* ── Company items ────────────────────────────────────── */
-    .company-list { display: flex; flex-direction: column; gap: 6px; }
-
-    .company-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 9px 12px;
-      background: var(--bg-secondary);
-      border-radius: var(--radius-md);
-      border: 0.5px solid var(--border-light);
-      gap: 12px;
-      transition: border-color .15s;
-    }
-    .company-item:hover { border-color: var(--border-medium); }
-
-    .company-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-    .company-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .company-meta { font-size: 12px; color: var(--text-secondary); }
-
-    .item-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-    .item-actions select { width: auto; font-size: 11px; padding: 3px 6px; }
-
-    /* ── Status badges ────────────────────────────────────── */
-    .status-badge {
-      font-size: 11px;
-      padding: 3px 9px;
-      border-radius: 20px;
-      font-weight: 600;
-      white-space: nowrap;
-      letter-spacing: .2px;
-    }
-    .s-evasa   { background: var(--green-bg); color: var(--green-text); }
-    .s-chiusa  { background: var(--red-bg);   color: var(--red-text);   }
-    .s-assunto { background: var(--amber-bg); color: var(--amber-text); }
-    .s-pending { background: var(--bg-tertiary); color: var(--text-secondary);
-                 border: 0.5px solid var(--border-light); }
-    .s-attiva  { background: var(--blue-bg);  color: var(--blue-text);
-                 border: 0.5px solid rgba(24,95,165,.25); }
-
-    /* ── Ufficio badge ────────────────────────────────────── */
-    .uff-badge {
-      font-size: 10px;
-      padding: 2px 7px;
-      border-radius: 20px;
-      font-weight: 500;
-    }
-    .uff-cesena { background: var(--info-bg);  color: var(--info-text);  }
-    .uff-forli  { background: var(--green-bg); color: var(--green-text); }
-
-    /* ── Month header ─────────────────────────────────────── */
-    .month-header {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      padding: 10px 0 4px;
-    }
-
-    /* ── Toast ────────────────────────────────────────────── */
-    #toast {
-      position: fixed; bottom: 24px; left: 50%;
-      transform: translateX(-50%) translateY(60px);
-      background: #18181b; color: #fafaf9;
-      padding: 9px 20px; border-radius: 24px;
-      font-size: 13px; font-weight: 500;
-      z-index: 9999; opacity: 0; pointer-events: none;
-      transition: all .25s cubic-bezier(.16,1,.3,1);
-      white-space: nowrap;
-    }
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ── Empty state ──────────────────────────────────────── */
-    .empty-state {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-tertiary);
-      font-size: 13px;
-    }
+    :root { --bg-primary:#ffffff; --bg-secondary:#f5f5f3; --bg-tertiary:#ebebea; --text-primary:#1a1a18; --text-secondary:#6b6b68; --text-tertiary:#9b9b97; --border-light:rgba(0,0,0,.10); --border-medium:rgba(0,0,0,.18); --radius-md:8px; --radius-lg:12px; --green-bg:#EAF3DE; --green-text:#27500A; --red-bg:#FCEBEB; --red-text:#A32D2D; --amber-bg:#FAEEDA; --amber-text:#633806; --blue-bg:#E6F1FB; --blue-text:#185FA5; --info-bg:#E6F1FB; --info-text:#185FA5; }
+    @media (prefers-color-scheme: dark) { :root { --bg-primary:#1e1e1c; --bg-secondary:#2a2a28; --bg-tertiary:#333330; --text-primary:#f0f0ec; --text-secondary:#a0a09c; --text-tertiary:#6b6b68; --border-light:rgba(255,255,255,.10); --border-medium:rgba(255,255,255,.18); --green-bg:#173404; --green-text:#C0DD97; --red-bg:#501313; --red-text:#F7C1C1; --amber-bg:#412402; --amber-text:#FAC775; --blue-bg:#042C53; --blue-text:#B5D4F4; --info-bg:#042C53; --info-text:#B5D4F4; } }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg-tertiary); color:var(--text-primary); font-size:15px; line-height:1.5; min-height:100vh; }
+    .shell { max-width:900px; margin:0 auto; padding:1.5rem 1rem 4rem; }
+    .app-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:1.5rem; }
+    .app-title { display:flex; align-items:center; gap:8px; font-size:20px; font-weight:600; color:var(--text-primary); }
+    .app-title i { font-size:22px; color:var(--info-text); }
+    .header-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .ufficio-switcher { display:flex; gap:6px; flex-wrap:wrap; }
+    .uff-btn { padding:6px 18px; border-radius:var(--radius-md); border:1px solid var(--border-medium); background:transparent; cursor:pointer; font-size:13px; font-weight:500; color:var(--text-secondary); transition:all .15s; }
+    .uff-btn:hover { background:var(--bg-secondary); }
+    .uff-btn.active { border-color:transparent; }
+    .uff-btn.cesena.active, .office-badge.cesena { background:var(--info-bg); color:var(--info-text); }
+    .uff-btn.forli.active, .office-badge.forli { background:var(--green-bg); color:var(--green-text); }
+    .uff-btn.tutte.active, .office-badge.tutte { background:var(--amber-bg); color:var(--amber-text); }
+    .uff-btn.dynamic.active { background:var(--bg-secondary); color:var(--text-primary); }
+    .note-edit-wrap { display:inline-flex; align-items:center; gap:4px; }
+    .note-inline-input { font-size:12px; padding:2px 6px; border:.5px solid var(--border-medium); border-radius:4px; background:var(--bg-primary); color:var(--text-primary); outline:none; width:160px; }
+    .note-inline-input:focus { border-color:var(--info-text); }
+    .btn-note-edit,.btn-note-save,.btn-note-cancel { background:none; border:none; cursor:pointer; padding:0 2px; font-size:13px; line-height:1; }
+    .btn-note-edit { color:var(--text-tertiary); }
+    .btn-note-edit:hover { color:var(--info-text); }
+    .btn-note-save { color:var(--green-text); }
+    .btn-note-cancel { color:var(--red-text); }
+    .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:8px; margin-bottom:1.5rem; }
+    .stat-card { background:var(--bg-primary); border:.5px solid var(--border-light); border-radius:var(--radius-md); padding:.75rem 1rem; }
+    .stat-label { font-size:12px; color:var(--text-secondary); margin-bottom:4px; }
+    .stat-val { font-size:24px; font-weight:600; }
+    .nav-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.25rem; }
+    .nav-3-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:16px 8px; border-radius:var(--radius-lg); border:.5px solid var(--border-light); background:var(--bg-primary); cursor:pointer; font-size:13px; font-weight:600; color:var(--text-secondary); transition:all .15s; }
+    .nav-3-btn i { font-size:22px; }
+    .nav-3-btn:hover { background:var(--bg-secondary); color:var(--text-primary); }
+    .nav-3-btn.active { background:var(--info-bg); color:var(--info-text); border-color:transparent; }
+    .nav-tabs { display:flex; gap:4px; flex-wrap:wrap; border-bottom:.5px solid var(--border-light); padding-bottom:8px; margin-bottom:1rem; }
+    .nav-tab { padding:5px 14px; border-radius:var(--radius-md); border:none; background:transparent; cursor:pointer; font-size:13px; font-weight:500; color:var(--text-secondary); transition:all .15s; }
+    .nav-tab:hover { background:var(--bg-secondary); color:var(--text-primary); }
+    .nav-tab.active { background:var(--bg-secondary); color:var(--text-primary); }
+    .section { background:var(--bg-primary); border:.5px solid var(--border-light); border-radius:var(--radius-lg); padding:1rem 1.25rem; margin-bottom:1rem; }
+    .section-title { font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:1rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .form-grid { display:grid; grid-template-columns:2fr 1.5fr 1fr 1.5fr auto; gap:10px; align-items:end; }
+    @media (max-width:680px) { .form-grid { grid-template-columns:1fr 1fr; } .form-grid .btn-add { grid-column:1 / -1; } }
+    .form-group { display:flex; flex-direction:column; gap:4px; }
+    .form-group label { font-size:12px; color:var(--text-secondary); font-weight:500; }
+    input[type="text"], input[type="date"], input[type="email"], input[type="password"], select { width:100%; padding:7px 10px; font-size:13px; border:.5px solid var(--border-medium); border-radius:var(--radius-md); background:var(--bg-primary); color:var(--text-primary); outline:none; transition:border-color .15s; }
+    input[type="text"]:focus, input[type="date"]:focus, input[type="email"]:focus, input[type="password"]:focus, select:focus { border-color:var(--info-text); box-shadow:0 0 0 3px rgba(24,95,165,.12); }
+    .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:var(--radius-md); border:.5px solid var(--border-medium); background:transparent; cursor:pointer; font-size:13px; font-weight:500; color:var(--text-primary); white-space:nowrap; transition:all .15s; }
+    .btn:hover { background:var(--bg-secondary); }
+    .btn-primary { background:var(--info-bg); color:var(--info-text); border-color:transparent; }
+    .btn-primary:hover { opacity:.85; background:var(--info-bg); }
+    .btn-sm { padding:4px 10px; font-size:12px; }
+    .btn-danger { color:var(--red-text); border-color:transparent; background:transparent; }
+    .btn-danger:hover { background:var(--red-bg); }
+    .btn-export { margin-left:auto; font-size:12px; }
+    .list-controls { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
+    .list-controls select { width:auto; font-size:12px; padding:5px 8px; }
+    .company-list { display:flex; flex-direction:column; gap:6px; }
+    .company-item { display:flex; align-items:center; justify-content:space-between; padding:9px 12px; background:var(--bg-secondary); border-radius:var(--radius-md); border:.5px solid var(--border-light); gap:12px; transition:border-color .15s; }
+    .company-item:hover { border-color:var(--border-medium); }
+    .company-info { display:flex; flex-direction:column; gap:2px; flex:1; min-width:0; }
+    .company-name { font-size:14px; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .company-meta { font-size:12px; color:var(--text-secondary); }
+    .item-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+    .item-actions select { width:auto; font-size:11px; padding:3px 6px; }
+    .status-badge { font-size:11px; padding:3px 9px; border-radius:20px; font-weight:600; white-space:nowrap; letter-spacing:.2px; }
+    .s-evasa { background:var(--green-bg); color:var(--green-text); }
+    .s-chiusa { background:var(--red-bg); color:var(--red-text); }
+    .s-assunto { background:var(--amber-bg); color:var(--amber-text); }
+    .s-pending { background:var(--bg-tertiary); color:var(--text-secondary); border:.5px solid var(--border-light); }
+    .s-attiva { background:var(--blue-bg); color:var(--blue-text); border:.5px solid rgba(24,95,165,.25); }
+    .uff-badge, .office-badge { font-size:10px; padding:2px 7px; border-radius:20px; font-weight:500; }
+    .month-header { font-size:11px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.6px; padding:10px 0 4px; }
+    #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:#18181b; color:#fafaf9; padding:9px 20px; border-radius:24px; font-size:13px; font-weight:500; z-index:9999; opacity:0; pointer-events:none; transition:all .25s cubic-bezier(.16,1,.3,1); white-space:nowrap; }
+    #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .empty-state { text-align:center; padding:2rem; color:var(--text-tertiary); font-size:13px; }
+    .auth-wrap { max-width:460px; margin:7vh auto 0; }
+    .auth-actions, .admin-actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .subtle-text { font-size:12px; color:var(--text-secondary); }
+    .hidden { display:none !important; }
   </style>
 </head>
 <body>
-<div class="shell">
-
-  <!-- Header -->
-  <header class="app-header">
-    <div class="app-title">
-      <i class="ti ti-building-skyscraper"></i>
-      Gestione Aziende
-    </div>
-    <div class="ufficio-switcher">
-      <button class="uff-btn cesena active" onclick="setUfficio('cesena',this)">Cesena</button>
-      <button class="uff-btn forli"  onclick="setUfficio('forli',this)">Forlì</button>
-      <button class="uff-btn tutte"  onclick="setUfficio('tutte',this)">Tutte</button>
-    </div>
-  </header>
-
-  <!-- Stats -->
-  <div class="stats-row" id="statsRow"></div>
-
-  <!-- 3 big nav buttons -->
-  <div class="nav-3">
-    <button class="nav-3-btn active" id="nav3-inserisci" onclick="setBigTab('inserisci',this)">
-      <i class="ti ti-plus"></i> Inserisci
-    </button>
-    <button class="nav-3-btn" id="nav3-elenco" onclick="setBigTab('elenco',this)">
-      <i class="ti ti-list"></i> Elenco
-    </button>
-    <button class="nav-3-btn" id="nav3-suddivisione" onclick="setBigTab('suddivisione',this)">
-      <i class="ti ti-chart-bar"></i> Suddivisione
-    </button>
-  </div>
-
-  <!-- ══ BIG TAB: INSERISCI ══════════════════════════════════ -->
-  <div id="bigtab-inserisci">
+  <div id="authApp" class="shell auth-wrap">
     <div class="section">
-      <div class="section-title"><i class="ti ti-plus"></i> Nuova azienda</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Nome azienda *</label>
-          <input type="text" id="inp-nome" placeholder="Es: Rossi Srl" autocomplete="off"/>
+      <div class="section-title"><i class="ti ti-lock"></i> Accesso</div>
+      <div class="form-grid" style="grid-template-columns:1fr;">
+        <div class="form-group"><label>Email</label><input type="email" id="auth-email" placeholder="nome@azienda.it" autocomplete="username" /></div>
+        <div class="form-group"><label>Password</label><input type="password" id="auth-password" placeholder="Password" autocomplete="current-password" /></div>
+        <div class="auth-actions">
+          <button class="btn btn-primary" id="btn-login"><i class="ti ti-login"></i> Accedi</button>
+          <button class="btn" id="btn-register"><i class="ti ti-user-plus"></i> Crea account</button>
+          <button class="btn" id="btn-reset"><i class="ti ti-mail"></i> Reset password</button>
         </div>
-        <div class="form-group">
-          <label>Stato</label>
-          <select id="inp-stato">
-            <option value="pending">— in attesa —</option>
-            <option value="attiva">Attiva</option>
-            <option value="evasa">Evasa</option>
-            <option value="chiusa">Chiusa</option>
-            <option value="assunto">Hanno assunto da soli</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Data</label>
-          <input type="date" id="inp-data"/>
-        </div>
-        <div class="form-group">
-          <label>Note</label>
-          <input type="text" id="inp-note" placeholder="Opzionale…"/>
-        </div>
-        <button class="btn btn-primary btn-add" onclick="addAzienda()">
-          <i class="ti ti-plus"></i> Aggiungi
-        </button>
+        <div class="subtle-text">Ogni account ha un ambiente separato, sincronizzato nel cloud su più dispositivi.</div>
       </div>
     </div>
   </div>
-
-  <!-- ══ BIG TAB: ELENCO ═══════════════════════════════════════ -->
-  <div id="bigtab-elenco" style="display:none">
-
-    <!-- Sub-navigation -->
-    <nav class="nav-tabs">
-      <button class="nav-tab active" onclick="setTab('attive',this)">Attive</button>
-      <button class="nav-tab" onclick="setTab('evase',this)">Evase</button>
-      <button class="nav-tab" onclick="setTab('chiuse',this)">Chiuse</button>
-      <button class="nav-tab" onclick="setTab('assunto',this)">Hanno assunto</button>
-      <button class="nav-tab" onclick="setTab('tutte',this)">Tutte</button>
-    </nav>
-
-    <!-- TAB: ATTIVE -->
-    <div id="tab-attive" class="tab-content">
+  <div id="mainApp" class="shell hidden">
+    <header class="app-header">
+      <div class="app-title"><i class="ti ti-building-skyscraper"></i> Gestione Aziende</div>
+      <div class="header-right">
+        <div class="ufficio-switcher" id="ufficioSwitcher"></div>
+        <button class="btn btn-sm" id="btn-manage-offices"><i class="ti ti-settings"></i> Uffici</button>
+        <button class="btn btn-sm hidden" id="btn-admin-view"><i class="ti ti-shield"></i> Admin</button>
+        <button class="btn btn-sm" id="btn-logout"><i class="ti ti-logout"></i> Esci</button>
+      </div>
+    </header>
+    <div class="stats-row" id="statsRow"></div>
+    <div class="nav-3">
+      <button class="nav-3-btn active" id="nav3-inserisci" onclick="setBigTab('inserisci',this)"><i class="ti ti-plus"></i> Inserisci</button>
+      <button class="nav-3-btn" id="nav3-elenco" onclick="setBigTab('elenco',this)"><i class="ti ti-list"></i> Elenco</button>
+      <button class="nav-3-btn" id="nav3-suddivisione" onclick="setBigTab('suddivisione',this)"><i class="ti ti-chart-bar"></i> Suddivisione</button>
+    </div>
+    <div id="bigtab-inserisci">
       <div class="section">
-        <div class="section-title">
-          <i class="ti ti-circle-check"></i> Ricerche Attive
-          <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio, 'attiva')">
-            <i class="ti ti-download"></i> Esporta CSV
-          </button>
+        <div class="section-title"><i class="ti ti-plus"></i> Nuova azienda</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Nome azienda *</label><input type="text" id="inp-nome" placeholder="Es: Rossi Srl" autocomplete="off" /></div>
+          <div class="form-group"><label>Stato</label><select id="inp-stato"><option value="pending">— in attesa —</option><option value="attiva">Attiva</option><option value="evasa">Evasa</option><option value="chiusa">Chiusa</option><option value="assunto">Hanno assunto da soli</option></select></div>
+          <div class="form-group"><label>Data</label><input type="date" id="inp-data" /></div>
+          <div class="form-group"><label>Note</label><input type="text" id="inp-note" placeholder="Opzionale…" /></div>
+          <button class="btn btn-primary btn-add" onclick="addAzienda()"><i class="ti ti-plus"></i> Aggiungi</button>
         </div>
-        <div class="list-controls">
-          <select id="ord-attiva" onchange="renderList('attiva',this.value)">
-            <option value="data-desc">Data ↓</option>
-            <option value="data-asc">Data ↑</option>
-            <option value="alfa">Alfabetico</option>
-          </select>
+      </div>
+      <div class="section hidden" id="office-manager-section">
+        <div class="section-title"><i class="ti ti-building"></i> Gestione uffici</div>
+        <div class="form-grid" style="grid-template-columns:2fr auto;">
+          <div class="form-group"><label>Nuovo nome ufficio</label><input type="text" id="office-name" placeholder="Es: Forlì" /></div>
+          <button class="btn btn-primary" id="btn-add-office"><i class="ti ti-plus"></i> Aggiungi ufficio</button>
         </div>
-        <div class="company-list" id="list-attiva"></div>
-        <div class="empty-state" id="empty-attiva" style="display:none">Nessuna ricerca attiva.</div>
+        <div class="company-list" id="office-list" style="margin-top:12px;"></div>
+      </div>
+      <div class="section hidden" id="admin-panel-section">
+        <div class="section-title"><i class="ti ti-shield"></i> Visualizzazione admin</div>
+        <div class="admin-actions"><select id="admin-user-select"></select><button class="btn btn-primary" id="btn-admin-open"><i class="ti ti-eye"></i> Apri ambiente</button><button class="btn" id="btn-admin-return"><i class="ti ti-arrow-back"></i> Torna al mio ambiente</button></div>
+        <div class="subtle-text" id="admin-current-target" style="margin-top:10px;"></div>
       </div>
     </div>
-
-    <!-- TAB: EVASE -->
-    <div id="tab-evase" class="tab-content" style="display:none">
-      <div class="section">
-        <div class="section-title">
-          <i class="ti ti-check"></i> Ricerche Evase
-          <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'evasa')">
-            <i class="ti ti-download"></i> Esporta CSV
-          </button>
-        </div>
-        <div class="list-controls">
-          <select id="ord-evase" onchange="renderList('evasa',this.value)">
-            <option value="data-desc">Data ↓</option>
-            <option value="data-asc">Data ↑</option>
-            <option value="alfa">Alfabetico</option>
-            <option value="mese">Per mese</option>
-          </select>
-        </div>
-        <div class="company-list" id="list-evasa"></div>
-        <div class="empty-state" id="empty-evasa" style="display:none">Nessuna ricerca evasa.</div>
-      </div>
+    <div id="bigtab-elenco" style="display:none">
+      <nav class="nav-tabs"><button class="nav-tab active" onclick="setTab('attive',this)">Attive</button><button class="nav-tab" onclick="setTab('evase',this)">Evase</button><button class="nav-tab" onclick="setTab('chiuse',this)">Chiuse</button><button class="nav-tab" onclick="setTab('assunto',this)">Hanno assunto</button><button class="nav-tab" onclick="setTab('tutte',this)">Tutte</button></nav>
+      <div id="tab-attive" class="tab-content"><div class="section"><div class="section-title"><i class="ti ti-circle-check"></i> Ricerche Attive <button class="btn btn-sm btn-export" onclick="exportCSV('attiva')"><i class="ti ti-download"></i> Esporta CSV</button></div><div class="list-controls"><select id="ord-attiva" onchange="renderList('attiva',this.value)"><option value="data-desc">Data ↓</option><option value="data-asc">Data ↑</option><option value="alfa">Alfabetico</option></select></div><div class="company-list" id="list-attiva"></div><div class="empty-state" id="empty-attiva" style="display:none">Nessuna ricerca attiva.</div></div></div>
+      <div id="tab-evase" class="tab-content" style="display:none"><div class="section"><div class="section-title"><i class="ti ti-check"></i> Ricerche Evase <button class="btn btn-sm btn-export" onclick="exportCSV('evasa')"><i class="ti ti-download"></i> Esporta CSV</button></div><div class="list-controls"><select id="ord-evase" onchange="renderList('evasa',this.value)"><option value="data-desc">Data ↓</option><option value="data-asc">Data ↑</option><option value="alfa">Alfabetico</option><option value="mese">Per mese</option></select></div><div class="company-list" id="list-evasa"></div><div class="empty-state" id="empty-evasa" style="display:none">Nessuna ricerca evasa.</div></div></div>
+      <div id="tab-chiuse" class="tab-content" style="display:none"><div class="section"><div class="section-title"><i class="ti ti-circle-x"></i> Ricerche Chiuse <button class="btn btn-sm btn-export" onclick="exportCSV('chiusa')"><i class="ti ti-download"></i> Esporta CSV</button></div><div class="list-controls"><select id="ord-chiuse" onchange="renderList('chiusa',this.value)"><option value="data-desc">Data ↓</option><option value="data-asc">Data ↑</option><option value="alfa">Alfabetico</option><option value="mese">Per mese</option></select></div><div class="company-list" id="list-chiusa"></div><div class="empty-state" id="empty-chiusa" style="display:none">Nessuna ricerca chiusa.</div></div></div>
+      <div id="tab-assunto" class="tab-content" style="display:none"><div class="section"><div class="section-title"><i class="ti ti-user-check"></i> Hanno assunto da soli <button class="btn btn-sm btn-export" onclick="exportCSV('assunto')"><i class="ti ti-download"></i> Esporta CSV</button></div><div class="list-controls"><select id="ord-assunto" onchange="renderList('assunto',this.value)"><option value="data-desc">Data ↓</option><option value="data-asc">Data ↑</option><option value="alfa">Alfabetico</option><option value="mese">Per mese</option></select></div><div class="company-list" id="list-assunto"></div><div class="empty-state" id="empty-assunto" style="display:none">Nessuna azienda.</div></div></div>
+      <div id="tab-tutte" class="tab-content" style="display:none"><div class="section"><div class="section-title"><i class="ti ti-list"></i> Tutte le aziende <button class="btn btn-sm btn-export" onclick="exportCSV('')"><i class="ti ti-download"></i> Esporta CSV</button></div><div class="list-controls"><select id="ord-tutte" onchange="renderList('tutte',this.value)"><option value="data-desc">Data ↓</option><option value="data-asc">Data ↑</option><option value="alfa">Alfabetico</option><option value="mese">Per mese</option></select><select id="fil-stato" onchange="renderList('tutte')"><option value="">Tutti gli stati</option><option value="pending">In attesa</option><option value="attiva">Attive</option><option value="evasa">Evase</option><option value="chiusa">Chiuse</option><option value="assunto">Hanno assunto</option></select><input type="text" id="search-input" placeholder="🔍 cerca…" oninput="renderList('tutte')" style="width:auto;flex:1;min-width:100px;font-size:12px;padding:5px 8px;" /></div><div class="company-list" id="list-tutte"></div><div class="empty-state" id="empty-tutte" style="display:none">Nessuna azienda trovata.</div></div></div>
     </div>
-
-    <!-- TAB: CHIUSE -->
-    <div id="tab-chiuse" class="tab-content" style="display:none">
-      <div class="section">
-        <div class="section-title">
-          <i class="ti ti-circle-x"></i> Ricerche Chiuse
-          <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'chiusa')">
-            <i class="ti ti-download"></i> Esporta CSV
-          </button>
-        </div>
-        <div class="list-controls">
-          <select id="ord-chiuse" onchange="renderList('chiusa',this.value)">
-            <option value="data-desc">Data ↓</option>
-            <option value="data-asc">Data ↑</option>
-            <option value="alfa">Alfabetico</option>
-            <option value="mese">Per mese</option>
-          </select>
-        </div>
-        <div class="company-list" id="list-chiusa"></div>
-        <div class="empty-state" id="empty-chiusa" style="display:none">Nessuna ricerca chiusa.</div>
-      </div>
-    </div>
-
-    <!-- TAB: HANNO ASSUNTO -->
-    <div id="tab-assunto" class="tab-content" style="display:none">
-      <div class="section">
-        <div class="section-title">
-          <i class="ti ti-user-check"></i> Hanno assunto da soli
-          <button class="btn btn-sm btn-export" onclick="exportCSV(currentUfficio,'assunto')">
-            <i class="ti ti-download"></i> Esporta CSV
-          </button>
-        </div>
-        <div class="list-controls">
-          <select id="ord-assunto" onchange="renderList('assunto',this.value)">
-            <option value="data-desc">Data ↓</option>
-            <option value="data-asc">Data ↑</option>
-            <option value="alfa">Alfabetico</option>
-            <option value="mese">Per mese</option>
-          </select>
-        </div>
-        <div class="company-list" id="list-assunto"></div>
-        <div class="empty-state" id="empty-assunto" style="display:none">Nessuna azienda.</div>
-      </div>
-    </div>
-
-    <!-- TAB: TUTTE -->
-    <div id="tab-tutte" class="tab-content" style="display:none">
-      <div class="section">
-        <div class="section-title">
-          <i class="ti ti-list"></i> Tutte le aziende
-          <button class="btn btn-sm btn-export" onclick="exportCSV('', '')">
-            <i class="ti ti-download"></i> Esporta CSV
-          </button>
-        </div>
-        <div class="list-controls">
-          <select id="ord-tutte" onchange="renderList('tutte',this.value)">
-            <option value="data-desc">Data ↓</option>
-            <option value="data-asc">Data ↑</option>
-            <option value="alfa">Alfabetico</option>
-            <option value="mese">Per mese</option>
-          </select>
-          <select id="fil-stato" onchange="renderList('tutte')">
-            <option value="">Tutti gli stati</option>
-            <option value="pending">In attesa</option>
-            <option value="attiva">Attive</option>
-            <option value="evasa">Evase</option>
-            <option value="chiusa">Chiuse</option>
-            <option value="assunto">Hanno assunto</option>
-          </select>
-          <input type="text" id="search-input"
-                 placeholder="🔍 cerca…"
-                 oninput="renderList('tutte')"
-                 style="width:auto;flex:1;min-width:100px;font-size:12px;padding:5px 8px;"/>
-        </div>
-        <div class="company-list" id="list-tutte"></div>
-        <div class="empty-state" id="empty-tutte" style="display:none">Nessuna azienda trovata.</div>
-      </div>
-    </div>
-
-  </div><!-- /bigtab-elenco -->
-
-  <!-- ══ BIG TAB: SUDDIVISIONE ═══════════════════════════════ -->
-  <div id="bigtab-suddivisione" style="display:none">
-    <div class="section">
-      <div class="section-title"><i class="ti ti-chart-bar"></i> Suddivisione per stato</div>
-      <div id="sudDiv"></div>
-    </div>
+    <div id="bigtab-suddivisione" style="display:none"><div class="section"><div class="section-title"><i class="ti ti-chart-bar"></i> Suddivisione per stato</div><div id="sudDiv"></div></div></div>
   </div>
-
-</div><!-- /shell -->
-
-<!-- Toast -->
-<div id="toast"></div>
-
-<script>
-/* ── Storage ─────────────────────────────────────────────── */
-const STORAGE_KEY = 'puntofc_v4';
-let db = [];
-try { db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch {}
-const save = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-
-/* ── State ───────────────────────────────────────────────── */
-let currentUfficio  = 'cesena';
-let currentBigTab   = 'inserisci';
-let currentSubTab   = 'attive';
-const sortState = {};
-
-/* ── Init ────────────────────────────────────────────────── */
-document.getElementById('inp-data').valueAsDate = new Date();
-renderStats();
-
-/* ══ UFFICIO ══════════════════════════════════════════════ */
-function setUfficio(val, btn) {
-  currentUfficio = val;
-  document.querySelectorAll('.uff-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderStats();
-  if (currentBigTab === 'elenco')       renderSubTab(currentSubTab);
-  if (currentBigTab === 'suddivisione') renderSuddivisione();
-}
-
-/* ══ BIG TAB ══════════════════════════════════════════════ */
-function setBigTab(name, btn) {
-  document.querySelectorAll('.nav-3-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  ['inserisci','elenco','suddivisione'].forEach(t =>
-    document.getElementById('bigtab-' + t).style.display = t === name ? '' : 'none'
-  );
-  currentBigTab = name;
-  if (name === 'elenco')       renderSubTab(currentSubTab);
-  if (name === 'suddivisione') renderSuddivisione();
-}
-
-/* ══ SUB TAB (inside Elenco) ══════════════════════════════ */
-function setTab(name, btn) {
-  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-  const tabId = 'tab-' + name;
-  if (document.getElementById(tabId))
-    document.getElementById(tabId).style.display = '';
-  currentSubTab = name;
-  renderSubTab(name);
-}
-
-function renderSubTab(name) {
-  const keyMap = { attive:'attiva', evase:'evasa', chiuse:'chiusa', assunto:'assunto', tutte:'tutte' };
-  const key = keyMap[name] || name;
-  renderList(key, sortState[key]);
-}
-
-/* ══ ADD ══════════════════════════════════════════════════ */
-function addAzienda() {
-  const nome = document.getElementById('inp-nome').value.trim();
-  if (!nome) { showToast('⚠️ Inserisci il nome azienda'); return; }
-  db.push({
-    id:      Date.now(),
-    nome,
-    stato:   document.getElementById('inp-stato').value,
-    data:    document.getElementById('inp-data').value || today(),
-    note:    document.getElementById('inp-note').value.trim(),
-    ufficio: currentUfficio === 'tutte' ? 'cesena' : currentUfficio,
-  });
-  save();
-  document.getElementById('inp-nome').value  = '';
-  document.getElementById('inp-stato').value = 'pending';
-  document.getElementById('inp-note').value  = '';
-  document.getElementById('inp-data').valueAsDate = new Date();
-  renderStats();
-  showToast('✅ Azienda aggiunta!');
-}
-
-/* ══ STATS ════════════════════════════════════════════════ */
-function renderStats() {
-  const filtered = currentUfficio === 'tutte' ? db : db.filter(a => a.ufficio === currentUfficio);
-  const c = { attiva:0, evasa:0, chiusa:0, assunto:0, pending:0 };
-  filtered.forEach(a => { if (c[a.stato] !== undefined) c[a.stato]++; });
-  document.getElementById('statsRow').innerHTML = `
-    <div class="stat-card"><div class="stat-label">Attive</div>  <div class="stat-val" style="color:var(--info-text)">${c.attiva}</div></div>
-    <div class="stat-card"><div class="stat-label">Evase</div>   <div class="stat-val" style="color:var(--green-text)">${c.evasa}</div></div>
-    <div class="stat-card"><div class="stat-label">Chiuse</div>  <div class="stat-val" style="color:var(--red-text)">${c.chiusa}</div></div>
-    <div class="stat-card"><div class="stat-label">Assunto</div> <div class="stat-val" style="color:var(--amber-text)">${c.assunto}</div></div>
-    <div class="stat-card"><div class="stat-label">Totale</div>  <div class="stat-val">${filtered.length}</div></div>`;
-}
-
-/* ══ RENDER LIST ══════════════════════════════════════════ */
-function renderList(key, ord) {
-  if (ord) sortState[key] = ord;
-  const curOrd = sortState[key] || 'data-desc';
-
-  let list = key === 'tutte' ? [...db] : db.filter(a => a.stato === key);
-
-  if (currentUfficio !== 'tutte') list = list.filter(a => a.ufficio === currentUfficio);
-
-  if (key === 'tutte') {
-    const sf  = (document.getElementById('fil-stato')   || {}).value || '';
-    const ss  = ((document.getElementById('search-input') || {}).value || '').toLowerCase();
-    if (sf) list = list.filter(a => a.stato === sf);
-    if (ss) list = list.filter(a => a.nome.toLowerCase().includes(ss));
-  }
-
-  list = sortList(list, curOrd);
-
-  const container = document.getElementById('list-'  + key);
-  const emptyEl   = document.getElementById('empty-' + key);
-  if (!container) return;
-
-  if (!list.length) {
-    container.innerHTML = '';
-    if (emptyEl) emptyEl.style.display = 'block';
-    return;
-  }
-  if (emptyEl) emptyEl.style.display = 'none';
-
-  if (curOrd === 'mese') {
-    const groups = {};
-    list.forEach(a => {
-      const k = (a.data || '').substring(0, 7) || '?';
-      (groups[k] || (groups[k] = [])).push(a);
-    });
-    container.innerHTML = Object.keys(groups).sort((a,b)=>b.localeCompare(a)).map(m =>
-      `<div class="month-header">${fmtMese(m)}</div>` + groups[m].map(a => itemHtml(a, key)).join('')
-    ).join('');
-  } else {
-    container.innerHTML = list.map(a => itemHtml(a, key)).join('');
-  }
-}
-
-/* ══ ITEM HTML ════════════════════════════════════════════ */
-function itemHtml(a, key) {
-  const showStatus = (key === 'tutte');
-  const showUff    = (currentUfficio === 'tutte');
-  return `
-  <div class="company-item" id="item-${a.id}">
-    <div class="company-info">
-      <div class="company-name">${esc(a.nome)}</div>
-      <div class="company-meta">
-        ${fmtData(a.data)}
-        ${showUff && a.ufficio ? ' · <span class="uff-badge uff-'+a.ufficio+'">'+cap(a.ufficio)+'</span>' : ''}
-        ${showStatus ? ' · <span class="status-badge s-'+a.stato+'">' + lblStato(a.stato) + '</span>' : ''}
-      </div>
-    </div>
-    <div class="note-edit-wrap" id="note-wrap-${a.id}">
-      ${noteViewHtml(a)}
-    </div>
-    <div class="item-actions">
-      <select onchange="changeStato(${a.id},this.value)">
-        <option value="pending"  ${a.stato==='pending' ?'selected':''}>In attesa</option>
-        <option value="attiva"   ${a.stato==='attiva'  ?'selected':''}>Attiva</option>
-        <option value="evasa"    ${a.stato==='evasa'   ?'selected':''}>Evasa</option>
-        <option value="chiusa"   ${a.stato==='chiusa'  ?'selected':''}>Chiusa</option>
-        <option value="assunto"  ${a.stato==='assunto' ?'selected':''}>Assunto</option>
-      </select>
-      <button class="btn btn-sm btn-danger" onclick="delAzienda(${a.id})"><i class="ti ti-trash"></i></button>
-    </div>
-  </div>`;
-}
-
-function noteViewHtml(a) {
-  if (a.note) {
-    return `<span style="font-size:12px;color:var(--text-secondary);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(a.note)}">${esc(a.note)}</span>
-            <button class="btn-note-edit" onclick="editNote(${a.id})" title="Modifica nota"><i class="ti ti-edit"></i></button>`;
-  }
-  return `<button class="btn-note-edit" onclick="editNote(${a.id})" title="Aggiungi nota"><i class="ti ti-note-plus"></i></button>`;
-}
-
-/* ── Note inline editing ────────────────────────────────── */
-function editNote(id) {
-  const a = db.find(x => x.id === id); if (!a) return;
-  const wrap = document.getElementById('note-wrap-' + id);
-  wrap.innerHTML = `
-    <input class="note-inline-input" id="note-inp-${id}" value="${esc(a.note||'')}" placeholder="Nota…" />
-    <button class="btn-note-save"   onclick="saveNote(${id})"   title="Salva"><i class="ti ti-check"></i></button>
-    <button class="btn-note-cancel" onclick="cancelNote(${id})" title="Annulla"><i class="ti ti-x"></i></button>`;
-  const inp = document.getElementById('note-inp-' + id);
-  inp.focus();
-  inp.addEventListener('keydown', e => {
-    if (e.key === 'Enter')  saveNote(id);
-    if (e.key === 'Escape') cancelNote(id);
-  });
-}
-function saveNote(id) {
-  const inp = document.getElementById('note-inp-' + id);
-  const idx = db.findIndex(a => a.id === id); if (idx < 0) return;
-  db[idx].note = inp.value.trim();
-  save();
-  document.getElementById('note-wrap-' + id).innerHTML = noteViewHtml(db[idx]);
-  showToast('✅ Nota salvata!');
-}
-function cancelNote(id) {
-  const a = db.find(x => x.id === id); if (!a) return;
-  document.getElementById('note-wrap-' + id).innerHTML = noteViewHtml(a);
-}
-
-/* ── Change stato ───────────────────────────────────────── */
-function changeStato(id, newStato) {
-  const idx = db.findIndex(a => a.id === id); if (idx < 0) return;
-  db[idx].stato = newStato;
-  save();
-  renderStats();
-  if (currentBigTab === 'elenco') renderSubTab(currentSubTab);
-  showToast('✅ Stato aggiornato!');
-}
-
-/* ── Delete ─────────────────────────────────────────────── */
-function delAzienda(id) {
-  if (!confirm('Eliminare questa azienda?')) return;
-  db = db.filter(a => a.id !== id);
-  save();
-  renderStats();
-  if (currentBigTab === 'elenco') renderSubTab(currentSubTab);
-  showToast('🗑 Eliminato!');
-}
-
-/* ══ SUDDIVISIONE ════════════════════════════════════════ */
-function renderSuddivisione() {
-  const filtered = currentUfficio === 'tutte' ? db : db.filter(a => a.ufficio === currentUfficio);
-  const stati = ['attiva','evasa','chiusa','assunto','pending'];
-  const labels = { attiva:'Attive', evasa:'Evase', chiusa:'Chiuse', assunto:'Hanno assunto', pending:'In attesa' };
-  const colors = { attiva:'var(--info-text)', evasa:'var(--green-text)', chiusa:'var(--red-text)', assunto:'var(--amber-text)', pending:'var(--text-secondary)' };
-  const total = filtered.length || 1;
-  const rows = stati.map(s => {
-    const cnt = filtered.filter(a => a.stato === s).length;
-    const pct = Math.round(cnt / total * 100);
-    return `
-      <div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-          <span style="font-weight:600;color:${colors[s]}">${labels[s]}</span>
-          <span style="color:var(--text-secondary)">${cnt} &nbsp;<small>(${pct}%)</small></span>
-        </div>
-        <div style="background:var(--bg-tertiary);border-radius:6px;height:8px;overflow:hidden">
-          <div style="width:${pct}%;height:100%;background:${colors[s]};border-radius:6px;transition:width .4s"></div>
-        </div>
-      </div>`;
-  }).join('');
-  document.getElementById('sudDiv').innerHTML = rows || '<div class="empty-state">Nessun dato.</div>';
-}
-
-/* ══ CSV ══════════════════════════════════════════════════ */
-function exportCSV(ufficio, stato) {
-  let list = stato ? db.filter(a => a.stato === stato) : [...db];
-  const u = ufficio || currentUfficio;
-  if (u && u !== 'tutte') list = list.filter(a => a.ufficio === u);
-  if (!list.length) { showToast('Nessun dato da esportare'); return; }
-  const hdr  = 'Nome,Stato,Ufficio,Data,Note';
-  const rows = list.map(a =>
-    `"${esc2(a.nome)}","${lblStato(a.stato)}","${cap(a.ufficio||"")}","${a.data||""}","${esc2(a.note||"")}"`
-  );
-  const csv  = [hdr, ...rows].join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url  = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url; link.download = `aziende_${stato||'tutte'}_${today()}.csv`; link.click();
-  URL.revokeObjectURL(url);
-  showToast('📥 CSV esportato!');
-}
-
-/* ══ UTILS ════════════════════════════════════════════════ */
-function sortList(list, ord) {
-  return [...list].sort((a, b) => {
-    if      (ord === 'data-desc') return (b.data || '').localeCompare(a.data || '');
-    else if (ord === 'data-asc')  return (a.data || '').localeCompare(b.data || '');
-    else if (ord === 'alfa')      return a.nome.localeCompare(b.nome, 'it');
-    return 0;
-  });
-}
-function lblStato(s) {
-  return { pending:'In attesa', attiva:'Attiva', evasa:'Evasa', chiusa:'Chiusa', assunto:'Hanno assunto' }[s] || s;
-}
-function fmtData(d) {
-  if (!d) return '—';
-  const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`;
-}
-function fmtMese(m) {
-  if (!m || m === '?') return 'Data sconosciuta';
-  const [y, mo] = m.split('-');
-  const n = ['','Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-  return `${n[parseInt(mo)]} ${y}`;
-}
-function today()  { return new Date().toISOString().split('T')[0]; }
-function esc(s)   { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function esc2(s)  { return String(s).replace(/"/g,'""'); }
-function cap(s)   { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
-
-let _toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-}
-</script>
+  <div id="toast"></div>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, updateDoc, deleteDoc, onSnapshot, query, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    const firebaseConfig = { apiKey:'AIzaSyCerXMBfDAXiF5tEkkKXHGg0QMy3I1pQic', authDomain:'punto-umana.firebaseapp.com', projectId:'punto-umana', storageBucket:'punto-umana.firebasestorage.app', messagingSenderId:'105141488497', appId:'1:105141488497:web:51d2689ba9b8ac425484d0', measurementId:'G-NJZZXM5RF8' };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const dbfs = getFirestore(app);
+    let aziende = [], offices = [], currentUser = null, viewedUid = null, currentUfficio = 'Tutte', currentBigTab = 'inserisci', currentSubTab = 'attive', isAdmin = false, allUsersCache = [], unsubAziende = null, unsubOffices = null;
+    const sortState = {};
+    const ADMIN_EMAILS = ['ambrogiani.ai@gmail.com'];
+    const $ = id => document.getElementById(id);
+    $('inp-data').valueAsDate = new Date();
+    const slugify = t => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'ufficio';
+    const officeClass = n => { const s = slugify(n); if (s.includes('cesena')) return 'cesena'; if (s.includes('forli')) return 'forli'; if (s.includes('tutte')) return 'tutte'; return 'dynamic'; };
+    const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const esc2 = s => String(s ?? '').replace(/"/g,'""');
+    const today = () => new Date().toISOString().split('T')[0];
+    const fmtData = d => !d ? '—' : `${d.split('-')[2]}/${d.split('-')[1]}/${d.split('-')[0]}`;
+    const fmtMese = m => { if (!m || m === '?') return 'Data sconosciuta'; const [y,mo] = m.split('-'); const n=['','Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic']; return `${n[parseInt(mo)]} ${y}`; };
+    const lblStato = s => ({ pending:'In attesa', attiva:'Attiva', evasa:'Evasa', chiusa:'Chiusa', assunto:'Hanno assunto' }[s] || s);
+    const getViewedUid = () => viewedUid || currentUser?.uid || null;
+    const getViewedEmail = () => viewedUid === currentUser?.uid ? (currentUser?.email || '') : (allUsersCache.find(u => u.uid === viewedUid)?.email || '');
+    function showToast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(window._toastTimer); window._toastTimer=setTimeout(()=>t.classList.remove('show'),2500); }
+    function sortList(list, ord){ return [...list].sort((a,b)=> ord==='data-desc' ? (b.data||'').localeCompare(a.data||'') : ord==='data-asc' ? (a.data||'').localeCompare(b.data||'') : ord==='alfa' ? (a.nome||'').localeCompare(b.nome||'','it') : 0); }
+    function mapAuthError(error){ const c=error?.code||''; if (c.includes('invalid-credential')||c.includes('wrong-password')||c.includes('user-not-found')) return 'Credenziali non valide'; if (c.includes('email-already-in-use')) return 'Email già registrata'; if (c.includes('weak-password')) return 'Password troppo debole'; if (c.includes('invalid-email')) return 'Email non valida'; return 'Operazione non riuscita'; }
+    async function ensureUserProfile(user){ const profileRef=doc(dbfs,'users',user.uid); const snap=await getDoc(profileRef); const base={ email:user.email||'', isAdmin:ADMIN_EMAILS.includes((user.email||'').toLowerCase()), createdAt:serverTimestamp() }; if(!snap.exists()) await setDoc(profileRef, base, { merge:true }); else if(snap.data().email !== user.email) await setDoc(profileRef,{ email:user.email||'' },{ merge:true }); isAdmin=(snap.data()?.isAdmin ?? base.isAdmin) || base.isAdmin; if(isAdmin) await setDoc(profileRef,{ isAdmin:true },{ merge:true }); const officeRef=doc(dbfs,'users',user.uid,'meta','settings'); const officeSnap=await getDoc(officeRef); if(!officeSnap.exists()) await setDoc(officeRef,{ offices:['Cesena','Forlì'], updatedAt:serverTimestamp() },{ merge:true }); }
+    async function login(){ const email=$('auth-email').value.trim(), password=$('auth-password').value; if(!email||!password) return showToast('Inserisci email e password'); await signInWithEmailAndPassword(auth,email,password); showToast('Accesso effettuato'); }
+    async function register(){ const email=$('auth-email').value.trim(), password=$('auth-password').value; if(!email||!password) return showToast('Inserisci email e password'); if(password.length<6) return showToast('Password minima: 6 caratteri'); await createUserWithEmailAndPassword(auth,email,password); showToast('Account creato'); }
+    async function resetPassword(){ const email=$('auth-email').value.trim(); if(!email) return showToast('Inserisci l’email'); await sendPasswordResetEmail(auth,email); showToast('Email di reset inviata'); }
+    async function logout(){ await signOut(auth); showToast('Disconnesso'); }
+    async function watchUserData(uid){ if(unsubAziende) unsubAziende(); if(unsubOffices) unsubOffices(); aziende=[]; offices=[]; unsubAziende=onSnapshot(query(collection(dbfs,'users',uid,'aziende')), snap=>{ aziende=snap.docs.map(d=>({ id:d.id, ...d.data() })); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); renderOfficeManager(); }); unsubOffices=onSnapshot(doc(dbfs,'users',uid,'meta','settings'), snap=>{ const data=snap.data()||{}; offices=Array.isArray(data.offices)&&data.offices.length ? data.offices : ['Cesena','Forlì']; if(currentUfficio!=='Tutte' && !offices.includes(currentUfficio)) currentUfficio='Tutte'; renderOfficeSwitcher(); renderOfficeManager(); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); }); }
+    function renderOfficeSwitcher(){ const items=[...offices,'Tutte']; $('ufficioSwitcher').innerHTML=items.map(name=>`<button class="uff-btn ${officeClass(name)} ${currentUfficio===name?'active':''}" data-office="${esc(name)}">${esc(name)}</button>`).join(''); $('ufficioSwitcher').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>setUfficio(btn.getAttribute('data-office')))); }
+    function filteredListByOffice(list){ return currentUfficio==='Tutte' ? list : list.filter(a=>a.ufficio===currentUfficio); }
+    function renderStats(){ const filtered=filteredListByOffice(aziende); const c={ attiva:0, evasa:0, chiusa:0, assunto:0, pending:0 }; filtered.forEach(a=>{ if(c[a.stato]!==undefined) c[a.stato]++; }); $('statsRow').innerHTML=`<div class="stat-card"><div class="stat-label">Attive</div><div class="stat-val" style="color:var(--info-text)">${c.attiva}</div></div><div class="stat-card"><div class="stat-label">Evase</div><div class="stat-val" style="color:var(--green-text)">${c.evasa}</div></div><div class="stat-card"><div class="stat-label">Chiuse</div><div class="stat-val" style="color:var(--red-text)">${c.chiusa}</div></div><div class="stat-card"><div class="stat-label">Assunto</div><div class="stat-val" style="color:var(--amber-text)">${c.assunto}</div></div><div class="stat-card"><div class="stat-label">Totale</div><div class="stat-val">${filtered.length}</div></div>`; }
+    function noteViewHtml(a){ return a.note ? `<span style="font-size:12px;color:var(--text-secondary);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(a.note)}">${esc(a.note)}</span><button class="btn-note-edit" onclick="editNote('${a.id}')" title="Modifica nota"><i class="ti ti-edit"></i></button>` : `<button class="btn-note-edit" onclick="editNote('${a.id}')" title="Aggiungi nota"><i class="ti ti-note-plus"></i></button>`; }
+    function itemHtml(a,key){ const showStatus=key==='tutte'; const showUff=currentUfficio==='Tutte'; return `<div class="company-item" id="item-${a.id}"><div class="company-info"><div class="company-name">${esc(a.nome)}</div><div class="company-meta">${fmtData(a.data)}${showUff&&a.ufficio ? ' · <span class="uff-badge office-badge '+officeClass(a.ufficio)+'">'+esc(a.ufficio)+'</span>' : ''}${showStatus ? ' · <span class="status-badge s-'+a.stato+'">'+lblStato(a.stato)+'</span>' : ''}</div></div><div class="note-edit-wrap" id="note-wrap-${a.id}">${noteViewHtml(a)}</div><div class="item-actions"><select onchange="changeStato('${a.id}',this.value)"><option value="pending" ${a.stato==='pending'?'selected':''}>In attesa</option><option value="attiva" ${a.stato==='attiva'?'selected':''}>Attiva</option><option value="evasa" ${a.stato==='evasa'?'selected':''}>Evasa</option><option value="chiusa" ${a.stato==='chiusa'?'selected':''}>Chiusa</option><option value="assunto" ${a.stato==='assunto'?'selected':''}>Assunto</option></select><button class="btn btn-sm btn-danger" onclick="delAzienda('${a.id}')"><i class="ti ti-trash"></i></button></div></div>`; }
+    function renderList(key, ord){ if(ord) sortState[key]=ord; const curOrd=sortState[key]||'data-desc'; let list=key==='tutte' ? [...aziende] : aziende.filter(a=>a.stato===key); list=filteredListByOffice(list); if(key==='tutte'){ const sf=$('fil-stato')?.value||''; const ss=($('search-input')?.value||'').toLowerCase(); if(sf) list=list.filter(a=>a.stato===sf); if(ss) list=list.filter(a=>(a.nome||'').toLowerCase().includes(ss)); } list=sortList(list,curOrd); const container=$('list-'+key), emptyEl=$('empty-'+key); if(!list.length){ container.innerHTML=''; emptyEl.style.display='block'; return; } emptyEl.style.display='none'; container.innerHTML = curOrd==='mese' ? Object.keys(list.reduce((g,a)=>((g[(a.data||'').substring(0,7)||'?']??=[]).push(a),g),{})).sort((a,b)=>b.localeCompare(a)).map(m=>`<div class="month-header">${fmtMese(m)}</div>` + list.filter(a=>((a.data||'').substring(0,7)||'?')===m).map(a=>itemHtml(a,key)).join('')).join('') : list.map(a=>itemHtml(a,key)).join(''); }
+    function renderSubTab(name){ const keyMap={ attive:'attiva', evase:'evasa', chiuse:'chiusa', assunto:'assunto', tutte:'tutte' }; renderList(keyMap[name]||name, sortState[keyMap[name]||name]); }
+    function setUfficio(val){ currentUfficio=val; renderOfficeSwitcher(); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); }
+    function setBigTab(name, btn){ document.querySelectorAll('.nav-3-btn').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); ['inserisci','elenco','suddivisione'].forEach(t=>$('bigtab-'+t).style.display=t===name?'':'none'); currentBigTab=name; if(name==='elenco') renderSubTab(currentSubTab); if(name==='suddivisione') renderSuddivisione(); }
+    function setTab(name, btn){ document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none'); $('tab-'+name).style.display=''; currentSubTab=name; renderSubTab(name); }
+    async function addAzienda(){ const nome=$('inp-nome').value.trim(); if(!nome) return showToast('⚠️ Inserisci il nome azienda'); const uid=getViewedUid(); if(!uid) return; await addDoc(collection(dbfs,'users',uid,'aziende'),{ nome, stato:$('inp-stato').value, data:$('inp-data').value||today(), note:$('inp-note').value.trim(), ufficio: currentUfficio==='Tutte' ? (offices[0]||'Cesena') : currentUfficio, createdAt:serverTimestamp(), updatedAt:serverTimestamp() }); $('inp-nome').value=''; $('inp-stato').value='pending'; $('inp-note').value=''; $('inp-data').valueAsDate=new Date(); showToast('✅ Azienda aggiunta!'); }
+    function editNote(id){ const a=aziende.find(x=>x.id===id); if(!a) return; $('note-wrap-'+id).innerHTML=`<input class="note-inline-input" id="note-inp-${id}" value="${esc(a.note||'')}" placeholder="Nota…" /><button class="btn-note-save" onclick="saveNote('${id}')" title="Salva"><i class="ti ti-check"></i></button><button class="btn-note-cancel" onclick="cancelNote('${id}')" title="Annulla"><i class="ti ti-x"></i></button>`; const inp=$('note-inp-'+id); inp.focus(); inp.addEventListener('keydown',e=>{ if(e.key==='Enter') saveNote(id); if(e.key==='Escape') cancelNote(id); }); }
+    async function saveNote(id){ const uid=getViewedUid(); const inp=$('note-inp-'+id); if(!uid||!inp) return; await updateDoc(doc(dbfs,'users',uid,'aziende',id),{ note:inp.value.trim(), updatedAt:serverTimestamp() }); showToast('✅ Nota salvata!'); }
+    function cancelNote(id){ const a=aziende.find(x=>x.id===id); if(a) $('note-wrap-'+id).innerHTML=noteViewHtml(a); }
+    async function changeStato(id, newStato){ const uid=getViewedUid(); if(!uid) return; await updateDoc(doc(dbfs,'users',uid,'aziende',id),{ stato:newStato, updatedAt:serverTimestamp() }); showToast('✅ Stato aggiornato!'); }
+    async function delAzienda(id){ if(!confirm('Eliminare questa azienda?')) return; const uid=getViewedUid(); if(!uid) return; await deleteDoc(doc(dbfs,'users',uid,'aziende',id)); showToast('🗑 Eliminato!'); }
+    function renderSuddivisione(){ const filtered=filteredListByOffice(aziende); const stati=['attiva','evasa','chiusa','assunto','pending']; const labels={ attiva:'Attive', evasa:'Evase', chiusa:'Chiuse', assunto:'Hanno assunto', pending:'In attesa' }; const colors={ attiva:'var(--info-text)', evasa:'var(--green-text)', chiusa:'var(--red-text)', assunto:'var(--amber-text)', pending:'var(--text-secondary)' }; const total=filtered.length||1; $('sudDiv').innerHTML=stati.map(s=>{ const cnt=filtered.filter(a=>a.stato===s).length; const pct=Math.round(cnt/total*100); return `<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="font-weight:600;color:${colors[s]}">${labels[s]}</span><span style="color:var(--text-secondary)">${cnt} &nbsp;<small>(${pct}%)</small></span></div><div style="background:var(--bg-tertiary);border-radius:6px;height:8px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${colors[s]};border-radius:6px;transition:width .4s"></div></div></div>`; }).join('') || '<div class="empty-state">Nessun dato.</div>'; }
+    function exportCSV(stato){ let list=stato ? aziende.filter(a=>a.stato===stato) : [...aziende]; list=filteredListByOffice(list); if(!list.length) return showToast('Nessun dato da esportare'); const csv=['Nome,Stato,Ufficio,Data,Note', ...list.map(a=>`"${esc2(a.nome)}","${lblStato(a.stato)}","${esc2(a.ufficio||'')}","${a.data||''}","${esc2(a.note||'')}"`) ].join('\n'); const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const link=document.createElement('a'); link.href=url; link.download=`aziende_${stato||'tutte'}_${today()}.csv`; link.click(); URL.revokeObjectURL(url); showToast('📥 CSV esportato!'); }
+    async function saveOffices(newOffices){ const uid=getViewedUid(); if(!uid) return; const clean=[...new Set(newOffices.map(v=>String(v).trim()).filter(Boolean))]; if(!clean.length) return showToast('Serve almeno un ufficio'); await setDoc(doc(dbfs,'users',uid,'meta','settings'),{ offices:clean, updatedAt:serverTimestamp() },{ merge:true }); }
+    async function addOffice(){ const val=$('office-name').value.trim(); if(!val) return showToast('Inserisci il nome ufficio'); if(offices.includes(val)) return showToast('Ufficio già presente'); await saveOffices([...offices,val]); $('office-name').value=''; showToast('✅ Ufficio aggiunto'); }
+    async function renameOffice(name){ const next=prompt('Nuovo nome ufficio',name); if(!next||next.trim()===name) return; const newName=next.trim(), uid=getViewedUid(); await Promise.all(aziende.filter(a=>a.ufficio===name).map(a=>updateDoc(doc(dbfs,'users',uid,'aziende',a.id),{ ufficio:newName, updatedAt:serverTimestamp() }))); await saveOffices(offices.map(o=>o===name?newName:o)); if(currentUfficio===name) currentUfficio=newName; showToast('✅ Ufficio rinominato'); }
+    async function removeOffice(name){ if(offices.length<=1) return showToast('Deve restare almeno un ufficio'); if(!confirm(`Eliminare l’ufficio "${name}"? Le aziende verranno spostate nel primo ufficio disponibile.`)) return; const uid=getViewedUid(), fallback=offices.find(o=>o!==name); await Promise.all(aziende.filter(a=>a.ufficio===name).map(a=>updateDoc(doc(dbfs,'users',uid,'aziende',a.id),{ ufficio:fallback, updatedAt:serverTimestamp() }))); await saveOffices(offices.filter(o=>o!==name)); if(currentUfficio===name) currentUfficio='Tutte'; showToast('🗑 Ufficio eliminato'); }
+    function renderOfficeManager(){ $('office-list').innerHTML=offices.map(name=>`<div class="company-item"><div class="company-info"><div class="company-name">${esc(name)}</div><div class="company-meta">Ufficio disponibile per questo account</div></div><div class="item-actions"><button class="btn btn-sm" onclick="renameOffice(${JSON.stringify(name)})"><i class="ti ti-edit"></i></button><button class="btn btn-sm btn-danger" onclick="removeOffice(${JSON.stringify(name)})"><i class="ti ti-trash"></i></button></div></div>`).join(''); }
+    async function loadAdminUsers(){ if(!isAdmin) return; const snap=await getDocs(collection(dbfs,'users')); allUsersCache=snap.docs.map(d=>({ uid:d.id, ...d.data() })).sort((a,b)=>(a.email||'').localeCompare(b.email||'')); $('admin-user-select').innerHTML=allUsersCache.map(u=>`<option value="${u.uid}">${esc(u.email || u.uid)}</option>`).join(''); updateAdminTargetLabel(); }
+    function updateAdminTargetLabel(){ $('admin-current-target').textContent = viewedUid && viewedUid !== currentUser?.uid ? `Ambiente aperto: ${getViewedEmail()}` : `Ambiente aperto: il tuo (${currentUser?.email || ''})`; }
+    async function openAdminView(){ if(!isAdmin) return; viewedUid=$('admin-user-select').value || currentUser.uid; currentUfficio='Tutte'; await watchUserData(viewedUid); updateAdminTargetLabel(); showToast('Ambiente caricato'); }
+    async function returnToOwnView(){ viewedUid=currentUser.uid; currentUfficio='Tutte'; await watchUserData(viewedUid); updateAdminTargetLabel(); showToast('Rientrato nel tuo ambiente'); }
+    window.setBigTab=setBigTab; window.setTab=setTab; window.setUfficio=setUfficio; window.addAzienda=addAzienda; window.editNote=editNote; window.saveNote=saveNote; window.cancelNote=cancelNote; window.changeStato=changeStato; window.delAzienda=delAzienda; window.exportCSV=exportCSV; window.renameOffice=renameOffice; window.removeOffice=removeOffice;
+    $('btn-login').addEventListener('click',()=>login().catch(e=>showToast(mapAuthError(e))));
+    $('btn-register').addEventListener('click',()=>register().catch(e=>showToast(mapAuthError(e))));
+    $('btn-reset').addEventListener('click',()=>resetPassword().catch(e=>showToast(mapAuthError(e))));
+    $('btn-logout').addEventListener('click',()=>logout().catch(e=>showToast(e.message)));
+    $('btn-manage-offices').addEventListener('click',()=>$('office-manager-section').classList.toggle('hidden'));
+    $('btn-add-office').addEventListener('click',()=>addOffice().catch(e=>showToast(e.message)));
+    $('btn-admin-view').addEventListener('click',()=>$('admin-panel-section').classList.toggle('hidden'));
+    $('btn-admin-open').addEventListener('click',()=>openAdminView().catch(e=>showToast(e.message)));
+    $('btn-admin-return').addEventListener('click',()=>returnToOwnView().catch(e=>showToast(e.message)));
+    onAuthStateChanged(auth, async user => { if(!user){ currentUser=null; viewedUid=null; isAdmin=false; aziende=[]; offices=[]; if(unsubAziende) unsubAziende(); if(unsubOffices) unsubOffices(); $('authApp').classList.remove('hidden'); $('mainApp').classList.add('hidden'); return; } currentUser=user; viewedUid=user.uid; await ensureUserProfile(user); $('authApp').classList.add('hidden'); $('mainApp').classList.remove('hidden'); $('btn-admin-view').classList.toggle('hidden', !isAdmin); $('office-manager-section').classList.add('hidden'); $('admin-panel-section').classList.add('hidden'); currentUfficio='Tutte'; await watchUserData(viewedUid); if(isAdmin) await loadAdminUsers(); updateAdminTargetLabel(); renderOfficeSwitcher(); renderStats(); renderSubTab(currentSubTab); });
+  </script>
 </body>
 </html>
