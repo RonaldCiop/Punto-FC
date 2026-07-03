@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Mantieni allineata questa lista con ADMIN_EMAILS in "pagina accesso.html"
+    function isAdminEmail() {
+      return request.auth != null && request.auth.token.email in ['ambrogiani.ai@gmail.com'];
+    }
+
+    function isAdminUser() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function canAccess(uid) {
+      return isOwner(uid) || isAdminEmail() || isAdminUser();
+    }
+
+    match /users/{uid} {
+      allow get, list: if canAccess(uid);
+
+      // In creazione: il campo isAdmin puo' essere true solo se l'email e' in ADMIN_EMAILS
+      // (impedisce a un utente di auto-promuoversi admin).
+      allow create: if isOwner(uid)
+        && request.resource.data.isAdmin == isAdminEmail();
+
+      // In aggiornamento: il proprietario non puo' cambiare isAdmin da solo;
+      // solo un admin (via isAdminEmail) puo' modificarlo, es. per promuovere altri utenti.
+      allow update: if canAccess(uid)
+        && (request.resource.data.isAdmin == resource.data.isAdmin || isAdminEmail());
+
+      match /aziende/{docId} {
+        allow read, write: if canAccess(uid);
+      }
+
+      match /meta/{docId} {
+        allow read, write: if canAccess(uid);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
