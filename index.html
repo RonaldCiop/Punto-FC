@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestione Aziende Commerciale</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg-primary:#ffffff; --bg-secondary:#f5f5f3; --bg-tertiary:#ebebea; --text-primary:#1a1a18; --text-secondary:#6b6b68; --text-tertiary:#9b9b97; --border-light:rgba(0,0,0,.10); --border-medium:rgba(0,0,0,.18); --radius-md:8px; --radius-lg:12px; --green-bg:#EAF3DE; --green-text:#27500A; --red-bg:#FCEBEB; --red-text:#A32D2D; --amber-bg:#FAEEDA; --amber-text:#633806; --blue-bg:#E6F1FB; --blue-text:#185FA5; --info-bg:#E6F1FB; --info-text:#185FA5; }
@@ -97,6 +100,9 @@
     #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .empty-state { text-align:center; padding:2rem; color:var(--text-tertiary); font-size:13px; }
     .auth-wrap { max-width:460px; margin:7vh auto 0; }
+    .brand-mark { display:flex; flex-direction:column; align-items:center; gap:14px; margin-bottom:2.25rem; opacity:.45; user-select:none; }
+    .brand-dot { width:20px; height:20px; border-radius:50%; background:var(--text-primary); }
+    .brand-name { font-family:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; font-size:34px; font-weight:500; letter-spacing:.22em; text-indent:.22em; color:var(--text-primary); line-height:1; }
     .auth-actions, .admin-actions { display:flex; gap:8px; flex-wrap:wrap; }
     .subtle-text { font-size:12px; color:var(--text-secondary); }
     .hidden { display:none !important; }
@@ -104,6 +110,7 @@
 </head>
 <body>
   <div id="authApp" class="shell auth-wrap">
+    <div class="brand-mark"><span class="brand-dot"></span><span class="brand-name">PUNTO</span></div>
     <div class="section">
       <div class="section-title"><i class="ti ti-lock"></i> Accesso</div>
       <div class="form-grid" style="grid-template-columns:1fr;">
@@ -170,7 +177,7 @@
     <div id="bigtab-suddivisione" style="display:none"><div class="section"><div class="section-title"><i class="ti ti-chart-bar"></i> Suddivisione per stato</div><div id="sudDiv"></div></div></div>
   </div>
   <div id="toast"></div>
-  <div id="editModal" class="modal-overlay hidden" onclick="closeEditModal()">
+  <div id="editModal" class="modal-overlay hidden" onclick="attemptCloseEditModal()">
     <div class="modal-box" onclick="event.stopPropagation()">
       <div class="section-title"><i class="ti ti-edit"></i> Modifica azienda</div>
       <div class="form-group"><label>Nome azienda</label><input type="text" id="edit-nome" /></div>
@@ -187,6 +194,16 @@
       </div>
       <div class="subtle-text" style="margin-top:10px;">Storico note</div>
       <div id="edit-note-history" class="note-history"></div>
+    </div>
+  </div>
+  <div id="confirmExit" class="modal-overlay hidden" style="z-index:1100;">
+    <div class="modal-box" style="max-width:340px;" onclick="event.stopPropagation()">
+      <div class="section-title"><i class="ti ti-alert-circle"></i> Modifiche non salvate</div>
+      <div class="subtle-text" style="margin-bottom:14px;">Vuoi salvare le modifiche prima di uscire?</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn btn-primary" id="btn-confirm-yes"><i class="ti ti-check"></i> Sì, salva</button>
+        <button class="btn" id="btn-confirm-no"><i class="ti ti-x"></i> No, esci</button>
+      </div>
     </div>
   </div>
   <script type="module">
@@ -235,9 +252,13 @@
     async function addAzienda(){ const nome=$('inp-nome').value.trim(); if(!nome) return showToast('⚠️ Inserisci il nome azienda'); const uid=getViewedUid(); if(!uid) return; const notaIniziale=$('inp-note').value.trim(); await addDoc(collection(dbfs,'users',uid,'aziende'),{ nome, stato:$('inp-stato').value, data:$('inp-data').value||today(), note:notaIniziale, noteStorico: notaIniziale ? [{ testo:notaIniziale, data:today(), ts:Date.now() }] : [], ufficio: currentUfficio==='Tutte' ? (offices[0]||'Cesena') : currentUfficio, createdAt:serverTimestamp(), updatedAt:serverTimestamp() }); $('inp-nome').value=''; $('inp-stato').value='attiva'; $('inp-note').value=''; $('inp-data').valueAsDate=new Date(); showToast('✅ Azienda aggiunta!'); }
     let editingId = null;
     function renderNoteHistory(a){ let hist=[...(a.noteStorico||[])]; if(!hist.length && a.note) hist=[{ testo:a.note, data:a.data||'', ts:0 }]; hist.sort((x,y)=>(y.ts||0)-(x.ts||0)); $('edit-note-history').innerHTML = hist.length ? hist.map(n=>`<div class="note-hist-item"><div class="note-hist-date">${fmtData(n.data)}</div><div class="note-hist-text">${esc(n.testo)}</div></div>`).join('') : '<div class="empty-state">Nessuna nota registrata.</div>'; }
-    function openEditModal(id){ const a=aziende.find(x=>x.id===id); if(!a) return; editingId=id; $('edit-nome').value=a.nome||''; $('edit-data').value=a.data||''; $('edit-note-text').value=''; renderNoteHistory(a); $('editModal').classList.remove('hidden'); }
-    function closeEditModal(){ $('editModal').classList.add('hidden'); editingId=null; }
-    async function saveEditModal(){ if(!editingId) return; const uid=getViewedUid(); if(!uid) return; const nome=$('edit-nome').value.trim(); if(!nome) return showToast('⚠️ Il nome non può essere vuoto'); const data=$('edit-data').value||today(); await updateDoc(doc(dbfs,'users',uid,'aziende',editingId),{ nome, data, updatedAt:serverTimestamp() }); showToast('✅ Azienda aggiornata!'); }
+    let editOriginal = null;
+    function openEditModal(id){ const a=aziende.find(x=>x.id===id); if(!a) return; editingId=id; editOriginal={ nome:a.nome||'', data:a.data||'' }; $('edit-nome').value=a.nome||''; $('edit-data').value=a.data||''; $('edit-note-text').value=''; renderNoteHistory(a); $('editModal').classList.remove('hidden'); }
+    function closeEditModal(){ $('confirmExit').classList.add('hidden'); $('editModal').classList.add('hidden'); editingId=null; editOriginal=null; }
+    function editIsDirty(){ return !!editingId && !!editOriginal && ($('edit-nome').value.trim()!==editOriginal.nome || $('edit-data').value!==editOriginal.data || $('edit-note-text').value.trim()!==''); }
+    function attemptCloseEditModal(){ if(editIsDirty()) $('confirmExit').classList.remove('hidden'); else closeEditModal(); }
+    async function saveEditModal(){ if(!editingId) return false; const uid=getViewedUid(); if(!uid) return false; const nome=$('edit-nome').value.trim(); if(!nome){ showToast('⚠️ Il nome non può essere vuoto'); return false; } const data=$('edit-data').value||today(); await updateDoc(doc(dbfs,'users',uid,'aziende',editingId),{ nome, data, updatedAt:serverTimestamp() }); editOriginal={ nome, data }; showToast('✅ Azienda aggiornata!'); return true; }
+    async function confirmExitYes(){ if(!editingId) return closeEditModal(); let ok=true; if($('edit-nome').value.trim()!==editOriginal.nome || $('edit-data').value!==editOriginal.data) ok=await saveEditModal(); if(ok && $('edit-note-text').value.trim()) await addNoteToHistory(); if(ok) closeEditModal(); else $('confirmExit').classList.add('hidden'); }
     async function addNoteToHistory(){ if(!editingId) return; const uid=getViewedUid(); if(!uid) return; const txt=$('edit-note-text').value.trim(); if(!txt) return showToast('⚠️ Scrivi una nota'); const entry={ testo:txt, data:today(), ts:Date.now() }; await updateDoc(doc(dbfs,'users',uid,'aziende',editingId),{ noteStorico:arrayUnion(entry), note:txt, updatedAt:serverTimestamp() }); $('edit-note-text').value=''; showToast('✅ Nota aggiunta!'); }
     async function changeStato(id, newStato){ const uid=getViewedUid(); if(!uid) return; await updateDoc(doc(dbfs,'users',uid,'aziende',id),{ stato:newStato, updatedAt:serverTimestamp() }); showToast('✅ Stato aggiornato!'); }
     async function delAzienda(id){ if(!confirm('Eliminare questa azienda?')) return; const uid=getViewedUid(); if(!uid) return; await deleteDoc(doc(dbfs,'users',uid,'aziende',id)); showToast('🗑 Eliminato!'); }
@@ -252,9 +273,11 @@
     function updateAdminTargetLabel(){ $('admin-current-target').textContent = viewedUid && viewedUid !== currentUser?.uid ? `Ambiente aperto: ${getViewedEmail()}` : `Ambiente aperto: il tuo (${currentUser?.email || ''})`; }
     async function openAdminView(){ if(!isAdmin) return; viewedUid=$('admin-user-select').value || currentUser.uid; currentUfficio='Tutte'; await watchUserData(viewedUid); updateAdminTargetLabel(); showToast('Ambiente caricato'); }
     async function returnToOwnView(){ viewedUid=currentUser.uid; currentUfficio='Tutte'; await watchUserData(viewedUid); updateAdminTargetLabel(); showToast('Rientrato nel tuo ambiente'); }
-    window.setBigTab=setBigTab; window.setTab=setTab; window.setUfficio=setUfficio; window.addAzienda=addAzienda; window.renderList=renderList; window.changeStato=changeStato; window.delAzienda=delAzienda; window.exportCSV=exportCSV; window.renameOffice=renameOffice; window.removeOffice=removeOffice; window.openEditModal=openEditModal; window.closeEditModal=closeEditModal;
+    window.setBigTab=setBigTab; window.setTab=setTab; window.setUfficio=setUfficio; window.addAzienda=addAzienda; window.renderList=renderList; window.changeStato=changeStato; window.delAzienda=delAzienda; window.exportCSV=exportCSV; window.renameOffice=renameOffice; window.removeOffice=removeOffice; window.openEditModal=openEditModal; window.closeEditModal=closeEditModal; window.attemptCloseEditModal=attemptCloseEditModal;
     $('btn-edit-save').addEventListener('click',()=>saveEditModal().catch(e=>showToast(e.message)));
-    $('btn-edit-close').addEventListener('click',closeEditModal);
+    $('btn-edit-close').addEventListener('click',attemptCloseEditModal);
+    $('btn-confirm-yes').addEventListener('click',()=>confirmExitYes().catch(e=>showToast(e.message)));
+    $('btn-confirm-no').addEventListener('click',closeEditModal);
     $('btn-edit-add-note').addEventListener('click',()=>addNoteToHistory().catch(e=>showToast(e.message)));
     $('btn-login').addEventListener('click',()=>login().catch(e=>showToast(mapAuthError(e))));
     $('btn-register').addEventListener('click',()=>register().catch(e=>showToast(mapAuthError(e))));
