@@ -49,6 +49,20 @@
     .section-title { font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:1rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .form-grid { display:grid; grid-template-columns:2fr 1.5fr 1fr 1.5fr auto; gap:10px; align-items:end; }
     @media (max-width:680px) { .form-grid { grid-template-columns:1fr 1fr; } .form-grid .btn-add { grid-column:1 / -1; } }
+    @media (max-width:600px) {
+      .shell { padding:1rem .75rem 3rem; }
+      .app-title { font-size:17px; }
+      .header-right { width:100%; justify-content:space-between; }
+      .uff-btn { padding:6px 12px; }
+      .stats-row { grid-template-columns:repeat(2,1fr); }
+      .nav-3-btn { font-size:12px; padding:12px 6px; }
+      .form-grid { grid-template-columns:1fr; }
+      .company-item { flex-wrap:wrap; row-gap:8px; }
+      .company-info { flex:1 1 100%; }
+      .company-note-preview { order:3; max-width:none; width:100%; white-space:normal; }
+      .item-actions { flex:1 1 100%; justify-content:flex-end; }
+      .modal-box { padding:1rem 1.1rem; }
+    }
     .form-group { display:flex; flex-direction:column; gap:4px; }
     .form-group label { font-size:12px; color:var(--text-secondary); font-weight:500; }
     input[type="text"], input[type="date"], input[type="email"], input[type="password"], select { width:100%; padding:7px 10px; font-size:13px; border:.5px solid var(--border-medium); border-radius:var(--radius-md); background:var(--bg-primary); color:var(--text-primary); outline:none; transition:border-color .15s; }
@@ -184,6 +198,7 @@
     const auth = getAuth(app);
     const dbfs = getFirestore(app);
     let aziende = [], offices = [], currentUser = null, viewedUid = null, currentUfficio = 'Tutte', currentBigTab = 'inserisci', currentSubTab = 'attive', isAdmin = false, allUsersCache = [], unsubAziende = null, unsubOffices = null;
+    const migratingIds = new Set();
     const sortState = {};
     const ADMIN_EMAILS = ['ambrogiani.ai@gmail.com'];
     const $ = id => document.getElementById(id);
@@ -206,7 +221,8 @@
     async function register(){ const email=$('auth-email').value.trim(), password=$('auth-password').value; if(!email||!password) return showToast('Inserisci email e password'); if(password.length<6) return showToast('Password minima: 6 caratteri'); await createUserWithEmailAndPassword(auth,email,password); showToast('Account creato'); }
     async function resetPassword(){ const email=$('auth-email').value.trim(); if(!email) return showToast('Inserisci l’email'); await sendPasswordResetEmail(auth,email); showToast('Email di reset inviata'); }
     async function logout(){ await signOut(auth); showToast('Disconnesso'); }
-    async function watchUserData(uid){ if(unsubAziende) unsubAziende(); if(unsubOffices) unsubOffices(); aziende=[]; offices=[]; unsubAziende=onSnapshot(query(collection(dbfs,'users',uid,'aziende')), snap=>{ aziende=snap.docs.map(d=>({ id:d.id, ...d.data() })); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); renderOfficeManager(); if(editingId){ const a=aziende.find(x=>x.id===editingId); if(a) renderNoteHistory(a); else closeEditModal(); } }); unsubOffices=onSnapshot(doc(dbfs,'users',uid,'meta','settings'), snap=>{ const data=snap.data()||{}; offices=Array.isArray(data.offices)&&data.offices.length ? data.offices : ['Cesena','Forlì']; if(currentUfficio!=='Tutte' && !offices.includes(currentUfficio)) currentUfficio='Tutte'; renderOfficeSwitcher(); renderOfficeManager(); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); }); }
+    async function migrateLegacyNotes(uid, list){ const toMigrate=list.filter(a=>a.note && (!a.noteStorico || !a.noteStorico.length) && !migratingIds.has(a.id)); toMigrate.forEach(a=>migratingIds.add(a.id)); await Promise.all(toMigrate.map(a=>updateDoc(doc(dbfs,'users',uid,'aziende',a.id),{ noteStorico:[{ testo:a.note, data:a.data||today(), ts:0 }] }).finally(()=>migratingIds.delete(a.id)))); }
+    async function watchUserData(uid){ if(unsubAziende) unsubAziende(); if(unsubOffices) unsubOffices(); aziende=[]; offices=[]; unsubAziende=onSnapshot(query(collection(dbfs,'users',uid,'aziende')), snap=>{ aziende=snap.docs.map(d=>({ id:d.id, ...d.data() })); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); renderOfficeManager(); if(editingId){ const a=aziende.find(x=>x.id===editingId); if(a) renderNoteHistory(a); else closeEditModal(); } migrateLegacyNotes(uid, aziende); }); unsubOffices=onSnapshot(doc(dbfs,'users',uid,'meta','settings'), snap=>{ const data=snap.data()||{}; offices=Array.isArray(data.offices)&&data.offices.length ? data.offices : ['Cesena','Forlì']; if(currentUfficio!=='Tutte' && !offices.includes(currentUfficio)) currentUfficio='Tutte'; renderOfficeSwitcher(); renderOfficeManager(); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); }); }
     function renderOfficeSwitcher(){ const items=[...offices,'Tutte']; $('ufficioSwitcher').innerHTML=items.map(name=>`<button class="uff-btn ${officeClass(name)} ${currentUfficio===name?'active':''}" data-office="${esc(name)}">${esc(name)}</button>`).join(''); $('ufficioSwitcher').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>setUfficio(btn.getAttribute('data-office')))); }
     function filteredListByOffice(list){ return currentUfficio==='Tutte' ? list : list.filter(a=>a.ufficio===currentUfficio); }
     function renderStats(){ const filtered=filteredListByOffice(aziende); const c={ attiva:0, evasa:0, chiusa:0, assunto:0, pending:0 }; filtered.forEach(a=>{ if(c[a.stato]!==undefined) c[a.stato]++; }); $('statsRow').innerHTML=`<div class="stat-card"><div class="stat-label">Attive</div><div class="stat-val" style="color:var(--info-text)">${c.attiva}</div></div><div class="stat-card"><div class="stat-label">Evase</div><div class="stat-val" style="color:var(--green-text)">${c.evasa}</div></div><div class="stat-card"><div class="stat-label">Chiuse</div><div class="stat-val" style="color:var(--red-text)">${c.chiusa}</div></div><div class="stat-card"><div class="stat-label">Assunto</div><div class="stat-val" style="color:var(--amber-text)">${c.assunto}</div></div><div class="stat-card"><div class="stat-label">Totale</div><div class="stat-val">${filtered.length}</div></div>`; }
@@ -218,7 +234,7 @@
     function setTab(name, btn){ document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none'); $('tab-'+name).style.display=''; currentSubTab=name; renderSubTab(name); }
     async function addAzienda(){ const nome=$('inp-nome').value.trim(); if(!nome) return showToast('⚠️ Inserisci il nome azienda'); const uid=getViewedUid(); if(!uid) return; const notaIniziale=$('inp-note').value.trim(); await addDoc(collection(dbfs,'users',uid,'aziende'),{ nome, stato:$('inp-stato').value, data:$('inp-data').value||today(), note:notaIniziale, noteStorico: notaIniziale ? [{ testo:notaIniziale, data:today(), ts:Date.now() }] : [], ufficio: currentUfficio==='Tutte' ? (offices[0]||'Cesena') : currentUfficio, createdAt:serverTimestamp(), updatedAt:serverTimestamp() }); $('inp-nome').value=''; $('inp-stato').value='attiva'; $('inp-note').value=''; $('inp-data').valueAsDate=new Date(); showToast('✅ Azienda aggiunta!'); }
     let editingId = null;
-    function renderNoteHistory(a){ const hist=[...(a.noteStorico||[])].sort((x,y)=>(y.ts||0)-(x.ts||0)); $('edit-note-history').innerHTML = hist.length ? hist.map(n=>`<div class="note-hist-item"><div class="note-hist-date">${fmtData(n.data)}</div><div class="note-hist-text">${esc(n.testo)}</div></div>`).join('') : '<div class="empty-state">Nessuna nota registrata.</div>'; }
+    function renderNoteHistory(a){ let hist=[...(a.noteStorico||[])]; if(!hist.length && a.note) hist=[{ testo:a.note, data:a.data||'', ts:0 }]; hist.sort((x,y)=>(y.ts||0)-(x.ts||0)); $('edit-note-history').innerHTML = hist.length ? hist.map(n=>`<div class="note-hist-item"><div class="note-hist-date">${fmtData(n.data)}</div><div class="note-hist-text">${esc(n.testo)}</div></div>`).join('') : '<div class="empty-state">Nessuna nota registrata.</div>'; }
     function openEditModal(id){ const a=aziende.find(x=>x.id===id); if(!a) return; editingId=id; $('edit-nome').value=a.nome||''; $('edit-data').value=a.data||''; $('edit-note-text').value=''; renderNoteHistory(a); $('editModal').classList.remove('hidden'); }
     function closeEditModal(){ $('editModal').classList.add('hidden'); editingId=null; }
     async function saveEditModal(){ if(!editingId) return; const uid=getViewedUid(); if(!uid) return; const nome=$('edit-nome').value.trim(); if(!nome) return showToast('⚠️ Il nome non può essere vuoto'); const data=$('edit-data').value||today(); await updateDoc(doc(dbfs,'users',uid,'aziende',editingId),{ nome, data, updatedAt:serverTimestamp() }); showToast('✅ Azienda aggiornata!'); }
