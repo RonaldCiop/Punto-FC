@@ -39,6 +39,11 @@ service cloud.firestore {
         allow read, write: if canAccess(uid);
       }
 
+      // Coda follow-up "AZIONE": accesso auth-gated per proprietario/admin.
+      match /azioni/{docId} {
+        allow read, write: if canAccess(uid);
+      }
+
       match /meta/{docId} {
         allow read, write: if canAccess(uid);
       }

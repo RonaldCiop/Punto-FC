@@ -39,7 +39,7 @@
     .stat-card { background:var(--bg-primary); border:.5px solid var(--border-light); border-radius:var(--radius-md); padding:.75rem 1rem; }
     .stat-label { font-size:12px; color:var(--text-secondary); margin-bottom:4px; }
     .stat-val { font-size:24px; font-weight:600; }
-    .nav-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:1.25rem; }
+    .nav-3 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:1.25rem; }
     .nav-3-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:16px 8px; border-radius:var(--radius-lg); border:.5px solid var(--border-light); background:var(--bg-primary); cursor:pointer; font-size:13px; font-weight:600; color:var(--text-secondary); transition:all .15s; }
     .nav-3-btn i { font-size:22px; }
     .nav-3-btn:hover { background:var(--bg-secondary); color:var(--text-primary); }
@@ -58,6 +58,7 @@
       .header-right { width:100%; justify-content:space-between; }
       .uff-btn { padding:6px 12px; }
       .stats-row { grid-template-columns:repeat(2,1fr); }
+      .nav-3 { grid-template-columns:repeat(2,1fr); }
       .nav-3-btn { font-size:12px; padding:12px 6px; }
       .form-grid { grid-template-columns:1fr; }
       .company-item { flex-wrap:wrap; row-gap:8px; }
@@ -113,6 +114,15 @@
     .nh-btn.nh-del:hover { color:var(--red-text); }
     .auth-actions, .admin-actions { display:flex; gap:8px; flex-wrap:wrap; }
     .subtle-text { font-size:12px; color:var(--text-secondary); }
+    @media (min-width:681px) { .az-form { grid-template-columns:1.6fr 1.4fr 1.3fr 1fr .9fr auto; } }
+    .az-overdue { border-color:var(--red-text); box-shadow:inset 3px 0 0 var(--red-text); }
+    .az-due-late { color:var(--red-text); font-weight:600; }
+    .az-link { color:var(--info-text); cursor:pointer; text-decoration:underline; }
+    .az-link-chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:2px 8px; border-radius:20px; background:var(--blue-bg); color:var(--blue-text); }
+    .az-link-chip button { background:none; border:none; color:inherit; cursor:pointer; font-size:12px; line-height:1; padding:0; }
+    .az-storico-banner { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; background:var(--bg-secondary); border:.5px solid var(--border-light); border-radius:var(--radius-md); padding:8px 12px; margin-bottom:10px; }
+    .az-storico-banner button { margin-left:auto; background:none; border:none; color:var(--text-tertiary); cursor:pointer; font-size:14px; line-height:1; }
+    .az-link-btn { background:none; border:none; padding:0; text-align:left; text-decoration:underline; color:var(--info-text); cursor:pointer; font-size:12px; }
     .hidden { display:none !important; }
   </style>
 </head>
@@ -148,6 +158,7 @@
       <button class="nav-3-btn active" id="nav3-inserisci" onclick="setBigTab('inserisci',this)"><i class="ti ti-plus"></i> Inserisci</button>
       <button class="nav-3-btn" id="nav3-elenco" onclick="setBigTab('elenco',this)"><i class="ti ti-list"></i> Elenco</button>
       <button class="nav-3-btn" id="nav3-suddivisione" onclick="setBigTab('suddivisione',this)"><i class="ti ti-chart-bar"></i> Suddivisione</button>
+      <button class="nav-3-btn" id="nav3-azione" onclick="setBigTab('azione',this)"><i class="ti ti-phone-call"></i> Azione</button>
     </div>
     <div id="bigtab-inserisci">
       <div class="section">
@@ -175,6 +186,35 @@
       <div id="tab-tutte" class="tab-content" style="display:none"><div class="section"><div class="section-title"><i class="ti ti-list"></i> Tutte le aziende <button class="btn btn-sm btn-export" onclick="exportCSV('')"><i class="ti ti-download"></i> Esporta CSV</button></div><div class="list-controls"><select id="ord-tutte" onchange="renderList('tutte',this.value)"><option value="data-desc">Data ↓</option><option value="data-asc">Data ↑</option><option value="alfa">Alfabetico</option><option value="mese">Per mese</option></select><select id="fil-stato" onchange="renderList('tutte')"><option value="">Tutti gli stati</option><option value="pending">In attesa</option><option value="attiva">Attive</option><option value="evasa">Evase</option><option value="chiusa">Chiuse</option><option value="assunto">Hanno assunto</option></select><input type="text" id="search-input" placeholder="🔍 cerca…" oninput="renderList('tutte')" style="width:auto;flex:1;min-width:100px;font-size:12px;padding:5px 8px;" /></div><div class="company-list" id="list-tutte"></div><div class="empty-state" id="empty-tutte" style="display:none">Nessuna azienda trovata.</div></div></div>
     </div>
     <div id="bigtab-suddivisione" style="display:none"><div class="section"><div class="section-title"><i class="ti ti-chart-bar"></i> Suddivisione per stato</div><div id="sudDiv"></div></div></div>
+    <div id="bigtab-azione" style="display:none">
+      <div class="section">
+        <div class="section-title"><i class="ti ti-mail-forward"></i> Nuova azione di follow-up</div>
+        <div class="form-grid az-form">
+          <div class="form-group">
+            <label>Azienda *</label>
+            <input type="text" id="az-azienda" placeholder="Es: Rossi Srl" autocomplete="off" />
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:2px;"><button type="button" class="az-link-btn" onclick="openLinkSearch()"><i class="ti ti-link"></i> Collega azienda attiva</button><span id="az-link-chip"></span></div>
+          </div>
+          <div class="form-group"><label>Contatto</label><input type="text" id="az-contatto" placeholder="Es: Mario Bianchi" autocomplete="off" /></div>
+          <div class="form-group"><label>Tipo invio</label><select id="az-tipo"><option value="propositiva">Propositiva</option><option value="proposta_incontro">Proposta incontro</option><option value="altro">Altro</option></select></div>
+          <div class="form-group"><label>Data invio</label><input type="date" id="az-datainvio" /></div>
+          <div class="form-group"><label>Richiama tra (gg)</label><input type="number" id="az-giorni" value="4" min="1" /></div>
+          <button class="btn btn-primary btn-add" onclick="addAzione()"><i class="ti ti-plus"></i> Aggiungi</button>
+          <div class="form-group" style="grid-column:1 / -1;"><label>Note</label><input type="text" id="az-note" placeholder="Opzionale…" /></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title"><i class="ti ti-phone-call"></i> Da richiamare</div>
+        <div class="list-controls">
+          <select id="az-fil-stato" onchange="renderAzioni()"><option value="">Da richiamare (aperte)</option><option value="da_fare">Da fare</option><option value="fatto">Fatto</option><option value="chiuso">Chiuse</option></select>
+          <select id="az-fil-tipo" onchange="renderAzioni()"><option value="">Tutti i tipi</option><option value="propositiva">Propositiva</option><option value="proposta_incontro">Proposta incontro</option><option value="altro">Altro</option></select>
+          <input type="text" id="az-search" placeholder="🔍 azienda o contatto…" oninput="renderAzioni()" style="width:auto;flex:1;min-width:120px;font-size:12px;padding:5px 8px;" />
+        </div>
+        <div id="az-storico-banner"></div>
+        <div class="company-list" id="az-list"></div>
+        <div class="empty-state" id="az-empty" style="display:none">Nessuna azione in coda.</div>
+      </div>
+    </div>
     <div class="watermark"><span class="brand-dot"></span><span class="brand-name">PUNTO</span></div>
   </div>
   <div id="toast"></div>
@@ -210,6 +250,35 @@
       </div>
     </div>
   </div>
+  <div id="linkModal" class="modal-overlay hidden" onclick="closeLinkModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="section-title"><i class="ti ti-link"></i> Collega azienda attiva</div>
+      <input type="text" id="link-search" placeholder="🔍 cerca azienda…" oninput="renderLinkResults()" />
+      <div class="company-list" id="link-results" style="margin-top:10px;max-height:340px;overflow-y:auto;"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px;"><button class="btn" onclick="closeLinkModal()"><i class="ti ti-x"></i> Chiudi</button></div>
+    </div>
+  </div>
+  <div id="azFattoModal" class="modal-overlay hidden" style="z-index:1100;">
+    <div class="modal-box" style="max-width:360px;" onclick="event.stopPropagation()">
+      <div class="section-title"><i class="ti ti-check"></i> Azione registrata</div>
+      <div class="subtle-text" style="margin-bottom:12px;">Vuoi pianificare il prossimo richiamo?</div>
+      <div class="form-group"><label>Tra quanti giorni</label><input type="number" id="az-fatto-giorni" value="4" min="1" style="max-width:130px;" /></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+        <button class="btn btn-primary" id="btn-azfatto-yes"><i class="ti ti-calendar-plus"></i> Sì, pianifica</button>
+        <button class="btn" id="btn-azfatto-no">No, lascia fatto</button>
+      </div>
+    </div>
+  </div>
+  <div id="azChiudiModal" class="modal-overlay hidden" style="z-index:1100;">
+    <div class="modal-box" style="max-width:360px;" onclick="event.stopPropagation()">
+      <div class="section-title"><i class="ti ti-circle-x"></i> Chiudi azione</div>
+      <div class="form-group"><label>Esito</label><select id="az-esito"><option value="positivo">Positivo</option><option value="negativo">Negativo</option><option value="da_riproporre">Da riproporre</option></select></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+        <button class="btn btn-primary" id="btn-azchiudi-ok"><i class="ti ti-check"></i> Chiudi azione</button>
+        <button class="btn" id="btn-azchiudi-cancel"><i class="ti ti-x"></i> Annulla</button>
+      </div>
+    </div>
+  </div>
   <div id="confirmExit" class="modal-overlay hidden" style="z-index:1100;">
     <div class="modal-box" style="max-width:340px;" onclick="event.stopPropagation()">
       <div class="section-title"><i class="ti ti-alert-circle"></i> Modifiche non salvate</div>
@@ -229,11 +298,17 @@
     const auth = getAuth(app);
     const dbfs = getFirestore(app);
     let aziende = [], offices = [], currentUser = null, viewedUid = null, currentUfficio = 'Tutte', currentBigTab = 'inserisci', currentSubTab = 'attive', isAdmin = false, allUsersCache = [], unsubAziende = null, unsubOffices = null;
+    let azioni = [], unsubAzioni = null, linkAziendaId = null, azFilterAziendaId = null, azFattoId = null, azChiudiId = null;
     const migratingIds = new Set();
     const sortState = {};
     const ADMIN_EMAILS = ['ambrogiani.ai@gmail.com'];
     const $ = id => document.getElementById(id);
     $('inp-data').valueAsDate = new Date();
+    $('az-datainvio').valueAsDate = new Date();
+    const addDays = (iso, n) => { const d = new Date((iso || today()) + 'T00:00:00'); d.setDate(d.getDate() + (parseInt(n) || 0)); return d.toISOString().split('T')[0]; };
+    const daysDiff = (from, to) => Math.round((new Date(to + 'T00:00:00') - new Date(from + 'T00:00:00')) / 86400000);
+    const lblTipo = t => ({ propositiva:'Propositiva', proposta_incontro:'Proposta incontro', altro:'Altro' }[t] || '—');
+    const lblEsito = e => ({ positivo:'Positivo', negativo:'Negativo', da_riproporre:'Da riproporre' }[e] || '');
     const slugify = t => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || 'ufficio';
     const officeClass = n => { const s = slugify(n); if (s.includes('cesena')) return 'cesena'; if (s.includes('forli')) return 'forli'; if (s.includes('tutte')) return 'tutte'; return 'dynamic'; };
     const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -254,7 +329,7 @@
     async function resetPassword(){ const email=$('auth-email').value.trim(); if(!email) return showToast('Inserisci l’email'); await sendPasswordResetEmail(auth,email); showToast('Email di reset inviata'); }
     async function logout(){ await signOut(auth); showToast('Disconnesso'); }
     async function migrateLegacyNotes(uid, list){ const toMigrate=list.filter(a=>a.note && (!a.noteStorico || !a.noteStorico.length) && !migratingIds.has(a.id)); toMigrate.forEach(a=>migratingIds.add(a.id)); await Promise.all(toMigrate.map(a=>updateDoc(doc(dbfs,'users',uid,'aziende',a.id),{ noteStorico:[{ testo:a.note, data:a.data||today(), ts:0 }] }).finally(()=>migratingIds.delete(a.id)))); }
-    async function watchUserData(uid){ if(unsubAziende) unsubAziende(); if(unsubOffices) unsubOffices(); aziende=[]; offices=[]; unsubAziende=onSnapshot(query(collection(dbfs,'users',uid,'aziende')), snap=>{ aziende=snap.docs.map(d=>({ id:d.id, ...d.data() })); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); renderOfficeManager(); if(editingId){ const a=aziende.find(x=>x.id===editingId); if(a) renderNoteHistory(a); else closeEditModal(); } migrateLegacyNotes(uid, aziende); }); unsubOffices=onSnapshot(doc(dbfs,'users',uid,'meta','settings'), snap=>{ const data=snap.data()||{}; offices=Array.isArray(data.offices)&&data.offices.length ? data.offices : ['Ufficio 1','Ufficio 2']; if(currentUfficio!=='Tutte' && !offices.includes(currentUfficio)) currentUfficio='Tutte'; renderOfficeSwitcher(); renderOfficeManager(); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); }); }
+    async function watchUserData(uid){ if(unsubAziende) unsubAziende(); if(unsubOffices) unsubOffices(); if(unsubAzioni) unsubAzioni(); aziende=[]; offices=[]; azioni=[]; azFilterAziendaId=null; unsubAzioni=onSnapshot(query(collection(dbfs,'users',uid,'azioni')), snap=>{ azioni=snap.docs.map(d=>({ id:d.id, ...d.data() })); if(currentBigTab==='azione') renderAzioni(); }); unsubAziende=onSnapshot(query(collection(dbfs,'users',uid,'aziende')), snap=>{ aziende=snap.docs.map(d=>({ id:d.id, ...d.data() })); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); if(currentBigTab==='azione') renderAzioni(); renderOfficeManager(); if(editingId){ const a=aziende.find(x=>x.id===editingId); if(a) renderNoteHistory(a); else closeEditModal(); } migrateLegacyNotes(uid, aziende); }); unsubOffices=onSnapshot(doc(dbfs,'users',uid,'meta','settings'), snap=>{ const data=snap.data()||{}; offices=Array.isArray(data.offices)&&data.offices.length ? data.offices : ['Ufficio 1','Ufficio 2']; if(currentUfficio!=='Tutte' && !offices.includes(currentUfficio)) currentUfficio='Tutte'; renderOfficeSwitcher(); renderOfficeManager(); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); }); }
     function renderOfficeSwitcher(){ const items=[...offices,'Tutte']; $('ufficioSwitcher').innerHTML=items.map(name=>`<button class="uff-btn ${officeClass(name)} ${currentUfficio===name?'active':''}" data-office="${esc(name)}">${esc(name)}</button>`).join(''); $('ufficioSwitcher').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>setUfficio(btn.getAttribute('data-office')))); }
     function filteredListByOffice(list){ return currentUfficio==='Tutte' ? list : list.filter(a=>a.ufficio===currentUfficio); }
     function renderStats(){ const filtered=filteredListByOffice(aziende); const c={ attiva:0, evasa:0, chiusa:0, assunto:0, pending:0 }; filtered.forEach(a=>{ if(c[a.stato]!==undefined) c[a.stato]++; }); $('statsRow').innerHTML=`<div class="stat-card"><div class="stat-label">Attive</div><div class="stat-val" style="color:var(--info-text)">${c.attiva}</div></div><div class="stat-card"><div class="stat-label">Evase</div><div class="stat-val" style="color:var(--green-text)">${c.evasa}</div></div><div class="stat-card"><div class="stat-label">Chiuse</div><div class="stat-val" style="color:var(--red-text)">${c.chiusa}</div></div><div class="stat-card"><div class="stat-label">Assunto</div><div class="stat-val" style="color:var(--amber-text)">${c.assunto}</div></div><div class="stat-card"><div class="stat-label">Totale</div><div class="stat-val">${filtered.length}</div></div>`; }
@@ -262,7 +337,7 @@
     function renderList(key, ord){ if(ord) sortState[key]=ord; const curOrd=sortState[key]||'data-desc'; let list=key==='tutte' ? [...aziende] : aziende.filter(a=>a.stato===key); list=filteredListByOffice(list); if(key==='tutte'){ const sf=$('fil-stato')?.value||''; const ss=($('search-input')?.value||'').toLowerCase(); if(sf) list=list.filter(a=>a.stato===sf); if(ss) list=list.filter(a=>(a.nome||'').toLowerCase().includes(ss)); } list=sortList(list,curOrd); const container=$('list-'+key), emptyEl=$('empty-'+key); if(!list.length){ container.innerHTML=''; emptyEl.style.display='block'; return; } emptyEl.style.display='none'; container.innerHTML = curOrd==='mese' ? Object.keys(list.reduce((g,a)=>((g[(a.data||'').substring(0,7)||'?']??=[]).push(a),g),{})).sort((a,b)=>b.localeCompare(a)).map(m=>`<div class="month-header">${fmtMese(m)}</div>` + list.filter(a=>((a.data||'').substring(0,7)||'?')===m).map(a=>itemHtml(a,key)).join('')).join('') : list.map(a=>itemHtml(a,key)).join(''); }
     function renderSubTab(name){ const keyMap={ attive:'attiva', evase:'evasa', chiuse:'chiusa', assunto:'assunto', tutte:'tutte' }; renderList(keyMap[name]||name, sortState[keyMap[name]||name]); }
     function setUfficio(val){ currentUfficio=val; renderOfficeSwitcher(); renderStats(); if(currentBigTab==='elenco') renderSubTab(currentSubTab); if(currentBigTab==='suddivisione') renderSuddivisione(); }
-    function setBigTab(name, btn){ document.querySelectorAll('.nav-3-btn').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); ['inserisci','elenco','suddivisione'].forEach(t=>$('bigtab-'+t).style.display=t===name?'':'none'); currentBigTab=name; if(name==='elenco') renderSubTab(currentSubTab); if(name==='suddivisione') renderSuddivisione(); }
+    function setBigTab(name, btn){ document.querySelectorAll('.nav-3-btn').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); ['inserisci','elenco','suddivisione','azione'].forEach(t=>$('bigtab-'+t).style.display=t===name?'':'none'); currentBigTab=name; $('statsRow').style.display=name==='azione'?'none':''; if(name==='elenco') renderSubTab(currentSubTab); if(name==='suddivisione') renderSuddivisione(); if(name==='azione') renderAzioni(); }
     function setTab(name, btn){ document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); document.querySelectorAll('.tab-content').forEach(el=>el.style.display='none'); $('tab-'+name).style.display=''; currentSubTab=name; renderSubTab(name); }
     async function addAzienda(){ const nome=$('inp-nome').value.trim(); if(!nome) return showToast('⚠️ Inserisci il nome azienda'); const uid=getViewedUid(); if(!uid) return; const notaIniziale=$('inp-note').value.trim(); await addDoc(collection(dbfs,'users',uid,'aziende'),{ nome, stato:$('inp-stato').value, data:$('inp-data').value||today(), note:notaIniziale, noteStorico: notaIniziale ? [{ testo:notaIniziale, data:today(), ts:Date.now() }] : [], ufficio: currentUfficio==='Tutte' ? (offices[0]||'Ufficio 1') : currentUfficio, createdAt:serverTimestamp(), updatedAt:serverTimestamp() }); $('inp-nome').value=''; $('inp-stato').value='attiva'; $('inp-note').value=''; $('inp-data').valueAsDate=new Date(); showToast('✅ Azienda aggiunta!'); }
     let editingId = null;
@@ -294,7 +369,29 @@
     async function openAdminView(){ if(!isAdmin) return; viewedUid=$('admin-user-select').value || currentUser.uid; currentUfficio='Tutte'; await watchUserData(viewedUid); updateAdminTargetLabel(); showToast('Ambiente caricato'); }
     async function returnToOwnView(){ viewedUid=currentUser.uid; currentUfficio='Tutte'; await watchUserData(viewedUid); updateAdminTargetLabel(); showToast('Rientrato nel tuo ambiente'); }
     function closeOfficeModal(){ $('officeModal').classList.add('hidden'); }
+    async function addAzione(){ const azienda=$('az-azienda').value.trim(); if(!azienda) return showToast('⚠️ Inserisci l’azienda'); const uid=getViewedUid(); if(!uid) return; const dataInvio=$('az-datainvio').value||today(); const giorni=parseInt($('az-giorni').value)||4; await addDoc(collection(dbfs,'users',uid,'azioni'),{ azienda, aziendaId:linkAziendaId||null, contatto:$('az-contatto').value.trim(), tipoInvio:$('az-tipo').value, dataInvio, dueDate:addDays(dataInvio,giorni), stato:'da_fare', esito:null, note:$('az-note').value.trim(), createdAt:serverTimestamp(), updatedAt:serverTimestamp() }); $('az-azienda').value=''; $('az-contatto').value=''; $('az-note').value=''; $('az-datainvio').valueAsDate=new Date(); $('az-giorni').value=4; clearLink(); showToast('✅ Azione aggiunta!'); }
+    function openLinkSearch(){ $('link-search').value=''; renderLinkResults(); $('linkModal').classList.remove('hidden'); $('link-search').focus(); }
+    function closeLinkModal(){ $('linkModal').classList.add('hidden'); }
+    function renderLinkResults(){ const q=($('link-search').value||'').toLowerCase(); let list=[...aziende]; if(q) list=list.filter(a=>(a.nome||'').toLowerCase().includes(q)); list=list.sort((a,b)=>(a.nome||'').localeCompare(b.nome||'','it')).slice(0,50); $('link-results').innerHTML = list.length ? list.map(a=>`<div class="company-item"><div class="company-info"><div class="company-name">${esc(a.nome)}</div><div class="company-meta">${fmtData(a.data)} · <span class="status-badge s-${a.stato}">${lblStato(a.stato)}</span></div></div><div class="item-actions"><button class="btn btn-sm btn-primary" onclick="selectLinkAzienda('${a.id}')"><i class="ti ti-link"></i> Collega</button></div></div>`).join('') : '<div class="empty-state">Nessuna azienda trovata.</div>'; }
+    function selectLinkAzienda(id){ const a=aziende.find(x=>x.id===id); if(!a) return; linkAziendaId=id; $('az-azienda').value=a.nome||''; renderLinkChip(); closeLinkModal(); }
+    function clearLink(){ linkAziendaId=null; renderLinkChip(); }
+    function renderLinkChip(){ const a=linkAziendaId?aziende.find(x=>x.id===linkAziendaId):null; $('az-link-chip').innerHTML = a ? `<span class="az-link-chip">Collegata: ${esc(a.nome)} <button onclick="clearLink()" title="Scollega">✕</button></span>` : ''; }
+    function azRowHtml(a){ const t=today(); const overdue=a.stato!=='chiuso'&&a.dueDate&&a.dueDate<t; const rit=overdue?daysDiff(a.dueDate,t):0; const due=a.stato==='chiuso' ? `Chiusa${a.esito?' · '+lblEsito(a.esito):''}` : overdue ? `<span class="az-due-late">In ritardo di ${rit} g (${fmtData(a.dueDate)})</span>` : `Richiamo: ${fmtData(a.dueDate)}`; const stor=a.aziendaId ? ` · <span class="az-link" onclick="azStorico('${a.aziendaId}')">Storico azienda</span>` : ''; const acts=a.stato!=='chiuso' ? `<button class="btn btn-sm btn-primary" onclick="azFatto('${a.id}')"><i class="ti ti-check"></i> Fatto</button><button class="btn btn-sm" onclick="azRimanda('${a.id}')"><i class="ti ti-clock"></i> Rimanda</button><button class="btn btn-sm" onclick="azChiudi('${a.id}')"><i class="ti ti-circle-x"></i> Chiudi</button>` : ''; return `<div class="company-item ${overdue?'az-overdue':''}"><div class="company-info"><div class="company-name">${esc(a.azienda)}</div><div class="company-meta">${a.contatto?esc(a.contatto)+' · ':''}<span class="status-badge s-attiva">${lblTipo(a.tipoInvio)}</span> · ${due}${stor}</div>${a.note?`<div class="company-note-preview" title="${esc(a.note)}" style="max-width:none;white-space:normal;">${esc(a.note)}</div>`:''}</div><div class="item-actions">${acts}<button class="btn btn-sm btn-danger" onclick="delAzione('${a.id}')"><i class="ti ti-trash"></i></button></div></div>`; }
+    function renderAzioni(){ const fStato=$('az-fil-stato').value, fTipo=$('az-fil-tipo').value, fText=($('az-search').value||'').toLowerCase(); let list=[...azioni]; if(azFilterAziendaId) list=list.filter(a=>a.aziendaId===azFilterAziendaId); if(fStato) list=list.filter(a=>a.stato===fStato); else if(!azFilterAziendaId) list=list.filter(a=>a.stato!=='chiuso'); if(fTipo) list=list.filter(a=>a.tipoInvio===fTipo); if(fText) list=list.filter(a=>((a.azienda||'')+' '+(a.contatto||'')).toLowerCase().includes(fText)); list.sort((a,b)=>(a.dueDate||'').localeCompare(b.dueDate||'')); const banner=$('az-storico-banner'); if(azFilterAziendaId){ const a=aziende.find(x=>x.id===azFilterAziendaId); banner.innerHTML=`<div class="az-storico-banner"><i class="ti ti-history"></i> Storico azienda: <strong>${esc(a?a.nome:'—')}</strong>${a?` · <span class="az-link" onclick="openEditModal('${a.id}')">Apri scheda</span>`:''}<button onclick="azClearStorico()" title="Chiudi storico">✕</button></div>`; } else banner.innerHTML=''; const t=today(); const grp=(title,arr)=>arr.length?`<div class="month-header">${title}</div>`+arr.map(azRowHtml).join(''):''; let html; if(azFilterAziendaId||fStato){ html=list.map(azRowHtml).join(''); } else { const scaduti=list.filter(a=>a.dueDate&&a.dueDate<t); const oggi=list.filter(a=>a.dueDate===t); const prossimi=list.filter(a=>a.dueDate&&a.dueDate>t); const senza=list.filter(a=>!a.dueDate); html=grp('⚠ Scaduti',scaduti)+grp('Oggi',oggi)+grp('Prossimi',prossimi)+grp('Senza data',senza); } $('az-list').innerHTML=html; $('az-empty').style.display=html?'none':'block'; }
+    async function azFatto(id){ const uid=getViewedUid(); if(!uid) return; await updateDoc(doc(dbfs,'users',uid,'azioni',id),{ stato:'fatto', updatedAt:serverTimestamp() }); azFattoId=id; $('az-fatto-giorni').value=4; $('azFattoModal').classList.remove('hidden'); }
+    async function azFattoDone(schedule){ const id=azFattoId; azFattoId=null; $('azFattoModal').classList.add('hidden'); if(!id) return; if(!schedule){ showToast('✅ Segnato come fatto'); return; } const uid=getViewedUid(); if(!uid) return; const g=parseInt($('az-fatto-giorni').value)||4; await updateDoc(doc(dbfs,'users',uid,'azioni',id),{ stato:'da_fare', dataInvio:today(), dueDate:addDays(today(),g), updatedAt:serverTimestamp() }); showToast('✅ Prossimo richiamo pianificato'); }
+    async function azRimanda(id){ const a=azioni.find(x=>x.id===id); const g=prompt('Rimanda il richiamo di quanti giorni?','4'); if(g===null) return; const n=parseInt(g)||0; if(!n) return showToast('⚠️ Numero di giorni non valido'); const uid=getViewedUid(); if(!uid) return; const base=(a&&a.dueDate)||today(); await updateDoc(doc(dbfs,'users',uid,'azioni',id),{ dueDate:addDays(base,n), stato:'da_fare', updatedAt:serverTimestamp() }); showToast('✅ Richiamo rimandato'); }
+    function azChiudi(id){ azChiudiId=id; $('az-esito').value='positivo'; $('azChiudiModal').classList.remove('hidden'); }
+    async function azChiudiOk(){ const id=azChiudiId; azChiudiId=null; $('azChiudiModal').classList.add('hidden'); if(!id) return; const uid=getViewedUid(); if(!uid) return; await updateDoc(doc(dbfs,'users',uid,'azioni',id),{ stato:'chiuso', esito:$('az-esito').value, updatedAt:serverTimestamp() }); showToast('✅ Azione chiusa'); }
+    function azStorico(aziendaId){ azFilterAziendaId=aziendaId; $('az-fil-stato').value=''; $('az-fil-tipo').value=''; $('az-search').value=''; renderAzioni(); }
+    function azClearStorico(){ azFilterAziendaId=null; renderAzioni(); }
+    async function delAzione(id){ if(!confirm('Eliminare questa azione?')) return; const uid=getViewedUid(); if(!uid) return; await deleteDoc(doc(dbfs,'users',uid,'azioni',id)); showToast('🗑 Eliminata'); }
     window.setBigTab=setBigTab; window.setTab=setTab; window.setUfficio=setUfficio; window.addAzienda=addAzienda; window.renderList=renderList; window.changeStato=changeStato; window.delAzienda=delAzienda; window.exportCSV=exportCSV; window.renameOffice=renameOffice; window.removeOffice=removeOffice; window.openEditModal=openEditModal; window.closeEditModal=closeEditModal; window.attemptCloseEditModal=attemptCloseEditModal; window.closeOfficeModal=closeOfficeModal; window.editNoteEntry=editNoteEntry; window.saveNoteEntry=saveNoteEntry; window.deleteNoteEntry=deleteNoteEntry; window.renderNoteHistoryById=renderNoteHistoryById;
+    window.addAzione=addAzione; window.renderAzioni=renderAzioni; window.openLinkSearch=openLinkSearch; window.closeLinkModal=closeLinkModal; window.renderLinkResults=renderLinkResults; window.selectLinkAzienda=selectLinkAzienda; window.clearLink=clearLink; window.azFatto=azFatto; window.azRimanda=azRimanda; window.azChiudi=azChiudi; window.azStorico=azStorico; window.azClearStorico=azClearStorico; window.delAzione=delAzione;
+    $('btn-azfatto-yes').addEventListener('click',()=>azFattoDone(true).catch(e=>showToast(e.message)));
+    $('btn-azfatto-no').addEventListener('click',()=>azFattoDone(false).catch(e=>showToast(e.message)));
+    $('btn-azchiudi-ok').addEventListener('click',()=>azChiudiOk().catch(e=>showToast(e.message)));
+    $('btn-azchiudi-cancel').addEventListener('click',()=>{ azChiudiId=null; $('azChiudiModal').classList.add('hidden'); });
     $('btn-edit-save').addEventListener('click',()=>saveEditModal().catch(e=>showToast(e.message)));
     $('btn-edit-close').addEventListener('click',attemptCloseEditModal);
     $('btn-confirm-yes').addEventListener('click',()=>confirmExitYes().catch(e=>showToast(e.message)));
@@ -310,7 +407,7 @@
     $('btn-admin-view').addEventListener('click',()=>$('admin-panel-section').classList.toggle('hidden'));
     $('btn-admin-open').addEventListener('click',()=>openAdminView().catch(e=>showToast(e.message)));
     $('btn-admin-return').addEventListener('click',()=>returnToOwnView().catch(e=>showToast(e.message)));
-    onAuthStateChanged(auth, async user => { if(!user){ currentUser=null; viewedUid=null; isAdmin=false; aziende=[]; offices=[]; if(unsubAziende) unsubAziende(); if(unsubOffices) unsubOffices(); $('authApp').classList.remove('hidden'); $('mainApp').classList.add('hidden'); return; } currentUser=user; viewedUid=user.uid; await ensureUserProfile(user); $('authApp').classList.add('hidden'); $('mainApp').classList.remove('hidden'); $('btn-admin-view').classList.toggle('hidden', !isAdmin); $('officeModal').classList.add('hidden'); $('admin-panel-section').classList.add('hidden'); currentUfficio='Tutte'; await watchUserData(viewedUid); if(isAdmin) await loadAdminUsers(); updateAdminTargetLabel(); renderOfficeSwitcher(); renderStats(); renderSubTab(currentSubTab); });
+    onAuthStateChanged(auth, async user => { if(!user){ currentUser=null; viewedUid=null; isAdmin=false; aziende=[]; offices=[]; azioni=[]; azFilterAziendaId=null; linkAziendaId=null; if(unsubAziende) unsubAziende(); if(unsubOffices) unsubOffices(); if(unsubAzioni) unsubAzioni(); $('authApp').classList.remove('hidden'); $('mainApp').classList.add('hidden'); return; } currentUser=user; viewedUid=user.uid; await ensureUserProfile(user); $('authApp').classList.add('hidden'); $('mainApp').classList.remove('hidden'); $('btn-admin-view').classList.toggle('hidden', !isAdmin); $('officeModal').classList.add('hidden'); $('admin-panel-section').classList.add('hidden'); currentUfficio='Tutte'; await watchUserData(viewedUid); if(isAdmin) await loadAdminUsers(); updateAdminTargetLabel(); renderOfficeSwitcher(); renderStats(); renderSubTab(currentSubTab); });
   </script>
 </body>
 </html>
