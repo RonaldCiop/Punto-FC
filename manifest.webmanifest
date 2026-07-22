@@ -1,6 +1,6 @@
 {
-  "name": "Punto-FC — Gestione Aziende",
-  "short_name": "Punto-FC",
+  "name": "Punto",
+  "short_name": "Punto",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
