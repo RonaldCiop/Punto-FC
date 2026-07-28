@@ -368,9 +368,14 @@
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
     import { getFirestore, doc, setDoc, getDoc, collection, addDoc, updateDoc, deleteDoc, onSnapshot, query, getDocs, serverTimestamp, arrayUnion } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
     // ══ Google Maps Platform ═══════════════════════════════════════════════
-    // Inserisci qui la chiave API Google Maps (referrer-restricted su punto-fc.vercel.app).
-    // API da abilitare sul progetto Google Cloud: "Maps JavaScript API" + "Places API (New)".
-    const GMAPS_API_KEY = 'INSERISCI_QUI_LA_CHIAVE_API_GOOGLE_MAPS';
+    // Chiave API Google Maps caricata lato client. Di default si riusa la chiave del
+    // progetto Google Cloud "punto-umana" (la stessa di Firebase qui sotto). Perché
+    // autocomplete e mappa funzionino vanno abilitate su quel progetto (con fatturazione
+    // attiva) le API "Maps JavaScript API" e "Places API (New)":
+    //   https://console.cloud.google.com/apis/library/maps-backend.googleapis.com?project=punto-umana
+    //   https://console.cloud.google.com/apis/library/places.googleapis.com?project=punto-umana
+    // Per usare invece una chiave dedicata (es. referrer-restricted), sostituiscila qui.
+    const GMAPS_API_KEY = 'AIzaSyCerXMBfDAXiF5tEkkKXHGg0QMy3I1pQic';
     const GMAPS_MAP_ID = 'DEMO_MAP_ID'; // richiesto dagli AdvancedMarker; sostituibile con un Map ID personalizzato
     const GMAPS_READY = () => !!GMAPS_API_KEY && !GMAPS_API_KEY.startsWith('INSERISCI');
     const FC_BOUNDS = { west:11.6, south:43.6, east:12.9, north:44.5 }; // bias suggerimenti: zona Forlì-Cesena
