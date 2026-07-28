@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Gestione Aziende Commerciale</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
@@ -22,7 +22,9 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --bg-primary:#ffffff; --bg-secondary:#f6f5f2; --bg-tertiary:#eeece8; --text-primary:#1a1a18; --text-secondary:#6b6b68; --text-tertiary:#9b9b97; --border-light:rgba(0,0,0,.06); --border-medium:rgba(0,0,0,.14); --radius-sm:8px; --radius-md:12px; --radius-lg:18px; --shadow-sm:0 1px 2px rgba(20,20,18,.04), 0 2px 8px rgba(20,20,18,.05); --shadow-md:0 6px 24px rgba(20,20,18,.07); --green-bg:#EAF3DE; --green-text:#27500A; --red-bg:#FCEBEB; --red-text:#A32D2D; --amber-bg:#FAEEDA; --amber-text:#633806; --blue-bg:#E6F1FB; --blue-text:#185FA5; --info-bg:#E6F1FB; --info-text:#185FA5; }
     @media (prefers-color-scheme: dark) { :root { --bg-primary:#232321; --bg-secondary:#2a2a28; --bg-tertiary:#1a1a18; --text-primary:#f0f0ec; --text-secondary:#a0a09c; --text-tertiary:#6b6b68; --border-light:rgba(255,255,255,.07); --border-medium:rgba(255,255,255,.16); --shadow-sm:0 1px 2px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.35); --shadow-md:0 6px 24px rgba(0,0,0,.5); --green-bg:#173404; --green-text:#C0DD97; --red-bg:#501313; --red-text:#F7C1C1; --amber-bg:#412402; --amber-text:#FAC775; --blue-bg:#042C53; --blue-text:#B5D4F4; --info-bg:#042C53; --info-text:#B5D4F4; } }
-    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg-tertiary); color:var(--text-primary); font-size:15px; line-height:1.55; min-height:100vh; }
+    html { touch-action:manipulation; overscroll-behavior:none; -webkit-text-size-adjust:100%; text-size-adjust:100%; -webkit-tap-highlight-color:transparent; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg-tertiary); color:var(--text-primary); font-size:15px; line-height:1.55; min-height:100vh; touch-action:manipulation; overscroll-behavior:none; }
+    @media (pointer:coarse) { input[type="text"], input[type="date"], input[type="email"], input[type="password"], input[type="number"], select, textarea { font-size:16px !important; } }
     .shell { max-width:900px; margin:0 auto; padding:1.5rem 1rem 4rem; }
     .app-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:1.5rem; }
     .app-title { display:flex; align-items:center; gap:8px; font-size:20px; font-weight:600; color:var(--text-primary); }
