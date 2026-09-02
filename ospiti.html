@@ -54,6 +54,10 @@
     .ac-powered { padding:4px 10px 6px; font-size:10px; color:var(--text-tertiary); text-align:right; }
     .banner { border-radius:var(--radius-md); padding:12px 14px; font-size:13px; margin-bottom:1rem; }
     .banner-err { background:var(--red-bg); color:var(--red-text); }
+    .owner-greet { border-radius:var(--radius-md); padding:12px 14px; font-size:14px; margin-bottom:1rem; background:var(--info-bg); color:var(--info-text); display:flex; align-items:center; gap:8px; }
+    .btn-undo { display:inline-flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; border:.5px solid var(--border-medium); background:var(--bg-primary); color:var(--text-primary); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all .15s; }
+    .btn-undo:hover { background:var(--bg-secondary); }
+    .badge-sending { background:var(--amber-bg); color:var(--amber-text); }
     #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:#18181b; color:#fafaf9; padding:9px 20px; border-radius:24px; font-size:13px; font-weight:500; z-index:9999; opacity:0; pointer-events:none; transition:all .25s cubic-bezier(.16,1,.3,1); white-space:nowrap; }
     #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .hidden { display:none !important; }
@@ -64,6 +68,7 @@
     <div class="brand-mark"><span class="brand-dot"></span><span class="brand-name">PUNTO</span></div>
 
     <div id="linkError" class="banner banner-err hidden"></div>
+    <div id="ownerGreet" class="owner-greet hidden"></div>
 
     <div class="section" id="formCard">
       <div class="section-title"><i class="ti ti-circle-check"></i> Aggiungi un compito</div>
@@ -90,10 +95,10 @@
     </div>
 
     <div class="section" id="sentCard">
-      <div class="section-title"><i class="ti ti-history"></i> Inviati adesso</div>
+      <div class="section-title"><i class="ti ti-history"></i> Compiti inviati</div>
       <div class="company-list" id="sent-list"></div>
-      <div class="empty-state" id="sent-empty">Nessun compito inviato in questa sessione.</div>
-      <div class="subtle-text" style="margin-top:12px;">I compiti inviati arrivano subito nella lista di lavoro di chi ti ha mandato il link. Da qui non è possibile vedere o modificare i compiti già presenti.</div>
+      <div class="empty-state" id="sent-empty">Non hai ancora inviato compiti.</div>
+      <div class="subtle-text" style="margin-top:12px;">Dopo l'invio hai qualche secondo per annullare. Lo storico resta su questo dispositivo. Da qui non è possibile vedere o modificare i compiti già presenti nella lista di chi ti ha mandato il link.</div>
     </div>
   </div>
   <div id="toast"></div>
@@ -120,6 +125,12 @@
     const params = new URLSearchParams(location.search);
     const ownerUid = (params.get('u') || '').trim();
     const guestToken = (params.get('t') || '').trim();
+    const ownerName = (params.get('n') || '').trim();
+    if (ownerName && ownerUid && guestToken) {
+      const g = $('ownerGreet');
+      g.innerHTML = `<i class="ti ti-send"></i> Stai inviando compiti a <strong>${esc(ownerName)}</strong>`;
+      g.classList.remove('hidden');
+    }
     if (!ownerUid || !guestToken) {
       $('linkError').textContent = 'Link non valido o incompleto. Chiedi che ti venga inviato di nuovo il link per aggiungere i compiti.';
       $('linkError').classList.remove('hidden');
@@ -145,47 +156,109 @@
     function scadenza(){ const v=$('op-scad').value; if(v==='domani') return addDays(today(),1); if(v==='settimana') return venerdi(); if(v==='data') return $('op-data').value||today(); return today(); }
     $('op-scad').addEventListener('change', toggleData);
 
-    const inviati = [];
-    function renderInviati(){ $('sent-empty').style.display = inviati.length ? 'none' : 'block'; $('sent-list').innerHTML = inviati.map(t=>`<div class="company-item"><div class="company-info"><div class="company-name">${esc(t.titolo)}</div><div class="company-meta">${t.azienda?esc(t.azienda)+' · ':''}Scadenza: ${fmtData(t.dueDate)}</div></div><span class="status-badge">Inviato</span></div>`).join(''); }
+    // ── Storico persistente su questo dispositivo (per titolare del link) ──
+    const storicoKey = `punto_inviati_${ownerUid}`;
+    function loadStorico(){ try { return JSON.parse(localStorage.getItem(storicoKey) || '[]'); } catch(e){ return []; } }
+    function saveStorico(){ try { localStorage.setItem(storicoKey, JSON.stringify(storico.slice(0, 50))); } catch(e){} }
+    let storico = loadStorico();
 
-    let invioInCorso = false;
-    async function inviaTask(){
-      if (invioInCorso) return;
-      const operatore = $('op-nome').value.trim();
-      const titolo = $('op-titolo').value.trim();
-      if (!operatore) return showToast('⚠️ Scrivi il nome operatore');
-      if (!titolo) return showToast('⚠️ Scrivi cosa c’è da fare');
-      const azienda = $('op-azienda').value.trim();
-      const dueDate = scadenza();
-      invioInCorso = true; $('btn-invia').disabled = true;
+    // ── Coda con finestra di annullamento (5s) prima dell'invio reale ──
+    const UNDO_SECONDS = 5;
+    let pending = [];       // { id, status:'pending'|'sending', remaining, titolo, azienda, dueDate, operatore }
+    let seq = 0, ticker = null;
+
+    function render(){
+      const rows = pending.map(e => {
+        const meta = `${e.azienda ? esc(e.azienda) + ' · ' : ''}Scadenza: ${fmtData(e.dueDate)}`;
+        const right = e.status === 'pending'
+          ? `<button class="btn-undo" data-undo="${e.id}"><i class="ti ti-arrow-back-up"></i> Annulla (${e.remaining})</button>`
+          : `<span class="status-badge badge-sending">Invio…</span>`;
+        return `<div class="company-item"><div class="company-info"><div class="company-name">${esc(e.titolo)}</div><div class="company-meta">${meta}</div></div>${right}</div>`;
+      });
+      const done = storico.map(t => `<div class="company-item"><div class="company-info"><div class="company-name">${esc(t.titolo)}</div><div class="company-meta">${t.azienda ? esc(t.azienda) + ' · ' : ''}Scadenza: ${fmtData(t.dueDate)}</div></div><span class="status-badge">Inviato</span></div>`);
+      const all = rows.concat(done);
+      $('sent-empty').style.display = all.length ? 'none' : 'block';
+      $('sent-list').innerHTML = all.join('');
+      $('sent-list').querySelectorAll('[data-undo]').forEach(b => b.addEventListener('click', () => annulla(b.dataset.undo)));
+    }
+
+    function ensureTicker(){
+      if (ticker) return;
+      ticker = setInterval(() => {
+        for (const e of pending) {
+          if (e.status !== 'pending') continue;
+          e.remaining -= 1;
+          if (e.remaining <= 0) commit(e);
+        }
+        if (!pending.some(e => e.status === 'pending')) { clearInterval(ticker); ticker = null; }
+        render();
+      }, 1000);
+    }
+
+    function annulla(id){
+      const i = pending.findIndex(e => e.id === id && e.status === 'pending');
+      if (i < 0) return;
+      pending.splice(i, 1);
+      render();
+      showToast('↩️ Invio annullato');
+    }
+
+    async function commit(entry){
+      if (entry.status === 'sending') return;
+      entry.status = 'sending';
+      render();
       try {
         await addDoc(collection(dbfs,'users',ownerUid,'azioni'), {
-          tipo:'task', titolo, azienda, aziendaId:null, contatto:'', tipoInvio:null, tipoInvioNota:'',
-          dataInvio: today(), dueDate, stato:'da_fare', esito:null, note:'',
-          operatore, origine:'ospite', gt: guestToken,
+          tipo:'task', titolo:entry.titolo, azienda:entry.azienda, aziendaId:null, contatto:'', tipoInvio:null, tipoInvioNota:'',
+          dataInvio: today(), dueDate:entry.dueDate, stato:'da_fare', esito:null, note:'',
+          operatore:entry.operatore, origine:'ospite', gt: guestToken,
           createdAt: serverTimestamp(), updatedAt: serverTimestamp()
         });
-        try { localStorage.setItem('punto_operatore', operatore); } catch(e){}
-        inviati.unshift({ titolo, azienda, dueDate });
-        renderInviati();
-        $('op-titolo').value = '';
-        $('op-titolo').focus();
+        pending = pending.filter(e => e !== entry);
+        storico.unshift({ titolo:entry.titolo, azienda:entry.azienda, dueDate:entry.dueDate, ts:Date.now() });
+        saveStorico();
+        render();
         showToast('✅ Compito inviato!');
       } catch (err) {
         console.warn('Invio non riuscito:', err);
+        pending = pending.filter(e => e !== entry);
+        render();
+        // ripristina i campi così l'ospite può riprovare senza riscrivere tutto
+        if (!$('op-titolo').value.trim()) $('op-titolo').value = entry.titolo;
+        if (!$('op-azienda').value.trim() && entry.azienda) $('op-azienda').value = entry.azienda;
         const negato = String(err?.code||'').includes('permission-denied');
         $('linkError').textContent = negato
           ? 'Questo link non è più valido: potrebbe essere stato revocato o non ancora attivato. Chiedi un link aggiornato.'
           : 'Invio non riuscito, controlla la connessione e riprova.';
         $('linkError').classList.remove('hidden');
         showToast(negato ? '⚠️ Link non valido' : '⚠️ Invio non riuscito');
-      } finally {
-        invioInCorso = false; $('btn-invia').disabled = false;
       }
     }
-    $('btn-invia').addEventListener('click', inviaTask);
-    $('op-titolo').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inviaTask(); } });
-    renderInviati();
+
+    function enqueueTask(){
+      const operatore = $('op-nome').value.trim();
+      const titolo = $('op-titolo').value.trim();
+      if (!operatore) return showToast('⚠️ Scrivi il nome operatore');
+      if (!titolo) return showToast('⚠️ Scrivi cosa c’è da fare');
+      const azienda = $('op-azienda').value.trim();
+      const dueDate = scadenza();
+      try { localStorage.setItem('punto_operatore', operatore); } catch(e){}
+      pending.unshift({ id:'p'+(++seq), status:'pending', remaining:UNDO_SECONDS, titolo, azienda, dueDate, operatore });
+      $('op-titolo').value = '';
+      $('op-titolo').focus();
+      render();
+      ensureTicker();
+      showToast(`Invio tra ${UNDO_SECONDS}s — puoi annullare`);
+    }
+
+    // Se l'ospite chiude o lascia la pagina, invia subito i compiti ancora in attesa (best-effort)
+    function flushPending(){ for (const e of pending) { if (e.status === 'pending') commit(e); } }
+    window.addEventListener('pagehide', flushPending);
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushPending(); });
+
+    $('btn-invia').addEventListener('click', enqueueTask);
+    $('op-titolo').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); enqueueTask(); } });
+    render();
   </script>
 </body>
 </html>

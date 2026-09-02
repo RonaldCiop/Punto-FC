@@ -398,7 +398,8 @@
     <div class="modal-box" onclick="event.stopPropagation()">
       <div class="section-title"><i class="ti ti-link"></i> Link compiti</div>
       <div class="subtle-text" style="margin-bottom:12px;">Chi riceve questo link può <strong>solo aggiungere compiti</strong> alla tua lista di lavoro, indicando il proprio nome operatore. Non può vedere né modificare nulla di ciò che hai già.</div>
-      <div class="form-group"><label>Link da condividere</label><input type="text" id="ospiti-link" readonly onclick="this.select()" /></div>
+      <div class="form-group"><label>Il tuo nome (mostrato all'ospite)</label><input type="text" id="ospiti-nome" placeholder="Es: Filippo Ambrogiani" /></div>
+      <div class="form-group" style="margin-top:10px;"><label>Link da condividere</label><input type="text" id="ospiti-link" readonly onclick="this.select()" /></div>
       <div id="ospiti-stato" class="subtle-text" style="margin-top:8px;"></div>
       <div id="ospiti-notif" style="margin-top:12px;"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
@@ -561,8 +562,9 @@
     let ospitiCfg = null;
     const nuovoToken = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random())+String(Math.random())).replace(/-/g,'');
     const ospitiRef = uid => doc(dbfs,'users',uid,'meta','ospiti');
-    function ospitiLink(uid){ return `${location.origin}/ospiti.html?u=${encodeURIComponent(uid)}&t=${encodeURIComponent(ospitiCfg?.token||'')}`; }
-    function renderOspiti(){ const uid=getViewedUid(); const attivo=!!ospitiCfg?.attivo; $('ospiti-link').value = uid && ospitiCfg?.token ? ospitiLink(uid) : ''; $('ospiti-stato').innerHTML = attivo ? '<span style="color:var(--green-text)">● Attivo</span> — chiunque abbia il link può aggiungere compiti.' : '<span style="color:var(--red-text)">● Sospeso</span> — il link non funziona finché non lo riattivi.'; $('btn-ospiti-toggle').innerHTML = attivo ? '<i class="ti ti-ban"></i> Sospendi' : '<i class="ti ti-check"></i> Riattiva'; $('btn-ospiti-copia').disabled = !attivo; }
+    function ospitiLink(uid){ const n = ospitiCfg?.titolare ? `&n=${encodeURIComponent(ospitiCfg.titolare)}` : ''; return `${location.origin}/ospiti.html?u=${encodeURIComponent(uid)}&t=${encodeURIComponent(ospitiCfg?.token||'')}${n}`; }
+    async function salvaNomeOspiti(){ const uid=getViewedUid(); if(!uid||!ospitiCfg) return; const nome=$('ospiti-nome').value.trim(); if(nome===(ospitiCfg.titolare||'')) return; ospitiCfg={ ...ospitiCfg, titolare:nome }; await setDoc(ospitiRef(uid),{ titolare:nome, updatedAt:serverTimestamp() },{ merge:true }); renderOspiti(); showToast('✅ Nome aggiornato'); }
+    function renderOspiti(){ const uid=getViewedUid(); const attivo=!!ospitiCfg?.attivo; const nomeInput=$('ospiti-nome'); if(nomeInput && document.activeElement!==nomeInput) nomeInput.value = ospitiCfg?.titolare || ''; $('ospiti-link').value = uid && ospitiCfg?.token ? ospitiLink(uid) : ''; $('ospiti-stato').innerHTML = attivo ? '<span style="color:var(--green-text)">● Attivo</span> — chiunque abbia il link può aggiungere compiti.' : '<span style="color:var(--red-text)">● Sospeso</span> — il link non funziona finché non lo riattivi.'; $('btn-ospiti-toggle').innerHTML = attivo ? '<i class="ti ti-ban"></i> Sospendi' : '<i class="ti ti-check"></i> Riattiva'; $('btn-ospiti-copia').disabled = !attivo; }
     async function openOspitiModal(){ const uid=getViewedUid(); if(!uid) return; $('ospitiModal').classList.remove('hidden'); $('ospiti-link').value='Caricamento…'; $('ospiti-stato').textContent=''; const snap=await getDoc(ospitiRef(uid)); if(snap.exists()) ospitiCfg=snap.data()||{}; else { ospitiCfg={ token:nuovoToken(), attivo:true }; await setDoc(ospitiRef(uid),{ ...ospitiCfg, updatedAt:serverTimestamp() },{ merge:true }); } renderOspiti(); renderNotifStato(); }
     function closeOspitiModal(){ $('ospitiModal').classList.add('hidden'); }
     async function copiaLinkOspiti(){ const v=$('ospiti-link').value; if(!v) return; try{ await navigator.clipboard.writeText(v); showToast('📋 Link copiato'); }catch(e){ $('ospiti-link').select(); showToast('Seleziona e copia il link'); } }
@@ -671,6 +673,7 @@
     $('btn-ospiti-copia').addEventListener('click',()=>copiaLinkOspiti());
     $('btn-ospiti-toggle').addEventListener('click',()=>toggleOspiti().catch(e=>showToast(e.message)));
     $('btn-ospiti-nuovo').addEventListener('click',()=>rigeneraOspiti().catch(e=>showToast(e.message)));
+    $('ospiti-nome').addEventListener('change',()=>salvaNomeOspiti().catch(e=>showToast(e.message)));
     $('btn-office-close').addEventListener('click',closeOfficeModal);
     $('btn-add-office').addEventListener('click',()=>addOffice().catch(e=>showToast(e.message)));
     $('btn-admin-view').addEventListener('click',()=>$('admin-panel-section').classList.toggle('hidden'));
