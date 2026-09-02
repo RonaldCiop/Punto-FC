@@ -31,6 +31,17 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(uid)/meta/ospiti).data;
     }
 
+    // Lettura ospite: chi ha il link puo' leggere UN suo compito per ID
+    // (solo origine 'ospite' e col token attivo), per vederne lo stato
+    // aggiornato quando il titolare lo completa. Nessun accesso al resto.
+    function isGuestReadableTask(uid) {
+      return exists(/databases/$(database)/documents/users/$(uid)/meta/ospiti)
+        && guestCfg(uid).token is string
+        && guestCfg(uid).token.size() >= 16
+        && resource.data.origine == 'ospite'
+        && resource.data.gt == guestCfg(uid).token;
+    }
+
     function isValidGuestTask(uid) {
       let d = request.resource.data;
       return exists(/databases/$(database)/documents/users/$(uid)/meta/ospiti)
@@ -72,7 +83,8 @@ service cloud.firestore {
       // In più gli ospiti muniti di link possono SOLO creare task (nessuna
       // lettura, modifica o cancellazione): vedi isValidGuestTask().
       match /azioni/{docId} {
-        allow read, update, delete: if canAccess(uid);
+        allow get: if canAccess(uid) || isGuestReadableTask(uid);
+        allow list, update, delete: if canAccess(uid);
         allow create: if canAccess(uid) || isValidGuestTask(uid);
       }
 

@@ -65,9 +65,13 @@
     .tl-item { position:relative; padding:0 0 14px 22px; }
     .tl-item::before { content:''; position:absolute; left:5px; top:14px; bottom:-2px; width:2px; background:var(--border-medium); }
     .tl-item:last-child::before { display:none; }
-    .tl-dot { position:absolute; left:0; top:3px; width:12px; height:12px; border-radius:50%; background:var(--green-text); box-shadow:0 0 0 3px var(--bg-primary), 0 0 0 4px var(--green-text); }
+    .tl-dot { position:absolute; left:0; top:3px; width:12px; height:12px; border-radius:50%; background:var(--bg-primary); box-shadow:0 0 0 2px var(--text-tertiary); display:flex; align-items:center; justify-content:center; color:#fff; transition:all .2s; }
+    .tl-dot.done { background:var(--green-text); box-shadow:0 0 0 2px var(--green-text); }
+    .tl-dot.done i { font-size:9px; line-height:1; }
     .tl-title { font-size:14px; font-weight:600; color:var(--text-primary); line-height:1.35; }
+    .tl-title.done { color:var(--text-secondary); text-decoration:line-through; text-decoration-color:var(--text-tertiary); }
     .tl-meta { font-size:12px; color:var(--text-secondary); margin-top:1px; }
+    .tl-done { color:var(--green-text); font-weight:600; }
     #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(60px); background:#18181b; color:#fafaf9; padding:9px 20px; border-radius:24px; font-size:13px; font-weight:500; z-index:9999; opacity:0; pointer-events:none; transition:all .25s cubic-bezier(.16,1,.3,1); white-space:nowrap; }
     #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .hidden { display:none !important; }
@@ -108,14 +112,14 @@
       <div class="section-title"><i class="ti ti-history"></i> Compiti inviati</div>
       <div class="company-list" id="sent-list"></div>
       <div class="empty-state" id="sent-empty">Non hai ancora inviato compiti.</div>
-      <div class="subtle-text" style="margin-top:12px;">Dopo l'invio hai qualche secondo per annullare. Lo storico resta su questo dispositivo. Da qui non è possibile vedere o modificare i compiti già presenti nella lista di chi ti ha mandato il link.</div>
+      <div class="subtle-text" style="margin-top:12px;">Dopo l'invio hai qualche secondo per annullare. Quando il destinatario completa un compito, qui lo vedi segnato ✓ Completato. Lo storico resta su questo dispositivo.</div>
     </div>
   </div>
   <div id="toast"></div>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, doc, getDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
     const GPLACES_KEY = 'AIzaSyCerXMBfDAXiF5tEkkKXHGg0QMy3I1pQic';
     const FC_CENTER = { lat:44.18, lng:12.18 };
@@ -197,9 +201,11 @@
       for (const t of storico) {
         const label = t.ts ? dayLabel(t.ts) : 'In precedenza';
         if (label !== lastLabel) { tl += `<div class="tl-day">${label}</div>`; lastLabel = label; }
+        const fatto = t.stato === 'fatto';
         const ora = t.ts ? ' · ' + hhmm(t.ts) : '';
-        const meta = `${t.azienda ? esc(t.azienda) + ' · ' : ''}Scad. ${fmtData(t.dueDate)}${ora}`;
-        tl += `<div class="tl-item"><span class="tl-dot"></span><div class="tl-title">${esc(t.titolo)}</div><div class="tl-meta">${meta}</div></div>`;
+        const stato = fatto ? ' · <span class="tl-done">✓ Completato</span>' : '';
+        const meta = `${t.azienda ? esc(t.azienda) + ' · ' : ''}Scad. ${fmtData(t.dueDate)}${ora}${stato}`;
+        tl += `<div class="tl-item"><span class="tl-dot${fatto ? ' done' : ''}">${fatto ? '<i class="ti ti-check"></i>' : ''}</span><div class="tl-title${fatto ? ' done' : ''}">${esc(t.titolo)}</div><div class="tl-meta">${meta}</div></div>`;
       }
       const timelineHtml = storico.length ? `<div class="tl">${tl}</div>` : '';
 
@@ -234,14 +240,14 @@
       entry.status = 'sending';
       render();
       try {
-        await addDoc(collection(dbfs,'users',ownerUid,'azioni'), {
+        const ref = await addDoc(collection(dbfs,'users',ownerUid,'azioni'), {
           tipo:'task', titolo:entry.titolo, azienda:entry.azienda, aziendaId:null, contatto:'', tipoInvio:null, tipoInvioNota:'',
           dataInvio: today(), dueDate:entry.dueDate, stato:'da_fare', esito:null, note:'',
           operatore:entry.operatore, origine:'ospite', gt: guestToken,
           createdAt: serverTimestamp(), updatedAt: serverTimestamp()
         });
         pending = pending.filter(e => e !== entry);
-        storico.unshift({ titolo:entry.titolo, azienda:entry.azienda, dueDate:entry.dueDate, ts:Date.now() });
+        storico.unshift({ id:ref.id, titolo:entry.titolo, azienda:entry.azienda, dueDate:entry.dueDate, ts:Date.now(), stato:'da_fare' });
         saveStorico();
         render();
         showToast('✅ Compito inviato!');
@@ -282,9 +288,38 @@
     window.addEventListener('pagehide', flushPending);
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushPending(); });
 
+    // ── Aggiorna lo stato dei compiti già inviati (es. "Completato" dal titolare) ──
+    let refreshInCorso = false;
+    async function refreshStati(){
+      if (refreshInCorso) return;
+      const daControllare = storico.filter(t => t.id && t.stato !== 'fatto');
+      if (!daControllare.length) return;
+      refreshInCorso = true;
+      let cambiato = false;
+      try {
+        await Promise.all(daControllare.map(async t => {
+          try {
+            const snap = await getDoc(doc(dbfs,'users',ownerUid,'azioni',t.id));
+            if (!snap.exists()) return; // compito rimosso dal titolare: lascio com'è
+            const st = snap.data()?.stato;
+            if (st && st !== t.stato) { t.stato = st; cambiato = true; }
+          } catch(e) { /* permesso/rete non disponibili: ignora silenziosamente */ }
+        }));
+      } finally {
+        refreshInCorso = false;
+      }
+      if (cambiato) { saveStorico(); render(); }
+    }
+
     $('btn-invia').addEventListener('click', enqueueTask);
     $('op-titolo').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); enqueueTask(); } });
     render();
+
+    if (ownerUid && guestToken) {
+      refreshStati();
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshStati(); });
+      setInterval(refreshStati, 60000); // controllo periodico mentre la pagina è aperta
+    }
   </script>
 </body>
 </html>
