@@ -90,6 +90,10 @@
           <select id="op-scad"><option value="oggi">Oggi</option><option value="domani">Domani</option><option value="settimana">Questa settimana (venerdì)</option><option value="data">Data…</option></select>
         </div>
         <div class="form-group hidden" id="op-data-group"><label>Data</label><input type="date" id="op-data" /></div>
+        <div class="form-group">
+          <label>La tua email <span class="subtle-text">(facoltativa, per ricevere conferma)</span></label>
+          <input type="email" id="op-email" placeholder="tu@esempio.it" autocomplete="email" inputmode="email" />
+        </div>
         <button class="btn btn-primary" id="btn-invia"><i class="ti ti-send"></i> Invia compito</button>
       </div>
     </div>
@@ -138,8 +142,9 @@
       $('sentCard').classList.add('hidden');
     }
 
-    // nome operatore ricordato sul dispositivo, così si scrive una volta sola
+    // nome operatore ed email ricordati sul dispositivo, così si scrivono una volta sola
     try { const memo = localStorage.getItem('punto_operatore'); if (memo) $('op-nome').value = memo; } catch(e){}
+    try { const memoMail = localStorage.getItem('punto_email'); if (memoMail) $('op-email').value = memoMail; } catch(e){}
 
     // ── suggerimenti azienda: Google Places con ripiego su OpenStreetMap ──
     const withTimeout=(p,ms)=>Promise.race([p, new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timeout rete')),ms))]);
@@ -211,7 +216,7 @@
         await addDoc(collection(dbfs,'users',ownerUid,'azioni'), {
           tipo:'task', titolo:entry.titolo, azienda:entry.azienda, aziendaId:null, contatto:'', tipoInvio:null, tipoInvioNota:'',
           dataInvio: today(), dueDate:entry.dueDate, stato:'da_fare', esito:null, note:'',
-          operatore:entry.operatore, origine:'ospite', gt: guestToken,
+          operatore:entry.operatore, origine:'ospite', gt: guestToken, emailOspite: entry.emailOspite || '',
           createdAt: serverTimestamp(), updatedAt: serverTimestamp()
         });
         pending = pending.filter(e => e !== entry);
@@ -241,9 +246,11 @@
       if (!operatore) return showToast('⚠️ Scrivi il nome operatore');
       if (!titolo) return showToast('⚠️ Scrivi cosa c’è da fare');
       const azienda = $('op-azienda').value.trim();
+      const emailOspite = $('op-email').value.trim();
       const dueDate = scadenza();
       try { localStorage.setItem('punto_operatore', operatore); } catch(e){}
-      pending.unshift({ id:'p'+(++seq), status:'pending', remaining:UNDO_SECONDS, titolo, azienda, dueDate, operatore });
+      try { localStorage.setItem('punto_email', emailOspite); } catch(e){}
+      pending.unshift({ id:'p'+(++seq), status:'pending', remaining:UNDO_SECONDS, titolo, azienda, dueDate, operatore, emailOspite });
       $('op-titolo').value = '';
       $('op-titolo').focus();
       render();
