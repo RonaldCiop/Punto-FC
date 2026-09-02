@@ -38,7 +38,7 @@ service cloud.firestore {
         && guestCfg(uid).token is string
         && guestCfg(uid).token.size() >= 16
         && d.gt == guestCfg(uid).token
-        && d.keys().hasOnly(['tipo','titolo','azienda','aziendaId','contatto','tipoInvio','tipoInvioNota','dataInvio','dueDate','stato','esito','note','operatore','origine','gt','emailOspite','createdAt','updatedAt'])
+        && d.keys().hasOnly(['tipo','titolo','azienda','aziendaId','contatto','tipoInvio','tipoInvioNota','dataInvio','dueDate','stato','esito','note','operatore','origine','gt','createdAt','updatedAt'])
         && d.tipo == 'task'
         && d.origine == 'ospite'
         && d.stato == 'da_fare'
@@ -48,7 +48,6 @@ service cloud.firestore {
         && d.operatore is string && d.operatore.size() > 0 && d.operatore.size() <= 80
         && d.azienda is string && d.azienda.size() <= 200
         && d.note is string && d.note.size() <= 500
-        && (!('emailOspite' in d) || (d.emailOspite is string && d.emailOspite.size() <= 120))
         && d.dueDate is string && d.dueDate.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}');
     }
 
